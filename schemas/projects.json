@@ -86,7 +86,7 @@
             "name": "teamProjects",
             "in": "query",
             "required": false,
-            "description": "If true, include team projects.",
+            "description": "When true, list team projects — projects shared with you, plus projects made public within your organization (this includes your own public projects). Your own private (unshared) projects are not team projects and are not returned when this flag is set; use the default listing (flag omitted) to retrieve them.",
             "schema": {
               "type": "boolean",
               "default": false
