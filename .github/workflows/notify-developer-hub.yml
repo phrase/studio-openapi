@@ -1,0 +1,31 @@
+name: Dispatch Developer Hub on PR merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - schemas/projects.json
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    # On PRs, only fire when the PR was actually merged (not just closed).
+    # workflow_dispatch runs have no pull_request context, so allow those too.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    steps:
+      - name: Send repository_dispatch to phrase/developer-hub
+        uses: peter-evans/repository-dispatch@0eae9e597ebc81bcc8c2220e34ddff4bc7c769b3
+        with:
+          token: ${{ secrets.DISPATCH_DEVELOPER_HUB_TOKEN }}
+          repository: phrase/developer-hub
+          event-type: trigger-studio-workflow
+          client-payload: >-
+            {
+              "source": "phrase/studio-openapi",
+              "type": "update",
+              "pr_author": "${{ github.event.pull_request.user.login }}",
+              "pr_url": "${{ github.event.pull_request.html_url }}",
+              "pr_merged_by": "${{ github.event.pull_request.merged_by.login }}"
+            }
