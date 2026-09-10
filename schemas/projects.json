@@ -4312,24 +4312,6 @@
         "type": "object",
         "description": "Partial update payload for project preferences and visibility. Only fields present in the body are applied; omitted fields are preserved.",
         "properties": {
-          "chatModelType": {
-            "type": "string",
-            "enum": [
-              "GPT",
-              "CUSTOM"
-            ],
-            "description": "AI model provider type for chat"
-          },
-          "chatModelName": {
-            "type": "string",
-            "enum": [
-              "gpt-5-mini",
-              "gpt-4o-mini",
-              "plai",
-              "aita"
-            ],
-            "description": "AI model identifier for chat"
-          },
           "insightsModelType": {
             "type": "string",
             "enum": [
