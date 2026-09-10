@@ -23,6 +23,8 @@ The Phrase Studio API allows you to:
 - `POST /v1/projects/{id}/start` - Start processing with uploaded files
 
 ### Recordings
+- `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` - Add a translation language to an existing recording
+- `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` - Add a dubbing language to an existing recording
 - `GET /v1/projects/{projectId}/recordings/{recordingId}/transcription-srt` - Get transcription SRT
 - `GET /v1/projects/{projectId}/recordings/{recordingId}/translations-srt` - Get all translation SRTs
 - `GET /v1/projects/{projectId}/recordings/{recordingId}/translations-srt/{languageCode}` - Get specific translation SRT
