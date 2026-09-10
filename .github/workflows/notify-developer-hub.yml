@@ -15,11 +15,11 @@ jobs:
     # workflow_dispatch runs have no pull_request context, so allow those too.
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     steps:
-      - name: Send repository_dispatch to phrase/developer-hub
+      - name: Send repository_dispatch to Phrase-Engineering/developer-hub
         uses: peter-evans/repository-dispatch@0eae9e597ebc81bcc8c2220e34ddff4bc7c769b3
         with:
           token: ${{ secrets.DISPATCH_DEVELOPER_HUB_TOKEN }}
-          repository: phrase/developer-hub
+          repository: Phrase-Engineering/developer-hub
           event-type: trigger-studio-workflow
           client-payload: >-
             {
