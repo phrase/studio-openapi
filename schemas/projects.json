@@ -354,7 +354,7 @@
           "Projects"
         ],
         "summary": "Create Project",
-        "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Direct file uploads are more robust and recommended over providing fileUrls.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.",
+        "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Direct file uploads are more robust and recommended over providing fileUrls.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.",
         "operationId": "createProject",
         "security": [
           {
@@ -382,133 +382,82 @@
                 "properties": {
                   "sourceLanguage": {
                     "type": "string",
-                    "description": "Source language code",
+                    "description": "Source language code — the language actually spoken in the recording. Always specify one explicitly.",
                     "enum": [
-                      "auto",
-                      "en",
-                      "en-us",
-                      "en-gb",
-                      "en-in",
-                      "en-au",
-                      "en-ca",
-                      "en-za",
-                      "zh",
-                      "zh-cn",
-                      "zh-tw",
-                      "zh-hk",
-                      "de",
-                      "es",
-                      "es-es",
-                      "es-mx",
-                      "es-419",
-                      "es-ar",
-                      "ru",
-                      "ko",
-                      "fr",
-                      "fr-ca",
-                      "ja",
-                      "pt",
-                      "pt-br",
-                      "tr",
-                      "pl",
-                      "ca",
-                      "nl",
-                      "ar",
-                      "ar-sa",
-                      "ar-ae",
-                      "sv",
-                      "it",
-                      "id",
-                      "hi",
-                      "fi",
-                      "vi",
-                      "he",
-                      "uk",
-                      "el",
-                      "ms",
-                      "cs",
-                      "ro",
-                      "da",
-                      "hu",
-                      "ta",
-                      "no",
-                      "th",
-                      "ur",
-                      "hr",
-                      "bg",
-                      "lt",
-                      "la",
-                      "mi",
-                      "ml",
-                      "cy",
-                      "sk",
-                      "te",
-                      "fa",
-                      "lv",
-                      "bn",
-                      "sr",
-                      "az",
-                      "sl",
-                      "kn",
-                      "et",
-                      "mk",
-                      "br",
-                      "eu",
-                      "is",
-                      "hy",
-                      "ne",
-                      "mn",
-                      "bs",
-                      "kk",
-                      "sq",
-                      "sw",
-                      "gl",
-                      "mr",
-                      "pa",
-                      "si",
-                      "km",
-                      "sn",
-                      "yo",
-                      "so",
-                      "af",
-                      "oc",
-                      "ka",
-                      "be",
-                      "tg",
-                      "sd",
-                      "gu",
                       "am",
-                      "yi",
-                      "lo",
-                      "uz",
-                      "fo",
-                      "ht",
-                      "ps",
-                      "tk",
-                      "nn",
-                      "mt",
-                      "sa",
-                      "lb",
-                      "my",
-                      "bo",
-                      "tl",
-                      "mg",
+                      "ar",
                       "as",
-                      "tt",
-                      "haw",
-                      "ln",
-                      "ha",
+                      "az",
                       "ba",
+                      "bg",
+                      "br",
+                      "ca",
+                      "cs",
+                      "cy",
+                      "da",
+                      "de",
+                      "el",
+                      "en",
+                      "es",
+                      "et",
+                      "eu",
+                      "fa",
+                      "fi",
+                      "fo",
+                      "fr",
+                      "gu",
+                      "ha",
+                      "he",
+                      "hi",
+                      "hu",
+                      "hy",
+                      "id",
+                      "is",
+                      "it",
+                      "ja",
                       "jw",
+                      "ka",
+                      "kk",
+                      "km",
+                      "kn",
+                      "ko",
+                      "la",
+                      "lb",
+                      "lv",
+                      "ml",
+                      "mn",
+                      "mr",
+                      "mt",
+                      "ne",
+                      "nl",
+                      "nn",
+                      "no",
+                      "pa",
+                      "pl",
+                      "ps",
+                      "pt",
+                      "ro",
+                      "ru",
+                      "si",
+                      "sk",
+                      "sl",
+                      "sq",
+                      "sr",
                       "su",
+                      "sv",
+                      "sw",
+                      "ta",
+                      "te",
+                      "th",
+                      "tl",
+                      "tr",
+                      "tt",
+                      "uk",
+                      "ur",
+                      "uz",
+                      "vi",
                       "yue",
-                      "fil",
-                      "ga",
-                      "zu",
-                      "ig",
-                      "ceb",
-                      "ny",
-                      "ky"
+                      "zh"
                     ]
                   },
                   "subtitleProfiles": {
@@ -516,222 +465,6 @@
                     "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/CreateProjectSubtitleProfile"
-                    }
-                  },
-                  "translationLanguages": {
-                    "description": "Target languages for translation. Provide as JSON array or JSON string.",
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "en",
-                        "en-us",
-                        "en-gb",
-                        "en-in",
-                        "en-au",
-                        "en-ca",
-                        "en-za",
-                        "zh",
-                        "zh-cn",
-                        "zh-tw",
-                        "zh-hk",
-                        "de",
-                        "es",
-                        "es-es",
-                        "es-mx",
-                        "es-419",
-                        "es-ar",
-                        "ru",
-                        "ko",
-                        "fr",
-                        "fr-ca",
-                        "ja",
-                        "pt",
-                        "pt-br",
-                        "tr",
-                        "pl",
-                        "ca",
-                        "nl",
-                        "ar",
-                        "ar-sa",
-                        "ar-ae",
-                        "sv",
-                        "it",
-                        "id",
-                        "hi",
-                        "fi",
-                        "vi",
-                        "he",
-                        "uk",
-                        "el",
-                        "ms",
-                        "cs",
-                        "ro",
-                        "da",
-                        "hu",
-                        "ta",
-                        "no",
-                        "th",
-                        "ur",
-                        "hr",
-                        "bg",
-                        "lt",
-                        "la",
-                        "mi",
-                        "ml",
-                        "cy",
-                        "sk",
-                        "te",
-                        "fa",
-                        "lv",
-                        "bn",
-                        "sr",
-                        "az",
-                        "sl",
-                        "kn",
-                        "et",
-                        "mk",
-                        "br",
-                        "eu",
-                        "is",
-                        "hy",
-                        "ne",
-                        "mn",
-                        "bs",
-                        "kk",
-                        "sq",
-                        "sw",
-                        "gl",
-                        "mr",
-                        "pa",
-                        "si",
-                        "km",
-                        "sn",
-                        "yo",
-                        "so",
-                        "af",
-                        "oc",
-                        "ka",
-                        "be",
-                        "tg",
-                        "sd",
-                        "gu",
-                        "am",
-                        "yi",
-                        "lo",
-                        "uz",
-                        "fo",
-                        "ht",
-                        "ps",
-                        "tk",
-                        "nn",
-                        "mt",
-                        "sa",
-                        "lb",
-                        "my",
-                        "bo",
-                        "tl",
-                        "mg",
-                        "as",
-                        "tt",
-                        "haw",
-                        "ln",
-                        "ha",
-                        "ba",
-                        "jw",
-                        "su",
-                        "yue",
-                        "fil",
-                        "ga",
-                        "zu",
-                        "ig",
-                        "ceb",
-                        "ny",
-                        "ky"
-                      ]
-                    }
-                  },
-                  "dubbingLanguages": {
-                    "description": "Target languages for dubbing. Provide as JSON array or JSON string.",
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "af",
-                        "ar",
-                        "hy",
-                        "as",
-                        "az",
-                        "be",
-                        "bn",
-                        "bs",
-                        "bg",
-                        "ca",
-                        "ceb",
-                        "ny",
-                        "zh",
-                        "hr",
-                        "cs",
-                        "da",
-                        "nl",
-                        "en",
-                        "et",
-                        "fil",
-                        "fi",
-                        "fr",
-                        "gl",
-                        "ka",
-                        "de",
-                        "el",
-                        "gu",
-                        "ha",
-                        "he",
-                        "hi",
-                        "hu",
-                        "is",
-                        "id",
-                        "ga",
-                        "it",
-                        "ja",
-                        "jw",
-                        "kn",
-                        "kk",
-                        "ky",
-                        "ko",
-                        "lv",
-                        "ln",
-                        "lt",
-                        "lb",
-                        "mk",
-                        "ms",
-                        "ml",
-                        "mr",
-                        "ne",
-                        "no",
-                        "ps",
-                        "fa",
-                        "pl",
-                        "pt",
-                        "pa",
-                        "ro",
-                        "ru",
-                        "sr",
-                        "sd",
-                        "sk",
-                        "sl",
-                        "so",
-                        "es",
-                        "sw",
-                        "sv",
-                        "ta",
-                        "te",
-                        "th",
-                        "tr",
-                        "uk",
-                        "ur",
-                        "vi",
-                        "cy"
-                      ]
                     }
                   },
                   "summary": {
@@ -820,13 +553,6 @@
                         "languageCode": "en"
                       }
                     ],
-                    "translationLanguages": [
-                      "tr",
-                      "es"
-                    ],
-                    "dubbingLanguages": [
-                      "tr"
-                    ],
                     "summary": false,
                     "customAttributes": true,
                     "insights": [
@@ -858,13 +584,6 @@
                         "subtitleProfileId": "00000000-0000-0000-0000-000000000001",
                         "languageCode": "en"
                       }
-                    ],
-                    "translationLanguages": [
-                      "tr",
-                      "es"
-                    ],
-                    "dubbingLanguages": [
-                      "tr"
                     ],
                     "summary": false,
                     "customAttributes": true,
@@ -4026,6 +3745,349 @@
           }
         }
       }
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/translate": {
+      "post": {
+        "tags": [
+          "Recordings"
+        ],
+        "summary": "Translate Recording",
+        "description": "Add one or more target translation languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists — for example the caller forgot a language at creation time, the user asks for another language later, or the caller only learns which language is needed after seeing the transcript.\n\n## Precondition: source transcription must be complete\n\nTranslation reads the recording's transcript, so it can only run after transcription has finished. This is **not enforced synchronously** by this endpoint — a call made too early is accepted and queued, but produces no usable result. Before calling this endpoint, check `GET /v1/recordings/{recordingId}/status?language={sourceLanguage}` and confirm `transcription` is `true` (or poll `GET /v1/recordings/{recordingId}/status?summary=true` until `status` is `COMPLETED`).\n\n## Re-requesting a language\n\nA language already in the recording's translation languages is not skipped — it is retranslated (logged as a retranslation rather than an initial translation). Only include a language in `languages` if you actually want it (re-)translated; use `ignoredLanguages` to record a language as intentionally not translated without omitting it from tracking.\n\n## Language support\n\n`languages` accepts any BCP-47-style code Phrase Studio has translation support for — effectively all locales except the literal `auto` placeholder. Do not pass the recording's own source language: the Studio UI excludes it from the language picker, but this endpoint does **not** reject it — it is accepted and produces a same-language \"translation\". An unsupported code is rejected with `400`.\n\n## After translation completes\n\nCall `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to dub any of the resulting languages — dubbing requires the language to be translated first.",
+        "operationId": "translateRecording",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "description": "Project ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "recordingId",
+            "in": "path",
+            "required": true,
+            "description": "Recording ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslateRecordingRequest"
+              },
+              "examples": {
+                "add_translation_language": {
+                  "summary": "Add Czech as a translation target language",
+                  "value": {
+                    "languages": [
+                      "cs"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Translation started for the requested languages"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "bad_request": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "Bad Request",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Unauthorized",
+                    "value": {
+                      "success": false,
+                      "statusCode": 401,
+                      "message": "Unauthorized",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "Forbidden",
+                    "value": {
+                      "success": false,
+                      "statusCode": 403,
+                      "message": "Access denied",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not Found",
+                    "value": {
+                      "success": false,
+                      "statusCode": 404,
+                      "message": "Project or recording not found",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "internal_server_error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "success": false,
+                      "statusCode": 500,
+                      "message": "Internal server error",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/dubbing": {
+      "post": {
+        "tags": [
+          "Recordings"
+        ],
+        "summary": "Dub Recording",
+        "description": "Add one or more target dubbing languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists.\n\n## Precondition: the language must already be translated\n\nDubbing is generated from that language's translated subtitles, so a language can only be dubbed after it has been translated (see `POST /v1/projects/{projectId}/recordings/{recordingId}/translate`). This is **not enforced with a clear error** — requesting dubbing for a language with no completed translation is accepted, the language is recorded against the recording, but no dubbing output is produced. Before calling this endpoint, check `GET /v1/recordings/{recordingId}/status?language={code}` and confirm `translation` is `true` for every language you pass.\n\n## Language support depends on the project's TTS provider\n\nEach Studio project uses one text-to-speech provider, configured in project preferences (falls back to the account default). The set of dubbable languages is different for each provider — always check which provider the project uses before picking languages. Requesting a language unsupported by the project's current provider fails fast with `400` and a message naming the unsupported languages and the provider (see `language_not_supported_by_provider` below) — no dubbing subtitle file or task is created for it.\n\n- **ElevenLabs v2** — 30 languages, base language only (no distinct regional voices; a region-specific code like `en-GB` is accepted only by falling back to its base `en`): `ar, bg, cs, da, de, el, en, es, fi, fil, fr, hi, hr, id, it, ja, ko, ms, nl, pl, pt, ro, ru, sk, sv, ta, tl, tr, uk, zh`\n- **ElevenLabs v3** — 77 languages, base language only (same fallback caveat as v2): `af, ar, as, az, be, bg, bn, bs, ca, ceb, cs, cy, da, de, el, en, es, et, fa, fi, fil, fr, ga, gl, gu, ha, he, hi, hr, hu, hy, id, is, it, ja, jw, ka, kk, kn, ko, ky, lb, ln, lt, lv, mk, ml, mr, ms, ne, nl, nn, no, ny, pa, pl, prs, ps, pt, ro, ru, sd, sk, sl, so, sr, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh`\n- **Azure TTS** — the only provider with real, distinct regional voices: 155 specific locales (not fallback-inherited) covering 85 languages: `af-ZA, am-ET, ar-AE, ar-BH, ar-DZ, ar-EG, ar-IQ, ar-JO, ar-KW, ar-LB, ar-LY, ar-MA, ar-OM, ar-QA, ar-SA, ar-SY, ar-TN, ar-YE, as-IN, az-AZ, bg-BG, bn-BD, bn-IN, bs-BA, ca-ES, cs-CZ, cy-GB, da-DK, de-AT, de-CH, de-DE, el-GR, en-AU, en-CA, en-GB, en-HK, en-IE, en-IN, en-KE, en-NG, en-NZ, en-PH, en-SG, en-TZ, en-US, en-ZA, es-AR, es-BO, es-CL, es-CO, es-CR, es-CU, es-DO, es-EC, es-ES, es-GQ, es-GT, es-HN, es-MX, es-NI, es-PA, es-PE, es-PR, es-PY, es-SV, es-US, es-UY, es-VE, et-EE, eu-ES, fa-IR, fi-FI, fil-PH, fr-BE, fr-CA, fr-CH, fr-FR, ga-IE, gl-ES, gu-IN, he-IL, hi-IN, hr-HR, hu-HU, hy-AM, id-ID, is-IS, it-CH, it-IT, iu-Cans-CA, iu-Latn-CA, ja-JP, jv-ID, ka-GE, kk-KZ, km-KH, kn-IN, ko-KR, lo-LA, lt-LT, lv-LV, mk-MK, ml-IN, mn-MN, mr-IN, ms-MY, mt-MT, my-MM, nb-NO, ne-NP, nl-BE, nl-NL, or-IN, pa-IN, pl-PL, ps-AF, pt-BR, pt-PT, ro-RO, ru-RU, si-LK, sk-SK, sl-SI, so-SO, sq-AL, sr-Latn-RS, sr-RS, su-ID, sv-SE, sw-KE, sw-TZ, ta-IN, ta-LK, ta-MY, ta-SG, te-IN, th-TH, tr-TR, uk-UA, ur-IN, ur-PK, uz-UZ, vi-VN, wuu-CN, yue-CN, zh-CN, zh-CN-guangxi, zh-CN-henan, zh-CN-liaoning, zh-CN-shaanxi, zh-CN-shandong, zh-CN-sichuan, zh-HK, zh-TW, zu-ZA`. A base code without a region (e.g. plain `zh`) is resolved to one of that language's locales above; pass the specific regional code when you need a particular one (e.g. `zh-TW` rather than `zh-CN`).\n\n## Re-requesting a language\n\nA language already in the recording's dubbing languages is not skipped — it is re-dubbed. `ignoredLanguages` is accepted on this request for shape-parity with the translate endpoint but has no effect on dubbing; every language listed in `languages` is processed.",
+        "operationId": "dubRecording",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "description": "Project ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "recordingId",
+            "in": "path",
+            "required": true,
+            "description": "Recording ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDubbingRequest"
+              },
+              "examples": {
+                "add_dubbing_language": {
+                  "summary": "Add Czech as a dubbing target language",
+                  "value": {
+                    "languages": [
+                      "cs"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dubbing started for the requested languages"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "bad_request": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "Bad Request",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  },
+                  "language_not_supported_by_provider": {
+                    "summary": "Language not supported by the project's TTS provider",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "Dubbing is not supported for cs with ElevenLabs v2",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Unauthorized",
+                    "value": {
+                      "success": false,
+                      "statusCode": 401,
+                      "message": "Unauthorized",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "forbidden": {
+                    "summary": "Forbidden",
+                    "value": {
+                      "success": false,
+                      "statusCode": 403,
+                      "message": "Access denied",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not Found",
+                    "value": {
+                      "success": false,
+                      "statusCode": 404,
+                      "message": "Project or recording not found",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "internal_server_error": {
+                    "summary": "Internal server error",
+                    "value": {
+                      "success": false,
+                      "statusCode": 500,
+                      "message": "Internal server error",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4081,131 +4143,80 @@
             "type": "string",
             "description": "Language for this profile",
             "enum": [
-              "auto",
-              "en",
-              "en-us",
-              "en-gb",
-              "en-in",
-              "en-au",
-              "en-ca",
-              "en-za",
-              "zh",
-              "zh-cn",
-              "zh-tw",
-              "zh-hk",
-              "de",
-              "es",
-              "es-es",
-              "es-mx",
-              "es-419",
-              "es-ar",
-              "ru",
-              "ko",
-              "fr",
-              "fr-ca",
-              "ja",
-              "pt",
-              "pt-br",
-              "tr",
-              "pl",
-              "ca",
-              "nl",
-              "ar",
-              "ar-sa",
-              "ar-ae",
-              "sv",
-              "it",
-              "id",
-              "hi",
-              "fi",
-              "vi",
-              "he",
-              "uk",
-              "el",
-              "ms",
-              "cs",
-              "ro",
-              "da",
-              "hu",
-              "ta",
-              "no",
-              "th",
-              "ur",
-              "hr",
-              "bg",
-              "lt",
-              "la",
-              "mi",
-              "ml",
-              "cy",
-              "sk",
-              "te",
-              "fa",
-              "lv",
-              "bn",
-              "sr",
-              "az",
-              "sl",
-              "kn",
-              "et",
-              "mk",
-              "br",
-              "eu",
-              "is",
-              "hy",
-              "ne",
-              "mn",
-              "bs",
-              "kk",
-              "sq",
-              "sw",
-              "gl",
-              "mr",
-              "pa",
-              "si",
-              "km",
-              "sn",
-              "yo",
-              "so",
-              "af",
-              "oc",
-              "ka",
-              "be",
-              "tg",
-              "sd",
-              "gu",
               "am",
-              "yi",
-              "lo",
-              "uz",
-              "fo",
-              "ht",
-              "ps",
-              "tk",
-              "nn",
-              "mt",
-              "sa",
-              "lb",
-              "my",
-              "bo",
-              "tl",
-              "mg",
+              "ar",
               "as",
-              "tt",
-              "haw",
-              "ln",
-              "ha",
+              "az",
               "ba",
+              "bg",
+              "br",
+              "ca",
+              "cs",
+              "cy",
+              "da",
+              "de",
+              "el",
+              "en",
+              "es",
+              "et",
+              "eu",
+              "fa",
+              "fi",
+              "fo",
+              "fr",
+              "gu",
+              "ha",
+              "he",
+              "hi",
+              "hu",
+              "hy",
+              "id",
+              "is",
+              "it",
+              "ja",
               "jw",
+              "ka",
+              "kk",
+              "km",
+              "kn",
+              "ko",
+              "la",
+              "lb",
+              "lv",
+              "ml",
+              "mn",
+              "mr",
+              "mt",
+              "ne",
+              "nl",
+              "nn",
+              "no",
+              "pa",
+              "pl",
+              "ps",
+              "pt",
+              "ro",
+              "ru",
+              "si",
+              "sk",
+              "sl",
+              "sq",
+              "sr",
               "su",
+              "sv",
+              "sw",
+              "ta",
+              "te",
+              "th",
+              "tl",
+              "tr",
+              "tt",
+              "uk",
+              "ur",
+              "uz",
+              "vi",
               "yue",
-              "fil",
-              "ga",
-              "zu",
-              "ig",
-              "ceb",
-              "ny",
-              "ky"
+              "zh"
             ]
           }
         },
@@ -4521,6 +4532,86 @@
             "items": {
               "$ref": "#/components/schemas/SubtitleSegment"
             }
+          }
+        }
+      },
+      "TranslateRecordingRequest": {
+        "type": "object",
+        "required": [
+          "languages"
+        ],
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language — the Studio UI excludes it from the picker, but this field does not reject it."
+          },
+          "ignoredLanguages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Subset of `languages` to record as intentionally not translated (tracked on the recording so it shows as deliberately skipped, not pending or failed) instead of actually running translation for it"
+          },
+          "tmsProjectTemplateUid": {
+            "type": "string",
+            "description": "TMS project template to use if translation is routed through a connected TMS"
+          },
+          "subtitleProfiles": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Subtitle profile id per language code. List available ids with GET /v1/subtitle-profiles."
+          },
+          "styleGuides": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Style guide id per language code. Style guides belong to a separate Phrase system (Frame), not Phrase Studio itself — no external Studio API lists them."
+          },
+          "termBases": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Term base ids per language code. Term bases belong to a connected TMS, not Phrase Studio itself — no external Studio API lists them."
+          }
+        }
+      },
+      "AddDubbingRequest": {
+        "type": "object",
+        "required": [
+          "languages"
+        ],
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate) — this is not checked, so an untranslated language is silently accepted but produces no dubbing output. Each language must also be supported by the project's configured TTS provider, which IS checked — an unsupported language fails the whole request with 400."
+          },
+          "ignoredLanguages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Accepted for shape-parity with TranslateRecordingRequest; has no effect on dubbing"
+          },
+          "pronunciations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Pronunciation ruleset id per language code"
           }
         }
       },
