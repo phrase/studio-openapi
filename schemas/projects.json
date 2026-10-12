@@ -4364,6 +4364,8 @@
             "enum": [
               "eleven_v2",
               "eleven_v3",
+              "eleven_v4",
+              "eleven_v4_turbo",
               "azure_tts"
             ],
             "description": "Text-to-speech provider for dubbing"
