@@ -4499,14 +4499,16 @@
           },
           "bgVolume": {
             "type": "number",
-            "description": "Dubbing background-audio volume (only honored for dubbing tracks)"
+            "minimum": 0,
+            "maximum": 2,
+            "description": "Dubbing background-audio volume, 0 (mute) to 2 (double); only honored for dubbing tracks"
           },
           "speakerVolumes": {
             "type": "object",
             "additionalProperties": {
               "type": "number"
             },
-            "description": "Per-speaker volume overrides (dubbing only)"
+            "description": "Per-speaker volume overrides (dubbing only); values above 2 are treated as 2"
           },
           "speakerVoiceSettings": {
             "type": "object",
@@ -4614,6 +4616,10 @@
               "type": "string"
             },
             "description": "Pronunciation ruleset id per language code"
+          },
+          "expandToContent": {
+            "type": "boolean",
+            "description": "Audio-only recordings only. When true the voice is not sped up to fit the original timing; each segment grows to the natural length of its speech instead, so the dubbed audio can end up longer than the source. The choice is stored per language and also applies to later single-segment re-dubs. Omit to keep the stored choice (new dubbings default to false). A video recording with true fails with 400."
           }
         }
       },
@@ -4678,7 +4684,9 @@
             }
           },
           "bgVolume": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
           },
           "speakerVolumes": {
             "type": "object",
