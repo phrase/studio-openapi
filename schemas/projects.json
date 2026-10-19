@@ -968,6 +968,13 @@
                       "zh-tw"
                     ]
                   },
+                  "expectedLanguages": {
+                    "description": "Additional languages that may be spoken in the recording besides sourceLanguage (for recordings that switch between languages). Provide as a JSON array string in multipart. sourceLanguage and duplicates are ignored.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
                   "subtitleProfiles": {
                     "description": "Array of subtitle profile selections. In multipart, provide this as a JSON array string.",
                     "type": "array",
@@ -1498,6 +1505,13 @@
                             "type": "string",
                             "description": "Source language code"
                           },
+                          "expectedLanguages": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Additional languages that may be spoken in the recording besides the source language"
+                          },
                           "translationLanguages": {
                             "type": "array",
                             "items": {
@@ -1738,6 +1752,7 @@
                           "type": "application/octet-stream",
                           "extension": "wav",
                           "sourceLanguage": "en",
+                          "expectedLanguages": [],
                           "translationLanguages": [],
                           "dubbingLanguages": [],
                           "summaryEnabled": false,
@@ -1786,6 +1801,7 @@
                           "type": "audio/wav",
                           "extension": "wav",
                           "sourceLanguage": "en",
+                          "expectedLanguages": [],
                           "translationLanguages": [
                             "tr"
                           ],
