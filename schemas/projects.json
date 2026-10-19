@@ -157,6 +157,13 @@
                             "type": "string",
                             "description": "Source language code"
                           },
+                          "expectedLanguages": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Union of the additional languages declared on the project's recordings"
+                          },
                           "subtitleProfileId": {
                             "type": "string",
                             "format": "uuid",
@@ -1406,6 +1413,13 @@
                     "sourceLanguage": {
                       "type": "string",
                       "description": "Source language code"
+                    },
+                    "expectedLanguages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Union of the additional languages declared on the project's recordings"
                     },
                     "subtitleProfileId": {
                       "type": "string",
