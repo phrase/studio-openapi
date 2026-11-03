@@ -3830,7 +3830,7 @@
           "Subtitles"
         ],
         "summary": "Update Subtitle",
-        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
         "operationId": "updateSubtitles",
         "security": [
           {
@@ -4089,7 +4089,7 @@
           "Subtitles"
         ],
         "summary": "Get Subtitle",
-        "description": "Retrieve the structured subtitle segments of a recording's language track in JSON form (with word-level timings). The response shape mirrors the PUT request body — use this before `PUT` to fetch the current segments, edit the `words` array of the segment(s) you want to change (word-level text and timings are the source of truth; editing `text` alone has no effect), and send the full array back. The `source` and `dubbing` query flags pick which track to read: source transcription, target translation, or dubbing.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+        "description": "Retrieve the structured subtitle segments of a recording's language track in JSON form (with word-level timings). The response shape mirrors the PUT request body — use this before `PUT` to fetch the current segments, edit the `words` array of the segment(s) you want to change (word-level text and timings are the source of truth; editing `text` alone has no effect), and send the full array back. The `source` and `dubbing` query flags pick which track to read: source transcription, target translation, or dubbing.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
         "operationId": "getSubtitles",
         "security": [
           {
@@ -5493,7 +5493,7 @@
           },
           "words": {
             "type": "array",
-            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`.",
+            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports.",
             "items": {
               "$ref": "#/components/schemas/SubtitleWord"
             }
@@ -5511,14 +5511,28 @@
             "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability)."
           },
           "metadata": {
-            "type": "object",
-            "description": "Optional editorial metadata (review state, tags, etc.)",
-            "additionalProperties": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SegmentMetadata"
+              }
+            ],
+            "description": "Review state and per-segment dubbing settings"
           },
           "cue_settings": {
-            "type": "object",
-            "description": "Optional VTT cue rendering settings",
-            "additionalProperties": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CueSettings"
+              }
+            ],
+            "description": "Optional position of this segment's subtitle on the video. Omit it to use the position of the subtitle profile; a segment sent without `cue_settings` loses the position it had."
+          },
+          "comments": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/SegmentComment"
+            },
+            "description": "Reviewer comments of the segment (at most 200). **Omit the field to keep the comments stored in Studio** for this segment. Send an array to replace them: a comment that is not in the array is deleted, and an empty array deletes all of them. To add a comment, send the current ones plus the new one; to resolve one, send it with `resolved: true`. Comments belong to subtitle tracks (source and translation), not to dubbing tracks."
           }
         }
       },
@@ -5581,6 +5595,23 @@
             "description": "Full segment list for the target language track. The endpoint performs a bulk replace, so the array must contain every segment in the final state, not just the edited ones. Every segment must include a non-empty `words` array; omitting a segment deletes it, and an empty `words` array drops the segment on the next read.",
             "items": {
               "$ref": "#/components/schemas/SubtitleSegment"
+            }
+          },
+          "editedBy": {
+            "type": "object",
+            "description": "Who saves this version. Shown as the author in Studio's Version History; a version saved without it is listed as Unknown. Stored as sent and not verified.",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              }
             }
           }
         }
@@ -5698,7 +5729,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SubtitleWord"
-            }
+            },
+            "description": "Word-level text and timings. A word can carry `<b>`, `<i>` and `<u>` styling tags (for example `<i>really</i>`)."
           },
           "language": {
             "type": "string"
@@ -5707,12 +5739,28 @@
             "type": "string"
           },
           "metadata": {
-            "type": "object",
-            "additionalProperties": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SegmentMetadata"
+              }
+            ],
+            "description": "Review state and per-segment dubbing settings"
           },
           "cue_settings": {
-            "type": "object",
-            "additionalProperties": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CueSettings"
+              }
+            ],
+            "description": "Position of this segment's subtitle on the video. Absent when the subtitle profile position is used."
+          },
+          "comments": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/SegmentComment"
+            },
+            "description": "Reviewer comments of the segment. Absent when the segment has none."
           }
         }
       },
@@ -5752,6 +5800,192 @@
             "items": {
               "$ref": "#/components/schemas/SubtitleSegmentResponseItem"
             }
+          }
+        }
+      },
+      "CueSettings": {
+        "type": "object",
+        "description": "Where a segment's subtitle is placed on the video, in WebVTT cue-setting notation. Every field is optional; a segment without `cue_settings` uses the position of the subtitle profile. Examples: top left `{\"align\":\"left\",\"line\":\"8%\",\"position\":\"5%\"}`, bottom center `{\"line\":\"85%\"}`. Studio's burn-in and the editor preview place the top of the subtitle box at `line` and the edge picked by `align` at `position`; vertical subtitle profiles ignore the position.",
+        "additionalProperties": false,
+        "properties": {
+          "align": {
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "left",
+              "right"
+            ],
+            "description": "Horizontal text alignment"
+          },
+          "line": {
+            "type": "string",
+            "pattern": "^-?\\d{1,10}(\\.\\d{1,6})?%?$",
+            "description": "Vertical position: a percentage of the video height (`\"8%\"`, `\"85%\"`) or a WebVTT line number (`\"0\"`, `\"-1\"`)"
+          },
+          "position": {
+            "type": "string",
+            "pattern": "^\\d{1,10}(\\.\\d{1,6})?%$",
+            "description": "Horizontal position as a percentage of the video width (`\"5%\"`, `\"95%\"`)"
+          },
+          "size": {
+            "type": "string",
+            "pattern": "^\\d{1,10}(\\.\\d{1,6})?%$",
+            "description": "Width of the subtitle box as a percentage of the video width"
+          },
+          "vertical": {
+            "type": "string",
+            "enum": [
+              "rl",
+              "lr"
+            ],
+            "description": "Vertical writing direction"
+          },
+          "region": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "WebVTT region identifier"
+          }
+        }
+      },
+      "SegmentComment": {
+        "type": "object",
+        "description": "A reviewer comment on a segment, as written in the Studio editor.",
+        "required": [
+          "id",
+          "authorId",
+          "authorName",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Comment identifier, unique within the segment. Use a new UUID for a comment you create."
+          },
+          "authorId": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Identifier of the author. Stored as sent and not verified."
+          },
+          "authorName": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Display name of the author. Stored as sent and not verified."
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Comment text"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 creation time"
+          },
+          "resolved": {
+            "type": "boolean",
+            "description": "True once the comment is resolved; omit for an open comment"
+          }
+        }
+      },
+      "SegmentReview": {
+        "type": "object",
+        "description": "Review state of a segment, as set in the Studio editor. Stored as sent; the reviewer is not verified.",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "REVIEWED"
+            ],
+            "description": "`REVIEWED` once a reviewer approved the segment. Editing a segment's text in Studio sets it back to `PENDING`."
+          },
+          "reviewedBy": {
+            "type": "object",
+            "description": "The reviewer",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the segment was reviewed"
+          }
+        }
+      },
+      "SegmentDubbingMetadata": {
+        "type": "object",
+        "description": "Per-segment dubbing settings. Only used on dubbing tracks.",
+        "additionalProperties": false,
+        "properties": {
+          "volume": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "description": "Gain of this segment's dubbing audio, from 0 (mute) to 2 (double)"
+          },
+          "stability": {
+            "type": "number",
+            "description": "Voice stability for this segment (provider specific)"
+          },
+          "similarity": {
+            "type": "number",
+            "description": "Voice similarity for this segment (provider specific)"
+          },
+          "needsRedub": {
+            "type": "boolean",
+            "description": "True when the text changed after the audio of this segment was generated"
+          },
+          "ttsDuration": {
+            "type": "number",
+            "readOnly": true,
+            "description": "Duration of the generated audio in seconds. Returned by `GET`; accepted and ignored on `PUT`, so a `GET` response can be sent back unchanged."
+          },
+          "originalTtsDuration": {
+            "type": "number",
+            "readOnly": true,
+            "description": "Duration of the audio before it was fitted to the segment, in seconds. Returned by `GET`; ignored on `PUT`."
+          },
+          "estimatedTtsDuration": {
+            "type": "number",
+            "readOnly": true,
+            "description": "Estimated audio duration before synthesis, in seconds. Returned by `GET`; ignored on `PUT`."
+          },
+          "ttsEstimationError": {
+            "type": "number",
+            "readOnly": true,
+            "nullable": true,
+            "description": "Difference between the estimate and the generated audio. Returned by `GET`; ignored on `PUT`."
+          }
+        }
+      },
+      "SegmentMetadata": {
+        "type": "object",
+        "description": "Editorial metadata of a segment.",
+        "additionalProperties": false,
+        "properties": {
+          "review": {
+            "$ref": "#/components/schemas/SegmentReview"
+          },
+          "dubbing": {
+            "$ref": "#/components/schemas/SegmentDubbingMetadata"
           }
         }
       }
