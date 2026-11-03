@@ -3830,7 +3830,7 @@
           "Subtitles"
         ],
         "summary": "Update Subtitle",
-        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
         "operationId": "updateSubtitles",
         "security": [
           {
@@ -5596,23 +5596,6 @@
             "items": {
               "$ref": "#/components/schemas/SubtitleSegment"
             }
-          },
-          "editedBy": {
-            "type": "object",
-            "description": "Who saves this version. Shown as the author in Studio's Version History; a version saved without it is listed as Unknown. Stored as sent and not verified.",
-            "required": [
-              "id",
-              "name"
-            ],
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid"
-              },
-              "name": {
-                "type": "string"
-              }
-            }
           }
         }
       },
@@ -5805,7 +5788,7 @@
       },
       "CueSettings": {
         "type": "object",
-        "description": "Where a segment's subtitle is placed on the video, in WebVTT cue-setting notation. Every field is optional; a segment without `cue_settings` uses the position of the subtitle profile. Examples: top left `{\"align\":\"left\",\"line\":\"8%\",\"position\":\"5%\"}`, bottom center `{\"line\":\"85%\"}`. Studio's burn-in and the editor preview place the top of the subtitle box at `line` and the edge picked by `align` at `position`; vertical subtitle profiles ignore the position.",
+        "description": "Where a segment's subtitle is placed on the video, in WebVTT cue-setting notation. Every field is optional; a segment without `cue_settings` uses the position of the subtitle profile. Examples: top left `{\"align\":\"left\",\"line\":\"8%\",\"position\":\"5%\"}`, bottom center `{\"line\":\"85%\"}`. Studio's burn-in and the editor preview place the top of the subtitle box at `line` and the edge picked by `align` at `position`; vertical subtitle profiles ignore the position. Percentages outside 0–100% are clamped to the video when the subtitle is rendered.",
         "additionalProperties": false,
         "properties": {
           "align": {
@@ -5932,8 +5915,7 @@
       },
       "SegmentDubbingMetadata": {
         "type": "object",
-        "description": "Per-segment dubbing settings. Only used on dubbing tracks.",
-        "additionalProperties": false,
+        "description": "Per-segment dubbing settings. Only used on dubbing tracks. `PUT` rejects fields that are not listed here.",
         "properties": {
           "volume": {
             "type": "number",
@@ -5978,8 +5960,7 @@
       },
       "SegmentMetadata": {
         "type": "object",
-        "description": "Editorial metadata of a segment.",
-        "additionalProperties": false,
+        "description": "Editorial metadata of a segment. `PUT` rejects fields that are not listed here.",
         "properties": {
           "review": {
             "$ref": "#/components/schemas/SegmentReview"
