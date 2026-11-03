@@ -5465,7 +5465,6 @@
         "type": "object",
         "required": [
           "id",
-          "key",
           "time_begin",
           "time_end",
           "words",
@@ -5479,7 +5478,7 @@
           },
           "key": {
             "type": "string",
-            "description": "Composite key in the form `${id}_${language}_${source}_${dubbing}`. Must match the request-level language/source/dubbing flags."
+            "description": "Optional and not read by Studio; a dubbing track returned by `GET` has none, so it can be sent back unchanged. Studio's editor writes `${id}_${language}_${source}_${dubbing}`."
           },
           "time_begin": {
             "type": "number",
@@ -5915,7 +5914,7 @@
       },
       "SegmentDubbingMetadata": {
         "type": "object",
-        "description": "Per-segment dubbing settings. Only used on dubbing tracks. `PUT` rejects fields that are not listed here.",
+        "description": "Per-segment dubbing settings. Only used on dubbing tracks. Fields that are not listed here are ignored by `PUT`.",
         "properties": {
           "volume": {
             "type": "number",
@@ -5960,7 +5959,7 @@
       },
       "SegmentMetadata": {
         "type": "object",
-        "description": "Editorial metadata of a segment. `PUT` rejects fields that are not listed here.",
+        "description": "Editorial metadata of a segment. Fields that are not listed here are ignored by `PUT`.",
         "properties": {
           "review": {
             "$ref": "#/components/schemas/SegmentReview"
