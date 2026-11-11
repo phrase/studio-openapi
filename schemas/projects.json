@@ -6083,8 +6083,8 @@
           },
           "deltaX": {
             "type": "number",
-            "minimum": -20,
-            "maximum": 20,
+            "minimum": -50,
+            "maximum": 50,
             "description": "Shift from the center, in percent of the video width. Negative moves it left."
           }
         }
@@ -6232,6 +6232,14 @@
           "autoPlaced": {
             "type": "boolean",
             "description": "True when Studio moved this subtitle automatically so it does not cover on-screen text. Resetting the position in the editor clears it."
+          },
+          "detectedStyle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubtitleStyle"
+              }
+            ],
+            "description": "How the video analysis saw an on-screen text drawn (font, size, colors, background). Studio's editor returns the segment's `style` to it on reset. Send it back unchanged; it is not an override and does not affect rendering."
           }
         }
       },
