@@ -3830,7 +3830,7 @@
           "Subtitles"
         ],
         "summary": "Update Subtitle",
-        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
         "operationId": "updateSubtitles",
         "security": [
           {
@@ -4089,7 +4089,7 @@
           "Subtitles"
         ],
         "summary": "Get Subtitle",
-        "description": "Retrieve the structured subtitle segments of a recording's language track in JSON form (with word-level timings). The response shape mirrors the PUT request body — use this before `PUT` to fetch the current segments, edit the `words` array of the segment(s) you want to change (word-level text and timings are the source of truth; editing `text` alone has no effect), and send the full array back. The `source` and `dubbing` query flags pick which track to read: source transcription, target translation, or dubbing.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings` and `comments` you got from `GET` for the segments you did not change.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+        "description": "Retrieve the structured subtitle segments of a recording's language track in JSON form (with word-level timings). The response shape mirrors the PUT request body — use this before `PUT` to fetch the current segments, edit the `words` array of the segment(s) you want to change (word-level text and timings are the source of truth; editing `text` alone has no effect), and send the full array back. The `source` and `dubbing` query flags pick which track to read: source transcription, target translation, or dubbing.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
         "operationId": "getSubtitles",
         "security": [
           {
@@ -5683,6 +5683,14 @@
             ],
             "description": "Optional position of this segment's subtitle on the video. Omit it to use the position of the subtitle profile; a segment sent without `cue_settings` loses the position it had."
           },
+          "style": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubtitleStyle"
+              }
+            ],
+            "description": "Optional style of this segment's subtitle, overriding the subtitle profile (font, size, colors, background, position). Omit it to use the subtitle profile; a segment sent without `style` loses the style it had."
+          },
           "comments": {
             "type": "array",
             "maxItems": 200,
@@ -5894,6 +5902,14 @@
             ],
             "description": "Position of this segment's subtitle on the video. Absent when the subtitle profile position is used."
           },
+          "style": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubtitleStyle"
+              }
+            ],
+            "description": "Optional style of this segment's subtitle, overriding the subtitle profile (font, size, colors, background, position). Omit it to use the subtitle profile; a segment sent without `style` loses the style it had."
+          },
           "comments": {
             "type": "array",
             "maxItems": 200,
@@ -5986,6 +6002,90 @@
             "type": "string",
             "pattern": "^[A-Za-z0-9_-]{1,64}$",
             "description": "WebVTT region identifier"
+          }
+        }
+      },
+      "SubtitleStyle": {
+        "type": "object",
+        "description": "Style of one segment's subtitle, overriding the matching fields of the subtitle profile. Every field is optional: a field that is left out follows the subtitle profile, and a segment sent without `style` loses the style it had. `delta` and `deltaX` (and `subtitlePosition`) place the subtitle the way the subtitle profile does; when any of them is set, the segment's `cue_settings` position is ignored for that segment. Studio's editor preview and burn-in follow the style; SRT and WebVTT exports carry no style. Vertical subtitle profiles ignore it.",
+        "additionalProperties": false,
+        "properties": {
+          "fontFamily": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks."
+          },
+          "fontSize": {
+            "type": "number",
+            "minimum": 8,
+            "maximum": 100,
+            "description": "Font size, relative to a 720px-high video like the subtitle profile's"
+          },
+          "fontWeight": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "bold"
+            ]
+          },
+          "fontStyle": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "italic"
+            ]
+          },
+          "subtitlePosition": {
+            "type": "string",
+            "enum": [
+              "top",
+              "bottom",
+              "center",
+              "right",
+              "middle",
+              "left"
+            ],
+            "description": "Where the subtitle is anchored horizontally (`left`, `center`, `right`), as in the subtitle profile"
+          },
+          "textAlign": {
+            "type": "string",
+            "enum": [
+              "left",
+              "center",
+              "right"
+            ]
+          },
+          "textColor": {
+            "type": "string",
+            "maxLength": 25,
+            "description": "`#RRGGBB`, `#RRGGBBAA` or `rgb()` / `rgba()`"
+          },
+          "backgroundType": {
+            "type": "string",
+            "enum": [
+              "none",
+              "box",
+              "outline",
+              "wrap"
+            ]
+          },
+          "backgroundColor": {
+            "type": "string",
+            "maxLength": 25,
+            "description": "`#RRGGBB`, `#RRGGBBAA` or `rgb()` / `rgba()`"
+          },
+          "delta": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Distance from the bottom, in percent of the video height. Higher moves the subtitle up."
+          },
+          "deltaX": {
+            "type": "number",
+            "minimum": -20,
+            "maximum": 20,
+            "description": "Shift from the center, in percent of the video width. Negative moves it left."
           }
         }
       },
