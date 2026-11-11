@@ -6059,7 +6059,7 @@
           "textColor": {
             "type": "string",
             "maxLength": 25,
-            "description": "`#RRGGBB`, `#RRGGBBAA` or `rgb()` / `rgba()`"
+            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
           },
           "backgroundType": {
             "type": "string",
@@ -6073,7 +6073,7 @@
           "backgroundColor": {
             "type": "string",
             "maxLength": 25,
-            "description": "`#RRGGBB`, `#RRGGBBAA` or `rgb()` / `rgba()`"
+            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
           },
           "delta": {
             "type": "number",
