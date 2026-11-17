@@ -17,7 +17,7 @@
         "type": "string"
       },
       "default": [],
-      "description": "Subset of `languages` whose subtitles you provide yourself (upload them with `POST .../subtitles/upload` or `PUT .../subtitles` first): Studio does not translate them. They are tracked as provided, not pending or failed. A language that the recording does not have yet is charged like any new translation language."
+      "description": "Subset of `languages` whose subtitles you provide yourself: upload them first with `POST .../subtitles/upload` or `PUT .../subtitles` (the language need not be on the recording yet), then send the language here. Studio does not translate it. It is tracked as provided, not pending or failed. A language that the recording does not have yet is charged like any new translation language."
     },
     "tmsProjectTemplateUid": {
       "type": "string",

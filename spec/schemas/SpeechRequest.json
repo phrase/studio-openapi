@@ -61,7 +61,8 @@
       "type": "integer",
       "description": "Same seed and text give a similar result.",
       "minimum": 0,
-      "maximum": 4294967295
+      "maximum": 4294967295,
+      "format": "int64"
     }
   },
   "required": [
