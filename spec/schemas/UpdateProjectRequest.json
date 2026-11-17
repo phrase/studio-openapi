@@ -48,7 +48,7 @@
     },
     "isPublic": {
       "type": "boolean",
-      "description": "When true, the project is shared so it can be accessed by the API key owner. When false, that share is revoked."
+      "description": "When true, every member of the organization can open the project (read access to all its steps and languages). When false, that organization-wide share is revoked; shares with individual members are not changed."
     }
   },
   "additionalProperties": false

@@ -194,7 +194,7 @@
                     "value": {
                       "data": [
                         {
-                          "id": "01jzmvc20cjq5hj5saa96ttp2x",
+                          "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c",
                           "name": "Meeting Recording",
                           "archived": false,
                           "status": "COMPLETED",
@@ -1116,13 +1116,13 @@
                   "ok_by_uploads": {
                     "summary": "Success (direct uploads)",
                     "value": {
-                      "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                      "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
                     }
                   },
                   "ok_by_file_urls": {
                     "summary": "Success (fileUrls)",
                     "value": {
-                      "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                      "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
                     }
                   }
                 }
@@ -1817,7 +1817,7 @@
                   }
                 },
                 "share_project": {
-                  "summary": "Mark the project as shared (visible to the API key owner)",
+                  "summary": "Make the project visible to every member of the organization",
                   "value": {
                     "isPublic": true
                   }
@@ -11283,7 +11283,7 @@
           "Exports"
         ],
         "summary": "Get an export",
-        "description": "Check how far an export is. Poll until `status` is `done`, then take `downloadUrl` (valid for three hours), or `failed`, then read `errorMessage`. The `exportId` comes from the answer to `POST .../exports`.",
+        "description": "Check how far an export is. Poll until `status` is `done`, then take `downloadUrl` (valid for three hours), or `failed`, then read `errorMessage`. The `exportId` comes from the answer to `POST .../exports`. A share limited to some steps or languages can only poll an export that it started itself; any other export id answers `404`.",
         "operationId": "getExport",
         "security": [
           {
@@ -11387,7 +11387,7 @@
             }
           },
           "404": {
-            "description": "No export with this id for this recording.",
+            "description": "No export with this id for this recording, or (for a share limited to some steps or languages) not started by you.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14730,7 +14730,7 @@
           "Recordings"
         ],
         "summary": "Get a url to upload a recording",
-        "description": "First step of adding a recording to a project that exists: ask where to upload the file. The answer holds a signed url, valid for 30 minutes. `PUT` the file to it with exactly the `headers` it lists; the media goes straight to storage, not through this API. Then call `POST /v1/projects/{projectId}/recordings` with the `recordingId`. The url is for one file of at most 20 GB and 180 minutes. Needs unrestricted access to the project; a share limited to some steps or languages is refused with `403`.",
+        "description": "First step of adding a recording to a project that exists: ask where to upload the file. The answer holds a signed url, valid for 30 minutes. `PUT` the file to it with exactly the `headers` it lists; the media goes straight to storage, not through this API. Then call `POST /v1/projects/{projectId}/recordings` with the `recordingId`. The url is for one file of at most 20 GB and 180 minutes; the size limit is part of the signed url, so storage refuses a larger file (and a request without the `x-goog-content-length-range` header) before it is stored. Needs unrestricted access to the project; a share limited to some steps or languages is refused with `403`.",
         "operationId": "createRecordingUploadUrl",
         "security": [
           {
@@ -14786,7 +14786,8 @@
                       "uploadUrl": "https://storage.googleapis.com/bucket/path/file.mp4?X-Goog-Signature=...",
                       "method": "PUT",
                       "headers": {
-                        "Content-Type": "video/mp4"
+                        "Content-Type": "video/mp4",
+                        "x-goog-content-length-range": "0,21474836480"
                       },
                       "expiresAt": "2026-01-01T00:30:00.000Z",
                       "maxSizeBytes": 21474836480
@@ -19676,7 +19677,7 @@
           },
           "isPublic": {
             "type": "boolean",
-            "description": "When true, the project is shared so it can be accessed by the API key owner. When false, that share is revoked."
+            "description": "When true, every member of the organization can open the project (read access to all its steps and languages). When false, that organization-wide share is revoked; shares with individual members are not changed."
           }
         },
         "additionalProperties": false
@@ -19740,6 +19741,7 @@
           },
           "words": {
             "type": "array",
+            "minItems": 1,
             "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports.",
             "items": {
               "$ref": "#/components/schemas/SubtitleWord"
@@ -19865,7 +19867,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language — the Studio UI excludes it from the picker, but this field does not reject it."
+            "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language: the request is rejected with `400`, and nothing is started for any of its languages."
           },
           "ignoredLanguages": {
             "type": "array",
@@ -20443,7 +20445,8 @@
           "id": {
             "type": "string",
             "description": "Project ID.",
-            "example": "01jzmvc20cjq5hj5saa96ttp2x"
+            "format": "uuid",
+            "example": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
           },
           "name": {
             "type": "string",
@@ -22200,8 +22203,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Voice ID. Use it as `voiceId` when assigning the voice to a speaker.",
-            "format": "uuid"
+            "description": "Voice ID. Use it as `voiceId` when assigning the voice to a speaker. A voice with `source` `external` comes from the ElevenLabs account your organization connected: its ID is the ElevenLabs voice ID, not a UUID, and it can be listed and assigned to a speaker but not fetched, renamed or deleted here."
           },
           "name": {
             "type": "string",
@@ -22217,7 +22219,8 @@
             "enum": [
               "neutral",
               "male",
-              "female"
+              "female",
+              null
             ],
             "nullable": true,
             "description": "Gender of the voice."
@@ -22280,7 +22283,8 @@
             "enum": [
               "neutral",
               "male",
-              "female"
+              "female",
+              null
             ],
             "nullable": true,
             "description": "Gender of the voice."

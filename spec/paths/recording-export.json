@@ -4,7 +4,7 @@
       "Exports"
     ],
     "summary": "Get an export",
-    "description": "Check how far an export is. Poll until `status` is `done`, then take `downloadUrl` (valid for three hours), or `failed`, then read `errorMessage`. The `exportId` comes from the answer to `POST .../exports`.",
+    "description": "Check how far an export is. Poll until `status` is `done`, then take `downloadUrl` (valid for three hours), or `failed`, then read `errorMessage`. The `exportId` comes from the answer to `POST .../exports`. A share limited to some steps or languages can only poll an export that it started itself; any other export id answers `404`.",
     "operationId": "getExport",
     "security": [
       {
@@ -68,7 +68,7 @@
         }
       },
       "404": {
-        "description": "No export with this id for this recording.",
+        "description": "No export with this id for this recording, or (for a share limited to some steps or languages) not started by you.",
         "content": {
           "application/json": {
             "schema": {

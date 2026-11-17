@@ -106,7 +106,7 @@
                 "value": {
                   "data": [
                     {
-                      "id": "01jzmvc20cjq5hj5saa96ttp2x",
+                      "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c",
                       "name": "Meeting Recording",
                       "archived": false,
                       "status": "COMPLETED",
@@ -1028,13 +1028,13 @@
               "ok_by_uploads": {
                 "summary": "Success (direct uploads)",
                 "value": {
-                  "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                  "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
                 }
               },
               "ok_by_file_urls": {
                 "summary": "Success (fileUrls)",
                 "value": {
-                  "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                  "id": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
                 }
               }
             }

@@ -17,7 +17,8 @@
       "enum": [
         "neutral",
         "male",
-        "female"
+        "female",
+        null
       ],
       "nullable": true,
       "description": "Gender of the voice."

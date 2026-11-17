@@ -4,7 +4,7 @@
       "Recordings"
     ],
     "summary": "Get a url to upload a recording",
-    "description": "First step of adding a recording to a project that exists: ask where to upload the file. The answer holds a signed url, valid for 30 minutes. `PUT` the file to it with exactly the `headers` it lists; the media goes straight to storage, not through this API. Then call `POST /v1/projects/{projectId}/recordings` with the `recordingId`. The url is for one file of at most 20 GB and 180 minutes. Needs unrestricted access to the project; a share limited to some steps or languages is refused with `403`.",
+    "description": "First step of adding a recording to a project that exists: ask where to upload the file. The answer holds a signed url, valid for 30 minutes. `PUT` the file to it with exactly the `headers` it lists; the media goes straight to storage, not through this API. Then call `POST /v1/projects/{projectId}/recordings` with the `recordingId`. The url is for one file of at most 20 GB and 180 minutes; the size limit is part of the signed url, so storage refuses a larger file (and a request without the `x-goog-content-length-range` header) before it is stored. Needs unrestricted access to the project; a share limited to some steps or languages is refused with `403`.",
     "operationId": "createRecordingUploadUrl",
     "security": [
       {
@@ -60,7 +60,8 @@
                   "uploadUrl": "https://storage.googleapis.com/bucket/path/file.mp4?X-Goog-Signature=...",
                   "method": "PUT",
                   "headers": {
-                    "Content-Type": "video/mp4"
+                    "Content-Type": "video/mp4",
+                    "x-goog-content-length-range": "0,21474836480"
                   },
                   "expiresAt": "2026-01-01T00:30:00.000Z",
                   "maxSizeBytes": 21474836480
