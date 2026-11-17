@@ -8,7 +8,8 @@
   "properties": {
     "word": {
       "type": "string",
-      "description": "Word text"
+      "description": "Word text, at most 500 characters.",
+      "maxLength": 500
     },
     "time_begin": {
       "type": "number",

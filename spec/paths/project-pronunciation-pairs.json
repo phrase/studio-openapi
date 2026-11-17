@@ -41,12 +41,14 @@
               "source": {
                 "type": "string",
                 "description": "The word or phrase as written.",
-                "minLength": 1
+                "minLength": 1,
+                "maxLength": 512
               },
               "target": {
                 "type": "string",
                 "description": "How it is spoken.",
-                "minLength": 1
+                "minLength": 1,
+                "maxLength": 512
               },
               "notation": {
                 "type": "string",
@@ -82,28 +84,39 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "description": "Pronunciation sets of the project.",
-              "items": {
-                "$ref": "../schemas/ProjectPronunciation.json"
+              "type": "object",
+              "description": "The list is in `data`.",
+              "required": [
+                "data"
+              ],
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Pronunciation sets of the project.",
+                  "items": {
+                    "$ref": "../schemas/ProjectPronunciation.json"
+                  }
+                }
               }
             },
             "examples": {
               "example": {
                 "summary": "Example",
-                "value": [
-                  {
-                    "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                    "name": "Project pronunciations",
-                    "languageCode": "es-es",
-                    "items": [
-                      {
-                        "source": "SQL",
-                        "target": "sequel"
-                      }
-                    ]
-                  }
-                ]
+                "value": {
+                  "data": [
+                    {
+                      "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "name": "Project pronunciations",
+                      "languageCode": "es-es",
+                      "items": [
+                        {
+                          "source": "SQL",
+                          "target": "sequel"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
             }
           }
@@ -150,7 +163,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project is not shared with you, or your share does not include the dubbing of this language.",
         "content": {
           "application/json": {
             "schema": {

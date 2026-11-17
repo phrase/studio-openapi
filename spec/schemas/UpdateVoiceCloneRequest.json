@@ -32,8 +32,9 @@
     },
     "projectId": {
       "type": "string",
-      "description": "Project to relate the voice to.",
-      "format": "uuid"
+      "description": "Project to relate the voice to. `null` removes the relation.",
+      "format": "uuid",
+      "nullable": true
     }
   }
 }

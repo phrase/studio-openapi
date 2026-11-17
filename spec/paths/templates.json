@@ -4,7 +4,7 @@
       "Templates"
     ],
     "summary": "Get templates",
-    "description": "Retrieve the project templates of your organization. A template is a saved set of project settings. The translation management ids inside come from the TMS. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "description": "Retrieve the project templates of your organization. A template is a saved set of project settings. The translation management ids inside come from the TMS. Members of the organization can read every item of the organization.",
     "operationId": "getTemplates",
     "security": [
       {
@@ -123,7 +123,7 @@
       "Templates"
     ],
     "summary": "Create a template",
-    "description": "Create a project template. Every dubbing language must also be a translation language or the source language; otherwise the call is rejected with `400`. Returns the created template.",
+    "description": "Create a project template. Every dubbing language must also be a translation language or the source language; otherwise the call is rejected with `400`. What a template stores has to work when a project is made from it, so the settings are checked when you save them: `glossaryId`, `subtitleProfileId`, the ids in `translation.subtitleProfiles` and in `dubbing.pronunciations` must be items your organization can see, otherwise the call is rejected with `400` (`<field> refers to something that is not available to your organization: <id>`); the translation `preferences` follow the rules of the project settings (a translation model from the allowed choices, a machine translation profile only with a model that takes one, a translation memory only with a Phrase AI model). Returns the created template.",
     "operationId": "createTemplate",
     "security": [
       {

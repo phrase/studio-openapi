@@ -9,11 +9,13 @@
     },
     "source": {
       "type": "string",
-      "description": "Written form of the term."
+      "description": "Written form of the term.",
+      "maxLength": 512
     },
     "target": {
       "type": "string",
-      "description": "How the term is pronounced, written in the given notation."
+      "description": "How the term is pronounced, written in the given notation.",
+      "maxLength": 512
     },
     "notation": {
       "type": "string",

@@ -7,7 +7,7 @@
     },
     "warnings": {
       "type": "array",
-      "description": "Cues that were skipped, for example a cue that ends before it starts or has no text.",
+      "description": "Cues that were skipped, for example a cue that ends before it starts, has no duration or has no text.",
       "items": {
         "type": "object",
         "properties": {

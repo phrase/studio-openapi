@@ -39,6 +39,10 @@
         "$ref": "./SubtitleSegmentResponseItem.json"
       },
       "description": "The segments of the track."
+    },
+    "expandToContent": {
+      "type": "boolean",
+      "description": "Audio-only dubbing tracks only, present when it is on: each segment grows to the natural length of its speech instead of fitting the original timing. Read only: it is chosen with `expandToContent` of the dubbing request, and `PUT .../subtitles` does not accept it."
     }
   }
 }

@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Studio API",
-    "description": "Studio turns audio and video into transcriptions, translations, subtitles and dubbing. Use this API to create projects, order translation and dubbing, follow the progress, and download the results.\n\n## Authentication\nSend your Phrase Platform API token with every request, as `X-API-Key: <token>` or as `Authorization: Bearer <token>`. A missing, invalid or expired token is answered with `401`. `403` means the token is valid but the action is not allowed: the item is someone else's, a share does not include the step or language, or your organization is blocked.\n\n## Typical flow\n1. Create a project with `POST /v1/projects`: upload files, or give direct links to media files. It answers with the project `id`. To add a recording to a project that exists, call `POST /v1/projects/{projectId}/recordings/upload-url`, upload the file to the url it returns, then call `POST /v1/projects/{projectId}/recordings`.\n2. Poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until the transcription is `done`. Every long step answers `202` and runs in the background: you poll the status, you do not wait on the call.\n3. Optional: `POST /v1/projects/{projectId}/recordings/{recordingId}/estimates` tells what a translation costs before you start it.\n4. Order translation with `POST …/translate`, and wait until the status shows the language as `done`.\n5. Order dubbing with `POST …/dubbing`. A language must be translated before it can be dubbed, otherwise the call answers `400`.\n6. Read and download: `GET …/subtitles` for the text, the result endpoints for summary and insights, `POST …/exports` for a file, then `GET …/exports/{exportId}` until it is `done`.\n\n## Credits\nCredits are minutes. Transcription and every new translation language use `ceil(duration / 60)` minutes of the recording. Dubbing, retranscription and retranslation use none. The estimate endpoint tells the price in advance. When an organization has no credits left, starting work is refused with `403` (`No remaining minutes available`): creating a project, adding a recording, transcribe, translate and dubbing. Reading results, estimates and generating speech still work.\n\n## Errors\nErrors are JSON: `{ \"statusCode\": 400, \"message\": \"...\", \"timestamp\": \"...\" }`. The `message` says what to change.\n- `400` the request is invalid.\n- `401` the token is missing, invalid or expired.\n- `403` the token is valid but the action is not allowed.\n- `404` the item does not exist, is not visible to you, or you may not manage it. Items of other organizations always answer `404`.\n- `409` an item with that name already exists.\n- `429` too many requests; wait and try again.\n- `5xx` a failure on our side or at a provider; try again later.\n\n## Where the ids come from\nIds that Studio accepts but does not list belong to other Phrase products. `tmsProjectTemplateUid`, `termBases`, `mtProfileId` and `translationMemoryId` are Phrase TMS uids: get them from the Phrase TMS API (project templates, term bases, translation memories, machine translation profiles). `styleGuides` ids come from the Style Guides API. Both are described at https://developers.phrase.com/en/api/overview. Every other id (projects, recordings, glossaries, insights, pronunciations, templates, subtitle profiles, voices) comes from the list endpoints of this API.",
+    "description": "Studio turns audio and video into transcriptions, translations, subtitles and dubbing. Use this API to create projects, order translation and dubbing, follow the progress, and download the results.\n\n## Authentication\nSend your Phrase Platform API token with every request, as `X-API-Key: <token>` or as `Authorization: Bearer <token>`. A missing, invalid or expired token is answered with `401`. `403` means the token is valid but the action is not allowed: the item is someone else's, a share does not include the step or language, or your organization is blocked.\n\n## Typical flow\n1. Create a project with `POST /v1/projects`: upload files, or give direct links to media files. It answers with the project `id`. To add a recording to a project that exists, call `POST /v1/projects/{projectId}/recordings/upload-url`, upload the file to the url it returns, then call `POST /v1/projects/{projectId}/recordings`.\n2. Poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until the transcription is `done`. Every long step answers `202` and runs in the background: you poll the status, you do not wait on the call.\n3. Optional: `POST /v1/projects/{projectId}/recordings/{recordingId}/estimates` tells what a translation costs before you start it.\n4. Order translation with `POST …/translate`, and wait until the status shows the language as `done`.\n5. Order dubbing with `POST …/dubbing`. A language must be translated before it can be dubbed, otherwise the call answers `400`.\n6. Read and download: `GET …/subtitles` for the text, the result endpoints for summary and insights, `POST …/exports` for a file, then `GET …/exports/{exportId}` until it is `done`.\n\n## Credits\nCredits are minutes. Transcription and every new translation language use `ceil(duration / 60)` minutes of the recording. Dubbing, retranscription and retranslation use none. The estimate endpoint tells the price in advance. When an organization has no credits left, starting work is refused with `403` (`No remaining minutes available`): creating a project, adding a recording, transcribe, translate, dubbing, sync-dubbing and speech. Reading results, estimates and editing the text of subtitles still work. The same goes for a re-dub (`PUT .../subtitles` with `segmentsToRedub`), re-syncing a dubbing and generating speech with `POST /v1/tts/speech`: they make new speech, so a blocked organization is refused for them too.\n\n## Errors\nErrors are JSON: `{ \"statusCode\": 400, \"message\": \"...\", \"timestamp\": \"...\" }`. The `message` says what to change.\n- `400` the request is invalid.\n- `401` the token is missing, invalid or expired.\n- `403` the token is valid but the action is not allowed: your share of a project does not include the step or language, the project does not exist or is not shared with you (project routes do not tell the two apart), or your organization has no credits left for an action that needs them.\n- `404` the item does not exist, or you may not manage it: a recording that is not in the project, or a glossary, template, insight, pronunciation set, subtitle profile, font or voice of your organization that does not exist. Settings of another organization answer `404` too.\n- `409` the request conflicts with what exists: a name that is taken, a recording that was added already, a speaker that is still in use, or a template that a trigger still uses. The message says which.\n- `429` too many requests; wait and try again.\n- `5xx` a failure on our side or at a provider; try again later.\n\n## Where the ids come from\nIds that Studio accepts but does not list belong to other Phrase products. `tmsProjectTemplateUid`, `termBases`, `mtProfileId` and `translationMemoryId` are Phrase TMS uids: get them from the Phrase TMS API (project templates, term bases, translation memories, machine translation profiles). `styleGuides` ids come from the Style Guides API. Both are described at https://developers.phrase.com/en/api/overview. Every other id (projects, recordings, glossaries, insights, pronunciations, templates, subtitle profiles, voices) comes from the list endpoints of this API.",
     "version": "1.0.0"
   },
   "servers": [
@@ -107,7 +107,7 @@
             "name": "status",
             "in": "query",
             "required": false,
-            "description": "Filter by project status.",
+            "description": "Filter by project status. `RECENTLY_COMPLETED` lists the projects that finished a step in the last 24 hours.",
             "schema": {
               "type": "string",
               "enum": [
@@ -116,7 +116,8 @@
                 "PENDING",
                 "IN_PROGRESS",
                 "COMPLETED",
-                "FAILED"
+                "FAILED",
+                "RECENTLY_COMPLETED"
               ],
               "default": "ALL"
             }
@@ -268,27 +269,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (access denied)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "forbidden": {
-                    "summary": "Access denied",
-                    "value": {
-                      "success": false,
-                      "statusCode": 403,
-                      "message": "Access denied",
-                      "timestamp": "2025-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -317,7 +297,7 @@
           "Projects"
         ],
         "summary": "Create Project",
-        "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Upload files with the `files` parts of the request. `fileUrls` also works for direct links to media files: an `https://` link that anyone can download and that ends in an audio or video file, not a web page. Uploading files is more robust than links.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.\n\nSupported sources: files you upload and direct links to audio or video files. The file is checked after it is downloaded: if it has no audio or video stream the request is rejected with `400` and no project is created.\n\nErrors of the upload, as `{ success, statusCode, message }`:\n- `400` `The file at the URL is not an audio or video file`: the link points to a web page or another kind of file.\n- `400` `The URL could not be downloaded: the server answered <status>`: the server of the link refused, for example with `404` or `403`.\n- `400` `Invalid fileUrls entry: ...`: the link is not an `https://` URL or points to a host that is not allowed.\n- `413` a file is larger than 20 GB.\n- `502` the server of the link failed or could not be reached, or the project could not be started.\n\nCredits: the transcription of every recording uses `ceil(duration / 60)` minutes. A project whose organization has no credits left is refused with `403`.",
+        "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Upload files with the `files` parts of the request. `fileUrls` also works for direct links to media files: an `https://` link that anyone can download and that ends in an audio or video file, not a web page. Uploading files is more robust than links.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.\n\nSupported sources: files you upload and direct links to audio or video files. The file is checked after it is downloaded: if it has no audio or video stream the request is rejected with `400` and no project is created.\n\nErrors of the upload, as `{ success, statusCode, message }`:\n- `400` `The file at the URL is not an audio or video file`: the link points to a web page or another kind of file.\n- `400` `The URL could not be downloaded: the server answered <status>`: the server of the link refused, for example with `404` or `403`.\n- `400` `Invalid fileUrls entry: ...`: the link is not an `https://` URL or points to a host that is not allowed.\n- `400` `Unsupported file type. Allowed: mp4, mov, mp3, wav, m4a`: a file part of another type.\n- `400` `Invalid JSON in: <fields>`: `expectedLanguages`, `insights`, `glossary`, `safeCommunications`, `pronunciations` or `fileUrls` is not valid JSON.\n- `400` `The recording is longer than 180 minutes`: a recording may be at most 180 minutes long.\n- `400` `Maximum 50 files allowed`: a project takes at most 50 files, uploads and links together.\n- `413` a file is larger than 20 GB.\n- `502` the server of the link failed or could not be reached, or the project could not be started.\n\nCredits: the transcription of every recording uses `ceil(duration / 60)` minutes. A project whose organization has no credits left is refused with `403`.",
         "operationId": "createProject",
         "security": [
           {
@@ -1002,7 +982,7 @@
                     }
                   },
                   "fileUrls": {
-                    "description": "External file URLs to import. Provide as JSON array or JSON string. If provided, uploaded files in this request are ignored for processing (but still count towards the 5-item limit).",
+                    "description": "External file URLs to import. Provide as JSON array or JSON string. If provided, uploaded files in this request are ignored for processing (but still count towards the limit of 50 files).",
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -1211,6 +1191,33 @@
                       "message": "Upload failed",
                       "timestamp": "2025-01-01T00:00:00.000Z"
                     }
+                  },
+                  "too_long": {
+                    "summary": "Recording longer than 180 minutes (upload service)",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "The recording is longer than 180 minutes",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  },
+                  "unsupported_type": {
+                    "summary": "File type not supported (upload service)",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "Unsupported file type. Allowed: mp4, mov, mp3, wav, m4a",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
+                  },
+                  "invalid_json": {
+                    "summary": "A field is not valid JSON (upload service)",
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": "Invalid JSON in: expectedLanguages",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
+                    }
                   }
                 }
               }
@@ -1260,7 +1267,7 @@
                     "value": {
                       "success": false,
                       "statusCode": 413,
-                      "message": "File too large. Max size is 5GB per file",
+                      "message": "File too large. Max size is 20GB per file",
                       "timestamp": "2025-01-01T00:00:00.000Z"
                     }
                   }
@@ -1367,7 +1374,8 @@
             "required": true,
             "description": "Project ID",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1588,7 +1596,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project exists but is not shared with you.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1671,13 +1679,14 @@
             "required": true,
             "description": "Project ID",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Project deleted successfully"
+          "204": {
+            "description": "The project was deleted. The response has no body."
           },
           "400": {
             "description": "Bad Request (invalid ID)",
@@ -1783,7 +1792,8 @@
             "required": true,
             "description": "Project ID",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1925,7 +1935,7 @@
           "Subtitle Profiles"
         ],
         "summary": "Get Subtitle Profiles",
-        "description": "Retrieve the subtitle profiles of your organization, together with the defaults of Studio. A default you edited is listed in place of the default, with `default` true and `sourceProfileId` set. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+        "description": "Retrieve the subtitle profiles of your organization, together with the defaults of Studio. A default you edited is listed in place of the default, with `default` true and `sourceProfileId` set. Members of the organization can read every item of the organization.",
         "operationId": "getSubtitleProfiles",
         "security": [
           {
@@ -2023,26 +2033,6 @@
                     "value": {
                       "statusCode": 401,
                       "message": "Unauthorized",
-                      "timestamp": "2025-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden (access denied)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "forbidden": {
-                    "summary": "Access denied",
-                    "value": {
-                      "statusCode": 403,
-                      "message": "Access denied",
                       "timestamp": "2025-01-01T00:00:00.000Z"
                     }
                   }
@@ -2427,7 +2417,7 @@
           "Pronunciations"
         ],
         "summary": "Get Pronunciations",
-        "description": "Retrieve the pronunciation sets of your organization, with their pairs. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+        "description": "Retrieve the pronunciation sets of your organization, with their pairs. Members of the organization can read every item of the organization.",
         "operationId": "getPronunciations",
         "security": [
           {
@@ -2506,16 +2496,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (access denied)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2533,7 +2513,7 @@
           "Pronunciations"
         ],
         "summary": "Create a pronunciation set",
-        "description": "Create a pronunciation set. With `pairs` the set and all its pairs are created in one call (up to 10000), which is the way to load a whole list before dubbing. Members of the organization can read every item of the organization. Items of other organizations answer `404`. Returns the created set with the ids of its pairs.",
+        "description": "Create a pronunciation set. With `pairs` the set and all its pairs are created in one call (up to 10000), which is the way to load a whole list before dubbing. Members of the organization can read every item of the organization. Returns the created set with the ids of its pairs.",
         "operationId": "createPronunciation",
         "security": [
           {
@@ -2698,7 +2678,7 @@
           "Glossaries"
         ],
         "summary": "Get Glossaries",
-        "description": "Retrieve the glossaries of your organization. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+        "description": "Retrieve the glossaries of your organization. Members of the organization can read every item of the organization.",
         "operationId": "getGlossaries",
         "security": [
           {
@@ -2770,16 +2750,6 @@
           },
           "401": {
             "description": "Unauthorized (invalid API key)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden (access denied)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2950,7 +2920,7 @@
           "Insights"
         ],
         "summary": "Get Insights",
-        "description": "Retrieve the insights of your organization, with their items. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+        "description": "Retrieve the insights of your organization, with their items. Members of the organization can read every item of the organization.",
         "operationId": "getInsights",
         "security": [
           {
@@ -3125,26 +3095,6 @@
                     "value": {
                       "statusCode": 401,
                       "message": "Unauthorized",
-                      "timestamp": "2025-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden (key lacks access to this resource)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "forbidden": {
-                    "summary": "Access denied",
-                    "value": {
-                      "statusCode": 403,
-                      "message": "Forbidden",
                       "timestamp": "2025-01-01T00:00:00.000Z"
                     }
                   }
@@ -3418,16 +3368,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (access denied)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -3447,7 +3387,7 @@
           "Subtitles"
         ],
         "summary": "Update Subtitle",
-        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.\n\n## Review state and QA warnings\n\n**Review state.** `metadata.review` holds `status` (`PENDING` or `REVIEWED`), `reviewedBy` and `reviewedAt`, per segment, on every track. To mark a segment as reviewed, `GET` the track, set `metadata.review` to `{ \"status\": \"REVIEWED\", \"reviewedBy\": { \"id\": \"<uuid>\", \"name\": \"<name>\" }, \"reviewedAt\": \"<ISO date-time>\" }` on that segment and `PUT` the full track back. The server stores the review exactly as sent and does not verify the reviewer. It does **not** change the review when you change the text of a segment: the Studio editor sets a segment back to `PENDING` when a person edits it, but this endpoint stores what you send, so set `PENDING` yourself on every segment whose text you rewrite. A segment sent without `metadata.review` counts as not reviewed.\n\n**Review progress.** `reviewProgress` on `GET /v1/projects` and on `GET /v1/projects/{id}` counts `reviewedSegments` against `totalSegments` for each step and language, recomputed from the segments of every track on each `PUT`. A shared project only lists the steps and languages its share includes.\n\n**QA warnings.** QA warnings are not stored or returned by the API. Studio computes them per segment from the rules of the project's subtitle profile (`GET /v1/subtitle-profiles`), and a caller can do the same. A segment breaks a rule when:\n\n* its longest line has more than `maxLineCharacterCount` characters;\n* its characters per second (characters of the text divided by its duration) is above `charactersPerSecond`;\n* its duration is below `minDuration`, or below `minGapFrames` frames at the frame rate of the recording (`fps`);\n* its duration is above `maxDuration`;\n* it has more than `maxLinesPerScreen` lines;\n* two consecutive words are further apart than `maxGapBetweenWords` seconds.\n\n## What is checked\n\nThe same checks as in the Studio editor, in Studio and in this API:\n\n* The track must exist for the recording: `source=true` takes the source language of the recording, otherwise `language` must be one of its translation languages. `source` and `dubbing` cannot both be `true`.\n* A segment is at least 0.3 seconds long.\n* Two segments of one speaker do not overlap. On-screen texts are left out of this: they may overlap each other and the spoken segments.\n\nWhat is stored already is not held against you: a segment that is sent back exactly as it was stored (same id, same start and end) is accepted even when it is shorter than 0.3 seconds or overlaps another stored segment, so a recording whose transcription made such a segment can still be saved after you edit another one. A segment that you change, or a new one, has to pass. Anything refused answers `400` with the segment and the reason, and nothing is saved.",
+        "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.\n\n## Review state and QA warnings\n\n**Review state.** `metadata.review` holds `status` (`PENDING` or `REVIEWED`), `reviewedBy` and `reviewedAt`, per segment, on every track. To mark a segment as reviewed, `GET` the track, set `metadata.review` to `{ \"status\": \"REVIEWED\", \"reviewedBy\": { \"id\": \"<uuid>\", \"name\": \"<name>\" }, \"reviewedAt\": \"<ISO date-time>\" }` on that segment and `PUT` the full track back. The server stores the review exactly as sent and does not verify the reviewer. It does **not** change the review when you change the text of a segment: the Studio editor sets a segment back to `PENDING` when a person edits it, but this endpoint stores what you send, so set `PENDING` yourself on every segment whose text you rewrite. A segment sent without `metadata.review` counts as not reviewed.\n\n**Review progress.** `reviewProgress` on `GET /v1/projects` and on `GET /v1/projects/{id}` counts `reviewedSegments` against `totalSegments` for each step and language, recomputed from the segments of every track on each `PUT`. A shared project only lists the steps and languages its share includes.\n\n**QA warnings.** QA warnings are not stored or returned by the API. Studio computes them per segment from the rules of the project's subtitle profile (`GET /v1/subtitle-profiles`), and a caller can do the same. A segment breaks a rule when:\n\n* its longest line has more than `maxLineCharacterCount` characters;\n* its characters per second (characters of the text divided by its duration) is above `charactersPerSecond`;\n* its duration is below `minDuration`, or below `minGapFrames` frames at the frame rate of the recording (`fps`);\n* its duration is above `maxDuration`;\n* it has more than `maxLinesPerScreen` lines;\n* two consecutive words are further apart than `maxGapBetweenWords` seconds.\n\n## What is checked\n\nThe same checks as in the Studio editor, in Studio and in this API:\n\n* The track must exist for the recording: `source=true` takes the source language of the recording, otherwise `language` must be one of its translation languages. `source` and `dubbing` cannot both be `true`.\n* A segment is at least 0.3 seconds long.\n* Two segments of one speaker do not overlap. On-screen texts are left out of this: they may overlap each other and the spoken segments.\n\nWhat is stored already is not held against you: a segment that is sent back exactly as it was stored (same id, same start and end) is accepted even when it is shorter than 0.3 seconds or overlaps another stored segment, so a recording whose transcription made such a segment can still be saved after you edit another one. A segment that you change, or a new one, has to pass. Anything refused answers `400` with the segment and the reason, and nothing is saved.\n\n## Limits\n\nAt most 20,000 segments in one save, at most 2,500 words in a segment, a segment text of at most 5,000 characters, a word of at most 500 characters, and at most 200 speakers in `speakerVolumes` and `speakerVoiceSettings`. A request over a limit answers `400` and nothing is saved.\n\n## Credits\n\nSaving the text uses no credits. A save with `segmentsToRedub` and `enqueueTtsUpdate` makes new speech: an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403` for it.",
         "operationId": "updateSubtitles",
         "security": [
           {
@@ -3636,7 +3576,7 @@
             }
           },
           "403": {
-            "description": "The project is not shared with you, or your share of the project does not include this step or language.",
+            "description": "Forbidden: the project is not shared with you, or your share of the project does not include this step or language. Also returned when `segmentsToRedub` is sent and your organization has no credits left (`No remaining minutes available`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3955,7 +3895,7 @@
           "Recordings"
         ],
         "summary": "Translate Recording",
-        "description": "Add one or more target translation languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists — for example the caller forgot a language at creation time, the user asks for another language later, or the caller only learns which language is needed after seeing the transcript.\n\n## Precondition: source transcription must be complete\n\nTranslation reads the recording's transcript, so it can only run after transcription has finished. This is **not enforced synchronously** by this endpoint — a call made too early is accepted and queued, but produces no usable result. Before calling this endpoint, poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until `transcription.status` is `done`.\n\n## Re-requesting a language\n\nA language already in the recording's translation languages is not skipped — it is retranslated (logged as a retranslation rather than an initial translation). Only include a language in `languages` if you actually want it (re-)translated; use `ignoredLanguages` to record a language as intentionally not translated without omitting it from tracking.\n\n## Language support\n\n`languages` accepts any BCP-47-style code Phrase Studio has translation support for — effectively all locales except the literal `auto` placeholder. Do not pass the recording's own source language: it is rejected with `400` (see `source_language_as_target` below), like an unsupported code. Nothing is started for any language of a rejected request.\n\n## After translation completes\n\nCall `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to dub any of the resulting languages — dubbing requires the language to be translated first.\n\n## Response\n\nThe call answers `202 Accepted` as soon as the work is queued, not when it is done. The body's `statusUrl` is the path to poll (`GET`, same credentials) until the result you need is ready. If the work could not be started, the step is listed as `failed` with `errorCode` and `errorMessage` instead of the call failing.",
+        "description": "Add one or more target translation languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists — for example the caller forgot a language at creation time, the user asks for another language later, or the caller only learns which language is needed after seeing the transcript.\n\n## Precondition: source transcription must be complete\n\nTranslation reads the recording's transcript, so it can only run after transcription has finished. This is **not enforced synchronously** by this endpoint — a call made too early is accepted and queued, but produces no usable result. Before calling this endpoint, poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until `transcription.status` is `done`.\n\n## Re-requesting a language\n\nA language already in the recording's translation languages is not skipped — it is retranslated (logged as a retranslation rather than an initial translation). Only include a language in `languages` if you actually want it (re-)translated. Use `ignoredLanguages` for a language whose subtitles you provide yourself: Studio does not translate it.\n\n## Credits\n\nOnly a language the recording does not have yet is charged: `ceil(duration / 60)` minutes per language, also when you provide its subtitles yourself with `ignoredLanguages`. Retranslating a language the recording already has is free. `POST .../estimates` tells the price before you start. An organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403` for every translation, charged or not\n\n## Language support\n\n`languages` accepts any BCP-47-style code Phrase Studio has translation support for — effectively all locales except the literal `auto` placeholder. Do not pass the recording's own source language: it is rejected with `400` (see `source_language_as_target` below), like an unsupported code. Nothing is started for any language of a rejected request.\n\n## After translation completes\n\nCall `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to dub any of the resulting languages — dubbing requires the language to be translated first.\n\n## Response\n\nThe call answers `202 Accepted` as soon as the work is queued, not when it is done. The body's `statusUrl` is the path to poll (`GET`, same credentials) until the result you need is ready. If the work could not be started, the step is listed as `failed` with `errorCode` and `errorMessage` instead of the call failing.",
         "operationId": "translateRecording",
         "security": [
           {
@@ -4143,7 +4083,7 @@
           "Recordings"
         ],
         "summary": "Dub Recording",
-        "description": "Add one or more target dubbing languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists.\n\n## Precondition: the language must already be translated\n\nDubbing is generated from that language's translated subtitles, so a language can only be dubbed after it has been translated (see `POST /v1/projects/{projectId}/recordings/{recordingId}/translate`). A language without a finished translation is rejected with `400` that names it (see `language_not_translated` below), and nothing is started for any language of that request. Before calling this endpoint, poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` and confirm every language you pass has `status` `done` in `translations`.\n\n## Language support depends on the project's TTS provider\n\nEach Studio project uses one text-to-speech provider, configured in project preferences (falls back to the account default). The set of dubbable languages is different for each provider — always check which provider the project uses before picking languages. Requesting a language unsupported by the project's current provider fails fast with `400` and a message naming the unsupported languages and the provider (see `language_not_supported_by_provider` below) — no dubbing subtitle file or task is created for it.\n\n- **ElevenLabs v2** — 30 languages, base language only (no distinct regional voices; a region-specific code like `en-GB` is accepted only by falling back to its base `en`): `ar, bg, cs, da, de, el, en, es, fi, fil, fr, hi, hr, id, it, ja, ko, ms, nl, pl, pt, ro, ru, sk, sv, ta, tl, tr, uk, zh`\n- **ElevenLabs v3** — 77 languages, base language only (same fallback caveat as v2): `af, ar, as, az, be, bg, bn, bs, ca, ceb, cs, cy, da, de, el, en, es, et, fa, fi, fil, fr, ga, gl, gu, ha, he, hi, hr, hu, hy, id, is, it, ja, jw, ka, kk, kn, ko, ky, lb, ln, lt, lv, mk, ml, mr, ms, ne, nl, nn, no, ny, pa, pl, prs, ps, pt, ro, ru, sd, sk, sl, so, sr, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh`\n- **Azure TTS** — the only provider with real, distinct regional voices: 155 specific locales (not fallback-inherited) covering 85 languages: `af-ZA, am-ET, ar-AE, ar-BH, ar-DZ, ar-EG, ar-IQ, ar-JO, ar-KW, ar-LB, ar-LY, ar-MA, ar-OM, ar-QA, ar-SA, ar-SY, ar-TN, ar-YE, as-IN, az-AZ, bg-BG, bn-BD, bn-IN, bs-BA, ca-ES, cs-CZ, cy-GB, da-DK, de-AT, de-CH, de-DE, el-GR, en-AU, en-CA, en-GB, en-HK, en-IE, en-IN, en-KE, en-NG, en-NZ, en-PH, en-SG, en-TZ, en-US, en-ZA, es-AR, es-BO, es-CL, es-CO, es-CR, es-CU, es-DO, es-EC, es-ES, es-GQ, es-GT, es-HN, es-MX, es-NI, es-PA, es-PE, es-PR, es-PY, es-SV, es-US, es-UY, es-VE, et-EE, eu-ES, fa-IR, fi-FI, fil-PH, fr-BE, fr-CA, fr-CH, fr-FR, ga-IE, gl-ES, gu-IN, he-IL, hi-IN, hr-HR, hu-HU, hy-AM, id-ID, is-IS, it-CH, it-IT, iu-Cans-CA, iu-Latn-CA, ja-JP, jv-ID, ka-GE, kk-KZ, km-KH, kn-IN, ko-KR, lo-LA, lt-LT, lv-LV, mk-MK, ml-IN, mn-MN, mr-IN, ms-MY, mt-MT, my-MM, nb-NO, ne-NP, nl-BE, nl-NL, or-IN, pa-IN, pl-PL, ps-AF, pt-BR, pt-PT, ro-RO, ru-RU, si-LK, sk-SK, sl-SI, so-SO, sq-AL, sr-Latn-RS, sr-RS, su-ID, sv-SE, sw-KE, sw-TZ, ta-IN, ta-LK, ta-MY, ta-SG, te-IN, th-TH, tr-TR, uk-UA, ur-IN, ur-PK, uz-UZ, vi-VN, wuu-CN, yue-CN, zh-CN, zh-CN-guangxi, zh-CN-henan, zh-CN-liaoning, zh-CN-shaanxi, zh-CN-shandong, zh-CN-sichuan, zh-HK, zh-TW, zu-ZA`. A base code without a region (e.g. plain `zh`) is resolved to one of that language's locales above; pass the specific regional code when you need a particular one (e.g. `zh-TW` rather than `zh-CN`).\n\n## Re-requesting a language\n\nA language already in the recording's dubbing languages is not skipped — it is re-dubbed. `ignoredLanguages` is accepted on this request for shape-parity with the translate endpoint but has no effect on dubbing; every language listed in `languages` is processed.\n\n## Response\n\nThe call answers `202 Accepted` as soon as the work is queued, not when it is done. The body's `statusUrl` is the path to poll (`GET`, same credentials) until the result you need is ready. If the work could not be started, the step is listed as `failed` with `errorCode` and `errorMessage` instead of the call failing.",
+        "description": "Add one or more target dubbing languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists.\n\n## Precondition: the language must already be translated\n\nDubbing is generated from that language's translated subtitles, so a language can only be dubbed after it has been translated (see `POST /v1/projects/{projectId}/recordings/{recordingId}/translate`). A language without a finished translation is rejected with `400` that names it (see `language_not_translated` below), and nothing is started for any language of that request. Before calling this endpoint, poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` and confirm every language you pass has `status` `done` in `translations`.\n\n## Language support depends on the project's TTS provider\n\nEach Studio project uses one text-to-speech provider, configured in project preferences (falls back to the account default). The set of dubbable languages is different for each provider — always check which provider the project uses before picking languages. Requesting a language unsupported by the project's current provider fails fast with `400` and a message naming the unsupported languages and the provider (see `language_not_supported_by_provider` below) — no dubbing subtitle file or task is created for it.\n\n- **ElevenLabs v2** — 30 languages, base language only (no distinct regional voices; a region-specific code like `en-GB` is accepted only by falling back to its base `en`): `ar, bg, cs, da, de, el, en, es, fi, fil, fr, hi, hr, id, it, ja, ko, ms, nl, pl, pt, ro, ru, sk, sv, ta, tl, tr, uk, zh`\n- **ElevenLabs v3** — 77 languages, base language only (same fallback caveat as v2): `af, ar, as, az, be, bg, bn, bs, ca, ceb, cs, cy, da, de, el, en, es, et, fa, fi, fil, fr, ga, gl, gu, ha, he, hi, hr, hu, hy, id, is, it, ja, jw, ka, kk, kn, ko, ky, lb, ln, lt, lv, mk, ml, mr, ms, ne, nl, nn, no, ny, pa, pl, prs, ps, pt, ro, ru, sd, sk, sl, so, sr, sv, sw, ta, te, th, tl, tr, uk, ur, vi, zh`\n- **Azure TTS** — the only provider with real, distinct regional voices: 155 specific locales (not fallback-inherited) covering 85 languages: `af-ZA, am-ET, ar-AE, ar-BH, ar-DZ, ar-EG, ar-IQ, ar-JO, ar-KW, ar-LB, ar-LY, ar-MA, ar-OM, ar-QA, ar-SA, ar-SY, ar-TN, ar-YE, as-IN, az-AZ, bg-BG, bn-BD, bn-IN, bs-BA, ca-ES, cs-CZ, cy-GB, da-DK, de-AT, de-CH, de-DE, el-GR, en-AU, en-CA, en-GB, en-HK, en-IE, en-IN, en-KE, en-NG, en-NZ, en-PH, en-SG, en-TZ, en-US, en-ZA, es-AR, es-BO, es-CL, es-CO, es-CR, es-CU, es-DO, es-EC, es-ES, es-GQ, es-GT, es-HN, es-MX, es-NI, es-PA, es-PE, es-PR, es-PY, es-SV, es-US, es-UY, es-VE, et-EE, eu-ES, fa-IR, fi-FI, fil-PH, fr-BE, fr-CA, fr-CH, fr-FR, ga-IE, gl-ES, gu-IN, he-IL, hi-IN, hr-HR, hu-HU, hy-AM, id-ID, is-IS, it-CH, it-IT, iu-Cans-CA, iu-Latn-CA, ja-JP, jv-ID, ka-GE, kk-KZ, km-KH, kn-IN, ko-KR, lo-LA, lt-LT, lv-LV, mk-MK, ml-IN, mn-MN, mr-IN, ms-MY, mt-MT, my-MM, nb-NO, ne-NP, nl-BE, nl-NL, or-IN, pa-IN, pl-PL, ps-AF, pt-BR, pt-PT, ro-RO, ru-RU, si-LK, sk-SK, sl-SI, so-SO, sq-AL, sr-Latn-RS, sr-RS, su-ID, sv-SE, sw-KE, sw-TZ, ta-IN, ta-LK, ta-MY, ta-SG, te-IN, th-TH, tr-TR, uk-UA, ur-IN, ur-PK, uz-UZ, vi-VN, wuu-CN, yue-CN, zh-CN, zh-CN-guangxi, zh-CN-henan, zh-CN-liaoning, zh-CN-shaanxi, zh-CN-shandong, zh-CN-sichuan, zh-HK, zh-TW, zu-ZA`. A base code without a region (e.g. plain `zh`) is resolved to one of that language's locales above; pass the specific regional code when you need a particular one (e.g. `zh-TW` rather than `zh-CN`).\n\n## Re-requesting a language\n\nA language already in the recording's dubbing languages is not skipped — it is re-dubbed. `ignoredLanguages` is accepted on this request for shape-parity with the translate endpoint but has no effect on dubbing; every language listed in `languages` is processed.\n\n## Response\n\nThe call answers `202 Accepted` as soon as the work is queued, not when it is done. The body's `statusUrl` is the path to poll (`GET`, same credentials) until the result you need is ready. If the work could not be started, the step is listed as `failed` with `errorCode` and `errorMessage` instead of the call failing.\n\n## Credits\n\nDubbing uses no credits, in a language that is translated already. An organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`.",
         "operationId": "dubRecording",
         "security": [
           {
@@ -4617,7 +4557,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4638,7 +4578,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4739,6 +4679,26 @@
                       ],
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -5040,6 +5000,26 @@
           "204": {
             "description": "Pronunciation set deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -5129,7 +5109,7 @@
           "Pronunciations"
         ],
         "summary": "Clone a pronunciation set",
-        "description": "Copy a pronunciation set, with its pairs, into your own sets under the name \"<name> (copy)\". Any member of the organization may clone. Returns the copy.",
+        "description": "Copy a pronunciation set, with its pairs, into your own sets under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
         "operationId": "clonePronunciation",
         "security": [
           {
@@ -5180,6 +5160,26 @@
                       ],
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -5727,6 +5727,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -5859,6 +5879,26 @@
                       "shared": false,
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -6132,6 +6172,26 @@
           "204": {
             "description": "Glossary deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -6201,7 +6261,7 @@
           "Glossaries"
         ],
         "summary": "Clone a glossary",
-        "description": "Copy a glossary into your own glossaries under the name \"<name> (copy)\". Any member of the organization may clone. Returns the copy.",
+        "description": "Copy a glossary into your own glossaries under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
         "operationId": "cloneGlossary",
         "security": [
           {
@@ -6244,6 +6304,26 @@
                       "shared": false,
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -6390,6 +6470,26 @@
                       ],
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -6691,6 +6791,26 @@
           "204": {
             "description": "Insight deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -6780,7 +6900,7 @@
           "Insights"
         ],
         "summary": "Clone an insight",
-        "description": "Copy an insight, with its items, into your own insights under the name \"<name> (copy)\". Any member of the organization may clone. Returns the copy.",
+        "description": "Copy an insight, with its items, into your own insights under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
         "operationId": "cloneInsight",
         "security": [
           {
@@ -6831,6 +6951,26 @@
                       ],
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -7370,6 +7510,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -7513,6 +7673,26 @@
                       "charactersPerSecond": 20,
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -7817,6 +7997,26 @@
           "204": {
             "description": "The subtitle profile was deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -7887,7 +8087,7 @@
           "Subtitle Profiles"
         ],
         "summary": "Clone a subtitle profile",
-        "description": "Copy a subtitle profile, a default or one of your organization, into your own profiles under the name \"<name> (copy)\". Returns the copy.",
+        "description": "Copy a subtitle profile, a default or one of your organization, into your own profiles under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Returns the copy.",
         "operationId": "cloneSubtitleProfile",
         "security": [
           {
@@ -7941,6 +8141,26 @@
                       "charactersPerSecond": 20,
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -8036,7 +8256,7 @@
           "Templates"
         ],
         "summary": "Get templates",
-        "description": "Retrieve the project templates of your organization. A template is a saved set of project settings. The translation management ids inside come from the TMS. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+        "description": "Retrieve the project templates of your organization. A template is a saved set of project settings. The translation management ids inside come from the TMS. Members of the organization can read every item of the organization.",
         "operationId": "getTemplates",
         "security": [
           {
@@ -8155,7 +8375,7 @@
           "Templates"
         ],
         "summary": "Create a template",
-        "description": "Create a project template. Every dubbing language must also be a translation language or the source language; otherwise the call is rejected with `400`. Returns the created template.",
+        "description": "Create a project template. Every dubbing language must also be a translation language or the source language; otherwise the call is rejected with `400`. What a template stores has to work when a project is made from it, so the settings are checked when you save them: `glossaryId`, `subtitleProfileId`, the ids in `translation.subtitleProfiles` and in `dubbing.pronunciations` must be items your organization can see, otherwise the call is rejected with `400` (`<field> refers to something that is not available to your organization: <id>`); the translation `preferences` follow the rules of the project settings (a translation model from the allowed choices, a machine translation profile only with a model that takes one, a translation memory only with a Phrase AI model). Returns the created template.",
         "operationId": "createTemplate",
         "security": [
           {
@@ -8380,6 +8600,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -8447,7 +8687,7 @@
           "Templates"
         ],
         "summary": "Update a template",
-        "description": "Change fields of a template. Send only what changes; `settings` replaces all settings. Only the owner of the template or a manager of the organization may change it; for anyone else the answer is `404`. Returns the template as it is afterwards.",
+        "description": "Change fields of a template. Send only what changes; `settings` replaces all settings. Only the owner of the template or a manager of the organization may change it; for anyone else the answer is `404`. The new `settings` are checked as when a template is created. `glossaryId`, `subtitleProfileId`, the ids in `translation.subtitleProfiles` and in `dubbing.pronunciations` must be items your organization can see, otherwise the call is rejected with `400` (`<field> refers to something that is not available to your organization: <id>`); the translation `preferences` follow the rules of the project settings (a translation model from the allowed choices, a machine translation profile only with a model that takes one, a translation memory only with a Phrase AI model). Returns the template as it is afterwards.",
         "operationId": "updateTemplate",
         "security": [
           {
@@ -8656,6 +8896,26 @@
           "204": {
             "description": "Template deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -8697,7 +8957,7 @@
             }
           },
           "409": {
-            "description": "Conflict: an item with this name already exists in your organization.",
+            "description": "Conflict: a credential trigger still uses the template.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8705,10 +8965,10 @@
                 },
                 "examples": {
                   "e409": {
-                    "summary": "Conflict: an item with this name already exists in your organization.",
+                    "summary": "Conflict: a credential trigger still uses the template.",
                     "value": {
                       "statusCode": 409,
-                      "message": "An item with the name \"x\" already exists",
+                      "message": "Template is still linked to a credential trigger and cannot be deleted",
                       "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
@@ -8745,7 +9005,7 @@
           "Templates"
         ],
         "summary": "Clone a template",
-        "description": "Copy a template into your own templates under the name \"<name> (copy)\". Any member of the organization may clone. Returns the copy.",
+        "description": "Copy a template into your own templates under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
         "operationId": "cloneTemplate",
         "security": [
           {
@@ -8797,6 +9057,26 @@
                       },
                       "createdAt": "2026-01-01T00:00:00.000Z",
                       "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -9082,6 +9362,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -9353,6 +9653,26 @@
           "204": {
             "description": "Voice deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -9422,7 +9742,7 @@
           "Recordings"
         ],
         "summary": "Get speakers",
-        "description": "Retrieve the speakers of a recording and the voice assigned to each one, per provider and language. Needs read access to the dubbing step.",
+        "description": "Retrieve the speakers of a recording and the voice assigned to each one, per provider and language. Needs read access to the transcription step.",
         "operationId": "getRecordingSpeakers",
         "security": [
           {
@@ -9460,27 +9780,58 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Speakers.",
-                  "items": {
-                    "$ref": "#/components/schemas/RecordingSpeaker"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Speakers.",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordingSpeaker"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "speakerName": "Alice",
-                        "providerVoices": {
-                          "eleven_v3": {
-                            "es-es": "provider-voice-id"
-                          }
-                        },
-                        "deletable": false
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "speakerName": "Alice",
+                          "providerVoices": {
+                            "eleven_v3": {
+                              "es-es": "provider-voice-id"
+                            }
+                          },
+                          "deletable": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
                   }
                 }
               }
@@ -9507,7 +9858,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9527,7 +9878,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9636,27 +9987,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Speakers.",
-                  "items": {
-                    "$ref": "#/components/schemas/RecordingSpeaker"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Speakers.",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordingSpeaker"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "speakerName": "Alice",
-                        "providerVoices": {
-                          "eleven_v3": {
-                            "es-es": "provider-voice-id"
-                          }
-                        },
-                        "deletable": false
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "speakerName": "Alice",
+                          "providerVoices": {
+                            "eleven_v3": {
+                              "es-es": "provider-voice-id"
+                            }
+                          },
+                          "deletable": false
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -9703,7 +10065,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9723,7 +10085,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9825,27 +10187,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Speakers.",
-                  "items": {
-                    "$ref": "#/components/schemas/RecordingSpeaker"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Speakers.",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordingSpeaker"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "speakerName": "Alice",
-                        "providerVoices": {
-                          "eleven_v3": {
-                            "es-es": "provider-voice-id"
-                          }
-                        },
-                        "deletable": true
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "speakerName": "Alice",
+                          "providerVoices": {
+                            "eleven_v3": {
+                              "es-es": "provider-voice-id"
+                            }
+                          },
+                          "deletable": true
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -9892,7 +10265,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9912,7 +10285,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10015,27 +10388,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Speakers.",
-                  "items": {
-                    "$ref": "#/components/schemas/RecordingSpeaker"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Speakers.",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordingSpeaker"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "speakerName": "Alice",
-                        "providerVoices": {
-                          "eleven_v3": {
-                            "es-es": "provider-voice-id"
-                          }
-                        },
-                        "deletable": true
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "speakerName": "Alice",
+                          "providerVoices": {
+                            "eleven_v3": {
+                              "es-es": "provider-voice-id"
+                            }
+                          },
+                          "deletable": true
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -10082,7 +10466,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10102,7 +10486,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10204,27 +10588,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Speakers.",
-                  "items": {
-                    "$ref": "#/components/schemas/RecordingSpeaker"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Speakers.",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordingSpeaker"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "speakerName": "Alice",
-                        "providerVoices": {
-                          "eleven_v3": {
-                            "es-es": "provider-voice-id"
-                          }
-                        },
-                        "deletable": true
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "speakerName": "Alice",
+                          "providerVoices": {
+                            "eleven_v3": {
+                              "es-es": "provider-voice-id"
+                            }
+                          },
+                          "deletable": true
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -10271,7 +10666,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10291,7 +10686,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10311,7 +10706,7 @@
             }
           },
           "409": {
-            "description": "Conflict: an item with this name already exists in your organization.",
+            "description": "Conflict: the speaker is still assigned to transcription segments.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10319,10 +10714,10 @@
                 },
                 "examples": {
                   "e409": {
-                    "summary": "Conflict: an item with this name already exists in your organization.",
+                    "summary": "Conflict: the speaker is still assigned to transcription segments.",
                     "value": {
                       "statusCode": 409,
-                      "message": "An item with the name \"x\" already exists",
+                      "message": "Speaker is still assigned to transcription segments",
                       "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
@@ -10411,6 +10806,26 @@
                     "value": {
                       "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
                       "archived": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -10538,6 +10953,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -10559,7 +10994,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: copying a project needs access to all of it; the project is not shared with you, or your share is limited to some steps or languages.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10664,12 +11099,14 @@
                   "source": {
                     "type": "string",
                     "description": "The word or phrase as written.",
-                    "minLength": 1
+                    "minLength": 1,
+                    "maxLength": 512
                   },
                   "target": {
                     "type": "string",
                     "description": "How it is spoken.",
-                    "minLength": 1
+                    "minLength": 1,
+                    "maxLength": 512
                   },
                   "notation": {
                     "type": "string",
@@ -10705,28 +11142,39 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Pronunciation sets of the project.",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectPronunciation"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Pronunciation sets of the project.",
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectPronunciation"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "name": "Project pronunciations",
-                        "languageCode": "es-es",
-                        "items": [
-                          {
-                            "source": "SQL",
-                            "target": "sequel"
-                          }
-                        ]
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "name": "Project pronunciations",
+                          "languageCode": "es-es",
+                          "items": [
+                            {
+                              "source": "SQL",
+                              "target": "sequel"
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -10773,7 +11221,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project is not shared with you, or your share does not include the dubbing of this language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10841,7 +11289,7 @@
           "Exports"
         ],
         "summary": "Export a recording",
-        "description": "Ask for a file that Studio makes from a recording: a video with the subtitles burned in, a dubbed video or dubbed audio, the dubbed audio as stems or per speaker, or the original audio. A file that is ready at once (the original audio, a bilingual Word document) answers `200` with `downloadUrl`. Anything that has to be rendered answers `202` with `statusUrl`: poll it until `status` is `done` and take `downloadUrl`, or `failed` and read `errorMessage`. Asking again for the same file while it renders returns the same `exportId`. Subtitle files are not rendered by a job; read them with `GET .../exports/subtitles`. Needs read access to the steps and languages the file is made from.\n\nThis replaces `GET /v1/recordings/{recordingId}`.",
+        "description": "Ask for a file that Studio makes from a recording: a video with the subtitles burned in, a dubbed video or dubbed audio, the dubbed audio as stems or per speaker, or the original audio. A file that is ready at once (the original audio, a bilingual Word document) answers `200` with `downloadUrl`. Anything that has to be rendered answers `202` with `statusUrl`: poll it until `status` is `done` and take `downloadUrl`, or `failed` and read `errorMessage`. Asking again for the same file while it renders returns the same `exportId`. Subtitle files are not rendered by a job; read them with `GET .../exports/subtitles`. Needs read access to the steps and languages the file is made from.",
         "operationId": "createExport",
         "security": [
           {
@@ -11001,7 +11449,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11021,7 +11469,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11215,7 +11663,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11235,7 +11683,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11346,6 +11794,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -11367,7 +11835,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11494,6 +11962,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -11515,7 +12003,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11535,7 +12023,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11642,7 +12130,8 @@
             "schema": {
               "type": "number",
               "minimum": 0,
-              "default": 60
+              "default": 60,
+              "maximum": 86400
             }
           }
         ],
@@ -11718,7 +12207,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11738,7 +12227,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11895,7 +12384,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11915,7 +12404,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12010,23 +12499,34 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Custom attributes.",
-                  "items": {
-                    "$ref": "#/components/schemas/CustomAttribute"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Custom attributes.",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomAttribute"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "tagName": "Pricing",
-                        "description": "Prices are discussed.",
-                        "score": 4,
-                        "reference": "00:02:10"
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "tagName": "Pricing",
+                          "description": "Prices are discussed.",
+                          "score": 4,
+                          "reference": "00:02:10"
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -12073,7 +12573,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12093,7 +12593,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12188,23 +12688,34 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Check results.",
-                  "items": {
-                    "$ref": "#/components/schemas/SafeCommunicationResult"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Check results.",
+                      "items": {
+                        "$ref": "#/components/schemas/SafeCommunicationResult"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "name": "Tone check",
-                        "score": 4,
-                        "description": "The tone is polite."
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "name": "Tone check",
+                          "score": 4,
+                          "description": "The tone is polite."
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -12251,7 +12762,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12271,7 +12782,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12366,24 +12877,35 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Answers.",
-                  "items": {
-                    "$ref": "#/components/schemas/InsightResult"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Answers.",
+                      "items": {
+                        "$ref": "#/components/schemas/InsightResult"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                        "name": "Marketing review",
-                        "itemId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
-                        "itemName": "Tone",
-                        "description": "Confident and friendly."
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                          "name": "Marketing review",
+                          "itemId": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                          "itemName": "Tone",
+                          "description": "Confident and friendly."
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -12430,7 +12952,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12450,7 +12972,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12611,7 +13133,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12631,7 +13153,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12679,7 +13201,7 @@
           "Results"
         ],
         "summary": "Transcribe a recording again",
-        "description": "Run the transcription of a recording again, for example with another source language. This uses credits and replaces the transcript. It answers `202` with `statusUrl`; poll the status until `transcription` is `done`. Needs write access to the transcription step.",
+        "description": "Run the transcription of a recording again, for example with another source language. This replaces the transcript. It uses no credits, because the language is not new (the first transcription is charged when the recording is added), but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`. It answers `202` with `statusUrl`; poll the status until `transcription` is `done`. Needs write access to the transcription step.",
         "operationId": "transcribeRecording",
         "security": [
           {
@@ -12789,7 +13311,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item. Also returned when your organization has no credits left (`No remaining minutes available`).",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -12809,7 +13331,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12971,7 +13493,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12991,7 +13513,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13138,7 +13660,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13158,7 +13680,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13303,7 +13825,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13323,7 +13845,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13474,7 +13996,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13494,7 +14016,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13578,6 +14100,26 @@
           "204": {
             "description": "Recording deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -13599,7 +14141,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13716,6 +14258,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -13759,7 +14321,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13809,7 +14371,7 @@
           "Dubbing audio"
         ],
         "summary": "Bring a dubbing up to date with its translation",
-        "description": "Rebuild the dubbing subtitles of a language from its current translation. Dubbing settings (volume, voice settings) of segments that still match are kept. Check `GET .../dubbing-sync-status` first. This only updates the subtitles; dub or redub the changed segments to make new audio. A language without a translation answers `404`. It answers `202` with `statusUrl`. Needs write access to the dubbing step of the language.",
+        "description": "Rebuild the dubbing subtitles of a language from its current translation. Dubbing settings (volume, voice settings) of segments that still match are kept. Check `GET .../dubbing-sync-status` first. This only updates the subtitles; dub or redub the changed segments to make new audio. A language without a translation answers `404`. It answers `202` with `statusUrl`. Needs write access to the dubbing step of the language. It makes no speech and uses no credits, but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`, like dubbing.",
         "operationId": "syncDubbing",
         "security": [
           {
@@ -13919,7 +14481,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project is not shared with you, or your share does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -13939,7 +14501,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14089,7 +14651,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14109,7 +14671,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14263,7 +14825,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14283,7 +14845,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14396,27 +14958,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "description": "Versions.",
-                  "items": {
-                    "$ref": "#/components/schemas/SubtitleVersion"
+                  "type": "object",
+                  "description": "The list is in `data`.",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Versions.",
+                      "items": {
+                        "$ref": "#/components/schemas/SubtitleVersion"
+                      }
+                    }
                   }
                 },
                 "examples": {
                   "example": {
                     "summary": "Example",
-                    "value": [
-                      {
-                        "id": "1794834022559",
-                        "savedAt": "2026-11-16T13:00:23.328Z",
-                        "savedBy": {
-                          "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
-                          "name": "API"
-                        },
-                        "segmentCount": 2,
-                        "reviewedSegmentCount": 1
-                      }
-                    ]
+                    "value": {
+                      "data": [
+                        {
+                          "id": "1794834022559",
+                          "savedAt": "2026-11-16T13:00:23.328Z",
+                          "savedBy": {
+                            "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                            "name": "API"
+                          },
+                          "segmentCount": 2,
+                          "reviewedSegmentCount": 1
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -14463,7 +15036,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14483,7 +15056,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14662,7 +15235,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14682,7 +15255,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14838,7 +15411,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14850,26 +15423,6 @@
                     "value": {
                       "statusCode": 403,
                       "message": "You are not authorized to modify this item",
-                      "timestamp": "2026-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found, or not visible to you.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "e404": {
-                    "summary": "Not found, or not visible to you.",
-                    "value": {
-                      "statusCode": 404,
-                      "message": "Not found",
                       "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
@@ -15012,7 +15565,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item. Also returned when your organization has no credits left (`No remaining minutes available`).",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -15031,28 +15584,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not found, or not visible to you.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "e404": {
-                    "summary": "Not found, or not visible to you.",
-                    "value": {
-                      "statusCode": 404,
-                      "message": "Not found",
-                      "timestamp": "2026-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "409": {
-            "description": "Conflict: an item with this name already exists in your organization.",
+            "description": "Conflict: this recording was already added.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15060,10 +15593,10 @@
                 },
                 "examples": {
                   "e409": {
-                    "summary": "Conflict: an item with this name already exists in your organization.",
+                    "summary": "Conflict: this recording was already added.",
                     "value": {
                       "statusCode": 409,
-                      "message": "An item with the name \"x\" already exists",
+                      "message": "This recording was already added",
                       "timestamp": "2026-01-01T00:00:00.000Z"
                     }
                   }
@@ -15185,6 +15718,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -15227,27 +15780,6 @@
               }
             }
           },
-          "404": {
-            "description": "Not found, or not visible to you.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "e404": {
-                    "summary": "Not found, or not visible to you.",
-                    "value": {
-                      "success": false,
-                      "statusCode": 404,
-                      "message": "Not found",
-                      "timestamp": "2026-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error.",
             "content": {
@@ -15278,7 +15810,7 @@
           "Credits"
         ],
         "summary": "Estimate the cost of an action",
-        "description": "Price a `translate`, `dubbing` or `transcribe` before you start it. Only `translate` costs credits. `transcribe` here is a retranscription of a recording that exists, which is free; the first transcription is charged when the recording is added and has no estimate. Nothing is started and nothing is charged. A language that is already translated, ignored, or the source language costs `0`. Needs the same access as the action itself.",
+        "description": "Price a `translate`, `dubbing` or `transcribe` before you start it. Only `translate` costs credits. `transcribe` here is a retranscription of a recording that exists, which is free; the first transcription is charged when the recording is added and has no estimate. Nothing is started and nothing is charged. A language that is already translated costs `0`. The source language of the recording cannot be translated into: asking for it answers `400`. A new language costs credits even when you provide its subtitles yourself. Needs the same access as the action itself. The answer works for an organization without credits too: `allowed` is then `false` and `balance.state` is `BLOCKED`.",
         "operationId": "createCostEstimate",
         "security": [
           {
@@ -15413,7 +15945,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: you may not change this item.",
+            "description": "Forbidden: the project is not shared with you, or your share does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15433,7 +15965,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15584,7 +16116,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           },
           {
@@ -15783,7 +16324,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           }
         ],
@@ -15905,7 +16455,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           }
         ],
@@ -16021,7 +16580,7 @@
           "Text to speech"
         ],
         "summary": "Generate speech",
-        "description": "Speak a text with an engine and a voice and get the audio back. Pronunciation is corrected the way dubbing does it: inline `pronunciations` and the sets in `pronunciationIds` are applied, and each engine gets them in the form it takes (see `pronunciationMode` of `GET /v1/tts/engines`). Nothing is saved. At most 30 requests a minute per account, and at most 100,000 characters a day for your whole organization (the voice preview and text-to-speech tool of Studio count against the same budget; it resets at 00:00 UTC); more are refused with `429`. Unlike creating a project or ordering a translation it uses no credits, so it also works when your organization has used them up, as the voice preview of Studio does.",
+        "description": "Speak a text with an engine and a voice and get the audio back. The text is at most 500 characters. Pronunciation is corrected the way dubbing does it: inline `pronunciations` and the sets in `pronunciationIds` are applied, and each engine gets them in the form it takes (see `pronunciationMode` of `GET /v1/tts/engines`). Nothing is saved. At most 30 requests a minute per account, and at most 100,000 characters a day for your whole organization (the voice preview and text-to-speech tool of Studio count against the same budget; it resets at 00:00 UTC); more are refused with `429`. It uses no credits, but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`, like the text-to-speech tool of Studio.",
         "operationId": "createSpeech",
         "security": [
           {
@@ -16110,6 +16669,27 @@
                       "statusCode": 401,
                       "message": "Authorization failed",
                       "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Your organization has no credits left (`No remaining minutes available`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "blocked": {
+                    "summary": "No credits left",
+                    "value": {
+                      "success": false,
+                      "statusCode": 403,
+                      "message": "No remaining minutes available",
+                      "timestamp": "2025-01-01T00:00:00.000Z"
                     }
                   }
                 }
@@ -16210,7 +16790,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           },
           {
@@ -16344,7 +16933,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           }
         ],
@@ -16592,7 +17190,16 @@
             "required": false,
             "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eleven_v2",
+                "eleven_v3",
+                "eleven_v4",
+                "eleven_v4_turbo",
+                "azure_tts",
+                "voiseed",
+                "gemini_2_5_flash_tts"
+              ]
             }
           }
         ],
@@ -17007,7 +17614,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17015,7 +17622,7 @@
                 },
                 "examples": {
                   "e403": {
-                    "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                    "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                     "value": {
                       "success": false,
                       "statusCode": 403,
@@ -17183,7 +17790,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17191,7 +17798,7 @@
                 },
                 "examples": {
                   "e403": {
-                    "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                    "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                     "value": {
                       "success": false,
                       "statusCode": 403,
@@ -17204,7 +17811,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17355,7 +17962,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17363,7 +17970,7 @@
                 },
                 "examples": {
                   "e403": {
-                    "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                    "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                     "value": {
                       "success": false,
                       "statusCode": 403,
@@ -17527,7 +18134,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17535,7 +18142,7 @@
                 },
                 "examples": {
                   "e403": {
-                    "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                    "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                     "value": {
                       "success": false,
                       "statusCode": 403,
@@ -17577,7 +18184,7 @@
           "Subtitles"
         ],
         "summary": "Upload a subtitle file",
-        "description": "Replaces the subtitles of one track with the cues of an `.srt` or `.vtt` file (at most 10 MB), parsed like the Upload subtitles action of the Studio editor: each cue becomes a segment with the speaker `Unknown`, and its words are timed along the cue. The result is saved like `PUT …/subtitles` and goes through the same checks, so a file whose cues overlap or fall outside the recording is refused with `400`. Send `multipart/form-data`. Needs write access to the track.",
+        "description": "Replaces the subtitles of one track with the cues of an `.srt` or `.vtt` file (at most 10 MB), parsed like the Upload subtitles action of the Studio editor: each cue becomes a segment with the speaker `Unknown`, and its words are timed along the cue. The result is saved like `PUT …/subtitles` and goes through the same checks, so a file whose cues overlap or fall outside the recording is refused with `400`. A cue that ends before it starts, has no duration or has no text is skipped and listed in `warnings`; a file without any usable cue is refused with `400`. Send `multipart/form-data`. Needs write access to the track.",
         "operationId": "uploadSubtitleFile",
         "security": [
           {
@@ -17682,7 +18289,7 @@
             }
           },
           "403": {
-            "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+            "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17690,7 +18297,7 @@
                 },
                 "examples": {
                   "e403": {
-                    "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                    "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                     "value": {
                       "success": false,
                       "statusCode": 403,
@@ -17703,7 +18310,7 @@
             }
           },
           "404": {
-            "description": "Not found, or not visible to you.",
+            "description": "The recording does not exist in this project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18153,27 +18760,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden: your organization is blocked.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "e403": {
-                    "summary": "Forbidden: your organization is blocked.",
-                    "value": {
-                      "success": false,
-                      "statusCode": 403,
-                      "message": "You are not authorized to access this resource",
-                      "timestamp": "2026-01-01T00:00:00.000Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error.",
             "content": {
@@ -18416,6 +19002,26 @@
         "responses": {
           "204": {
             "description": "The family was deleted"
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized (invalid API key).",
@@ -18702,6 +19308,26 @@
           "204": {
             "description": "The file was deleted"
           },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized (invalid API key).",
             "content": {
@@ -18821,6 +19447,26 @@
                   "example": {
                     "summary": "Example",
                     "value": "(binary font file)"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: an id in the path is not a valid UUID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "Invalid id",
+                    "value": {
+                      "statusCode": 400,
+                      "message": "not-a-uuid does not match the required regex",
+                      "timestamp": "2026-01-01T00:00:00.000Z"
+                    }
                   }
                 }
               }
@@ -19637,7 +20283,7 @@
       },
       "UpdateProjectRequest": {
         "type": "object",
-        "description": "Partial update payload for project preferences and visibility. Only fields present in the body are applied; omitted fields are preserved.",
+        "description": "Partial update payload for project preferences and visibility. Only fields present in the body are applied; omitted fields are preserved. The model types of Studio (`insightsModelType`, `translationModelType`) follow from the model names and cannot be set: they are accepted and ignored.",
         "properties": {
           "name": {
             "type": "string",
@@ -19671,17 +20317,18 @@
               "eleven_v4",
               "eleven_v4_turbo",
               "azure_tts",
+              "voiseed",
               "gemini_2_5_flash_tts"
             ],
             "description": "Text-to-speech provider for dubbing. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
           },
           "mtProfileId": {
             "type": "string",
-            "description": "Phrase TMS machine translation profile uid, for the translation model `plai` only. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it. Send an empty string to remove it. For `aita` Studio chooses the profile itself (the first one of your Phrase TMS connection, or the one already set while it still exists), so do not send it; a GPT model has none. Sending it for any other model is refused with `400`."
+            "description": "Phrase TMS machine translation profile uid, for the translation model `plai` only. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it. An empty string is refused with `400`. For `aita` Studio chooses the profile itself (the first one of your Phrase TMS connection, or the one already set while it still exists), so do not send it; a GPT model has none. Sending it for any other model is refused with `400`."
           },
           "translationMemoryId": {
             "type": "string",
-            "description": "Phrase TMS translation memory uid, for the translation models `plai` and `aita`. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it. Send an empty string to remove it. Changing to a GPT model removes it; setting it while the model is a GPT model is refused with `400`."
+            "description": "Phrase TMS translation memory uid, for the translation models `plai` and `aita`. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it. An empty string is refused with `400`. Changing to a GPT model removes it; setting it while the model is a GPT model is refused with `400`."
           },
           "isPublic": {
             "type": "boolean",
@@ -19700,7 +20347,8 @@
         "properties": {
           "word": {
             "type": "string",
-            "description": "Word text"
+            "description": "Word text, at most 500 characters.",
+            "maxLength": 500
           },
           "time_begin": {
             "type": "number",
@@ -19750,10 +20398,11 @@
           "words": {
             "type": "array",
             "minItems": 1,
-            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports.",
+            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports. At most 2,500 words per segment.",
             "items": {
               "$ref": "#/components/schemas/SubtitleWord"
-            }
+            },
+            "maxItems": 2500
           },
           "speaker": {
             "type": "string",
@@ -19765,7 +20414,8 @@
           },
           "text": {
             "type": "string",
-            "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability)."
+            "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability). At most 5,000 characters.",
+            "maxLength": 5000
           },
           "metadata": {
             "allOf": [
@@ -19810,7 +20460,7 @@
         "properties": {
           "language": {
             "type": "string",
-            "description": "BCP-47 language code of the track to write"
+            "description": "Language code of the track to write: one of the subtitle languages of Studio."
           },
           "source": {
             "type": "boolean",
@@ -19830,25 +20480,43 @@
           },
           "speakerVolumes": {
             "type": "object",
+            "maxProperties": 200,
             "additionalProperties": {
-              "type": "number"
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
             },
-            "description": "Per-speaker volume overrides (dubbing only); values above 2 are treated as 2"
+            "description": "Per-speaker volume overrides (dubbing only), at most 200 speakers. Each value is from 0 to 2; a value outside the range is refused with `400`."
           },
           "speakerVoiceSettings": {
             "type": "object",
+            "maxProperties": 200,
             "additionalProperties": {
               "type": "object",
-              "additionalProperties": true
+              "properties": {
+                "stability": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Voice stability, from 0 to 1."
+                },
+                "similarity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Voice similarity, from 0 to 1."
+                }
+              },
+              "description": "Voice settings of one speaker."
             },
-            "description": "Per-speaker TTS voice settings (dubbing only)"
+            "description": "Per-speaker TTS voice settings (dubbing only), at most 200 speakers."
           },
           "segmentsToRedub": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Segment ids that should be re-synthesized after this update"
+            "description": "Segment ids that should be re-synthesized after this update. Re-dubbing makes new speech, so it is refused with `403` when your organization has used up its credits; saving the text without `segmentsToRedub` is not."
           },
           "enqueueTtsUpdate": {
             "type": "boolean",
@@ -19857,10 +20525,16 @@
           },
           "subtitles": {
             "type": "array",
-            "description": "Full segment list for the target language track. The endpoint performs a bulk replace, so the array must contain every segment in the final state, not just the edited ones. Every segment must include a non-empty `words` array; omitting a segment deletes it, and an empty `words` array drops the segment on the next read.",
+            "description": "Full segment list for the target language track. The endpoint performs a bulk replace, so the array must contain every segment in the final state, not just the edited ones. Every segment must include a non-empty `words` array; omitting a segment deletes it, and an empty `words` array drops the segment on the next read. At most 20,000 segments.",
             "items": {
               "$ref": "#/components/schemas/SubtitleSegment"
-            }
+            },
+            "maxItems": 20000
+          },
+          "editedBy": {
+            "type": "object",
+            "description": "Accepted and ignored: a save through the API is always attributed to the API in the version history.",
+            "additionalProperties": true
           }
         }
       },
@@ -19883,7 +20557,7 @@
               "type": "string"
             },
             "default": [],
-            "description": "Subset of `languages` to record as intentionally not translated (tracked on the recording so it shows as deliberately skipped, not pending or failed) instead of actually running translation for it"
+            "description": "Subset of `languages` whose subtitles you provide yourself (upload them with `POST .../subtitles/upload` or `PUT .../subtitles` first): Studio does not translate them. They are tracked as provided, not pending or failed. A language that the recording does not have yet is charged like any new translation language."
           },
           "tmsProjectTemplateUid": {
             "type": "string",
@@ -19926,7 +20600,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate) — this is not checked, so an untranslated language is silently accepted but produces no dubbing output. Each language must also be supported by the project's configured TTS provider, which IS checked — an unsupported language fails the whole request with 400."
+            "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate): a language that is not translated is refused with `400` that names it, and nothing is started for any language of the request. Each language must also be supported by the project's configured TTS provider; an unsupported language fails the whole request with `400`."
           },
           "ignoredLanguages": {
             "type": "array",
@@ -20067,6 +20741,10 @@
               "$ref": "#/components/schemas/SubtitleSegmentResponseItem"
             },
             "description": "The segments of the track."
+          },
+          "expandToContent": {
+            "type": "boolean",
+            "description": "Audio-only dubbing tracks only, present when it is on: each segment grows to the natural length of its speech instead of fitting the original timing. Read only: it is chosen with `expandToContent` of the dubbing request, and `PUT .../subtitles` does not accept it."
           }
         }
       },
@@ -20125,7 +20803,8 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 128,
-            "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks."
+            "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks.",
+            "pattern": "^(custom:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|(?!custom:)[^,\\r\\n{}\\\\]{1,128})$"
           },
           "fontSize": {
             "type": "number",
@@ -20173,7 +20852,8 @@
           "textColor": {
             "type": "string",
             "maxLength": 25,
-            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
+            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+            "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "backgroundType": {
             "type": "string",
@@ -20188,7 +20868,8 @@
           "backgroundColor": {
             "type": "string",
             "maxLength": 25,
-            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
+            "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+            "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "delta": {
             "type": "number",
@@ -20425,7 +21106,7 @@
           },
           "pageSize": {
             "type": "integer",
-            "description": "Maximum number of items on a page.",
+            "description": "Items per page. A list that is not paged answers all its items in one page, and `pageSize` is then the number of items in it.",
             "example": 1000
           },
           "total": {
@@ -20533,7 +21214,7 @@
           },
           "reviewProgress": {
             "type": "object",
-            "description": "Review progress per step (`TRANSCRIPTION`, `TRANSLATION`, `DUBBING`) and language, returned by the project list and the project detail. For a shared project only the steps and languages of the share are listed. Present when the project has reviewable segments.",
+            "description": "Review progress per step (`TRANSCRIPTION`, `TRANSLATION`, `DUBBING`) and language, returned by the project list and the project detail. The project detail lists only the steps and languages of your share of a shared project; the project list counts every step and language of the project. Present when the project has reviewable segments.",
             "additionalProperties": {
               "type": "object",
               "description": "Counts per language code.",
@@ -20859,16 +21540,6 @@
                   "ttsProvider": {
                     "type": "string",
                     "description": "Text-to-speech engine for dubbing, an id from `GET /v1/tts/engines`."
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "description": "Creation time.",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "description": "Last update time.",
-                    "format": "date-time"
                   }
                 }
               },
@@ -21083,11 +21754,13 @@
           },
           "source": {
             "type": "string",
-            "description": "Written form of the term."
+            "description": "Written form of the term.",
+            "maxLength": 512
           },
           "target": {
             "type": "string",
-            "description": "How the term is pronounced, written in the given notation."
+            "description": "How the term is pronounced, written in the given notation.",
+            "maxLength": 512
           },
           "notation": {
             "type": "string",
@@ -21332,7 +22005,7 @@
           },
           "layout": {
             "type": "string",
-            "description": "Video layout the profile is made for.",
+            "description": "Video layout the profile is made for. Read only: the API does not change it.",
             "enum": [
               "landscape",
               "portrait",
@@ -21511,12 +22184,14 @@
           "source": {
             "type": "string",
             "description": "The word or phrase as written.",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 512
           },
           "target": {
             "type": "string",
             "description": "How it is spoken.",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 512
           },
           "notation": {
             "type": "string",
@@ -21689,8 +22364,9 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Title of the item.",
-            "minLength": 1
+            "description": "Title of the item, at most 256 characters.",
+            "minLength": 1,
+            "maxLength": 256
           },
           "content": {
             "type": "string",
@@ -21709,8 +22385,9 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Title of the item.",
-            "minLength": 1
+            "description": "Title of the item, at most 256 characters.",
+            "minLength": 1,
+            "maxLength": 256
           },
           "content": {
             "type": "string",
@@ -21725,7 +22402,9 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Profile name."
+            "description": "Profile name.",
+            "minLength": 1,
+            "maxLength": 256
           },
           "description": {
             "type": "string",
@@ -21745,23 +22424,28 @@
           },
           "minDuration": {
             "type": "number",
-            "description": "Minimum duration of a subtitle in seconds."
+            "description": "Minimum duration of a subtitle in seconds.",
+            "minimum": 0
           },
           "maxDuration": {
             "type": "number",
-            "description": "Maximum duration of a subtitle in seconds."
+            "description": "Maximum duration of a subtitle in seconds.",
+            "minimum": 0
           },
           "maxLineCharacterCount": {
             "type": "integer",
-            "description": "Maximum number of characters on a line."
+            "description": "Maximum number of characters on a line.",
+            "minimum": 1
           },
           "maxGapBetweenWords": {
             "type": "number",
-            "description": "Longest pause between two words that still stay in one subtitle, in seconds."
+            "description": "Longest pause between two words that still stay in one subtitle, in seconds.",
+            "minimum": 0
           },
           "minGapFrames": {
             "type": "integer",
-            "description": "Minimum gap between two subtitles in frames."
+            "description": "Minimum gap between two subtitles in frames.",
+            "minimum": 0
           },
           "subtitlePosition": {
             "type": "string",
@@ -21781,35 +22465,54 @@
           },
           "maxLinesPerScreen": {
             "type": "integer",
-            "description": "Maximum number of lines shown at the same time."
+            "description": "Maximum number of lines shown at the same time.",
+            "minimum": 1
           },
           "charactersPerSecond": {
             "type": "number",
-            "description": "Maximum reading speed in characters per second."
+            "description": "Maximum reading speed in characters per second.",
+            "minimum": 1
           },
           "fontFamily": {
             "type": "string",
-            "description": "Font family: a name such as `Arial`, or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`). A custom font that was deleted falls back to Arial in burned-in video."
+            "description": "Font family: a name of 1-128 characters without commas, braces, backslashes or line breaks (such as `Arial`), or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`) that you can use. A custom font that does not exist or is not yours is refused with `400`. A custom font that was deleted later falls back to Arial in burned-in video.",
+            "maxLength": 128
           },
           "fontSize": {
             "type": "number",
-            "description": "Font size."
+            "description": "Font size.",
+            "minimum": 1
           },
           "fontWeight": {
             "type": "string",
-            "description": "Font weight."
+            "description": "Font weight.",
+            "enum": [
+              "normal",
+              "bold"
+            ]
           },
           "fontStyle": {
             "type": "string",
-            "description": "Font style."
+            "description": "Font style.",
+            "enum": [
+              "normal",
+              "italic"
+            ]
           },
           "textAlign": {
             "type": "string",
-            "description": "Text alignment."
+            "description": "Text alignment.",
+            "enum": [
+              "left",
+              "center",
+              "right"
+            ]
           },
           "textColor": {
             "type": "string",
-            "description": "Text color as a CSS color."
+            "description": "Text color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+            "maxLength": 25,
+            "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "backgroundType": {
             "type": "string",
@@ -21823,7 +22526,9 @@
           },
           "backgroundColor": {
             "type": "string",
-            "description": "Background color as a CSS color."
+            "description": "Background color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+            "maxLength": 25,
+            "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "verticalPositioning": {
             "type": "boolean",
@@ -21831,20 +22536,14 @@
           },
           "delta": {
             "type": "number",
-            "description": "Vertical offset of the subtitles."
+            "description": "Vertical offset of the subtitles.",
+            "minimum": 0
           },
           "deltaX": {
             "type": "number",
-            "description": "Horizontal offset of the subtitles."
-          },
-          "layout": {
-            "type": "string",
-            "description": "Video layout the profile is made for.",
-            "enum": [
-              "landscape",
-              "portrait",
-              "portrait_4_5"
-            ]
+            "description": "Horizontal offset of the subtitles.",
+            "minimum": -50,
+            "maximum": 50
           }
         },
         "required": [
@@ -21857,7 +22556,9 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Profile name."
+            "description": "Profile name.",
+            "minLength": 1,
+            "maxLength": 256
           },
           "description": {
             "type": "string",
@@ -21877,23 +22578,28 @@
           },
           "minDuration": {
             "type": "number",
-            "description": "Minimum duration of a subtitle in seconds."
+            "description": "Minimum duration of a subtitle in seconds.",
+            "minimum": 0
           },
           "maxDuration": {
             "type": "number",
-            "description": "Maximum duration of a subtitle in seconds."
+            "description": "Maximum duration of a subtitle in seconds.",
+            "minimum": 0
           },
           "maxLineCharacterCount": {
             "type": "integer",
-            "description": "Maximum number of characters on a line."
+            "description": "Maximum number of characters on a line.",
+            "minimum": 1
           },
           "maxGapBetweenWords": {
             "type": "number",
-            "description": "Longest pause between two words that still stay in one subtitle, in seconds."
+            "description": "Longest pause between two words that still stay in one subtitle, in seconds.",
+            "minimum": 0
           },
           "minGapFrames": {
             "type": "integer",
-            "description": "Minimum gap between two subtitles in frames."
+            "description": "Minimum gap between two subtitles in frames.",
+            "minimum": 0
           },
           "subtitlePosition": {
             "type": "string",
@@ -21913,35 +22619,54 @@
           },
           "maxLinesPerScreen": {
             "type": "integer",
-            "description": "Maximum number of lines shown at the same time."
+            "description": "Maximum number of lines shown at the same time.",
+            "minimum": 1
           },
           "charactersPerSecond": {
             "type": "number",
-            "description": "Maximum reading speed in characters per second."
+            "description": "Maximum reading speed in characters per second.",
+            "minimum": 1
           },
           "fontFamily": {
             "type": "string",
-            "description": "Font family: a name such as `Arial`, or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`). A custom font that was deleted falls back to Arial in burned-in video."
+            "description": "Font family: a name of 1-128 characters without commas, braces, backslashes or line breaks (such as `Arial`), or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`) that you can use. A custom font that does not exist or is not yours is refused with `400`. A custom font that was deleted later falls back to Arial in burned-in video.",
+            "maxLength": 128
           },
           "fontSize": {
             "type": "number",
-            "description": "Font size."
+            "description": "Font size.",
+            "minimum": 1
           },
           "fontWeight": {
             "type": "string",
-            "description": "Font weight."
+            "description": "Font weight.",
+            "enum": [
+              "normal",
+              "bold"
+            ]
           },
           "fontStyle": {
             "type": "string",
-            "description": "Font style."
+            "description": "Font style.",
+            "enum": [
+              "normal",
+              "italic"
+            ]
           },
           "textAlign": {
             "type": "string",
-            "description": "Text alignment."
+            "description": "Text alignment.",
+            "enum": [
+              "left",
+              "center",
+              "right"
+            ]
           },
           "textColor": {
             "type": "string",
-            "description": "Text color as a CSS color."
+            "description": "Text color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+            "maxLength": 25,
+            "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "backgroundType": {
             "type": "string",
@@ -21955,7 +22680,9 @@
           },
           "backgroundColor": {
             "type": "string",
-            "description": "Background color as a CSS color."
+            "description": "Background color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+            "maxLength": 25,
+            "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
           },
           "verticalPositioning": {
             "type": "boolean",
@@ -21963,20 +22690,14 @@
           },
           "delta": {
             "type": "number",
-            "description": "Vertical offset of the subtitles."
+            "description": "Vertical offset of the subtitles.",
+            "minimum": 0
           },
           "deltaX": {
             "type": "number",
-            "description": "Horizontal offset of the subtitles."
-          },
-          "layout": {
-            "type": "string",
-            "description": "Video layout the profile is made for.",
-            "enum": [
-              "landscape",
-              "portrait",
-              "portrait_4_5"
-            ]
+            "description": "Horizontal offset of the subtitles.",
+            "minimum": -50,
+            "maximum": 50
           }
         }
       },
@@ -22053,6 +22774,7 @@
                   "eleven_v4",
                   "eleven_v4_turbo",
                   "azure_tts",
+                  "voiseed",
                   "gemini_2_5_flash_tts"
                 ],
                 "description": "Text-to-speech provider for dubbing. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
@@ -22306,8 +23028,9 @@
           },
           "projectId": {
             "type": "string",
-            "description": "Project to relate the voice to.",
-            "format": "uuid"
+            "description": "Project to relate the voice to. `null` removes the relation.",
+            "format": "uuid",
+            "nullable": true
           }
         }
       },
@@ -22377,6 +23100,7 @@
                     "eleven_v4",
                     "eleven_v4_turbo",
                     "azure_tts",
+                    "voiseed",
                     "gemini_2_5_flash_tts"
                   ],
                   "description": "Text-to-speech provider the voice is for. Defaults to the default provider of Studio. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
@@ -22988,8 +23712,9 @@
         "properties": {
           "speakerName": {
             "type": "string",
-            "description": "Name of the speaker as it is used in the subtitles.",
-            "minLength": 1
+            "description": "Name of the speaker as it is used in the subtitles, at most 256 characters.",
+            "minLength": 1,
+            "maxLength": 256
           }
         },
         "required": [
@@ -23006,7 +23731,8 @@
           },
           "newSpeakerName": {
             "type": "string",
-            "description": "New name."
+            "description": "New name, at most 256 characters.",
+            "maxLength": 256
           }
         },
         "required": [
@@ -23136,7 +23862,8 @@
           "fileName": {
             "type": "string",
             "description": "Name of the file with its extension: `mp4`, `mov`, `mp3`, `wav` or `m4a`. No path.",
-            "maxLength": 255
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\u0000]+\\.[A-Za-z0-9]{2,5}$"
           },
           "contentType": {
             "type": "string",
@@ -23205,7 +23932,9 @@
           },
           "fileName": {
             "type": "string",
-            "description": "The `fileName` you asked the upload url for."
+            "description": "The `fileName` you asked the upload url for: a name with an extension and no path, at most 255 characters.",
+            "pattern": "^[^/\\\\\\u0000]+\\.[A-Za-z0-9]{2,5}$",
+            "maxLength": 255
           },
           "contentType": {
             "type": "string",
@@ -23294,7 +24023,7 @@
           },
           "state": {
             "type": "string",
-            "description": "How the balance stands: `OK`, `WARNING` (running low), `BLOCKED` (no credits, actions that cost credits are refused). `null` when unknown.",
+            "description": "How the balance stands: `OK`, `WARNING` (running low), `BLOCKED` (no credits left). A blocked organization cannot start transcription, translation, dubbing or text-to-speech; reading, editing the text of subtitles and exporting still work. `null` when unknown.",
             "nullable": true,
             "enum": [
               "OK",
@@ -23332,7 +24061,7 @@
           },
           "ignoredLanguages": {
             "type": "array",
-            "description": "Languages you will skip, as in the translate request. They cost nothing.",
+            "description": "Languages you provide the subtitles of yourself, as in the translate request. A language the recording does not have yet costs the same as a translation into it, whoever provides the text.",
             "items": {
               "type": "string"
             }
@@ -23356,11 +24085,10 @@
           },
           "reason": {
             "type": "string",
-            "description": "`new_language` is charged; `already_translated`, `ignored` and `not_metered` cost nothing.",
+            "description": "`new_language` is charged, also when you provide the subtitles of that language yourself; `already_translated` and `not_metered` cost nothing.",
             "enum": [
               "new_language",
               "already_translated",
-              "ignored",
               "not_metered"
             ]
           }
@@ -23412,7 +24140,7 @@
           },
           "allowed": {
             "type": "boolean",
-            "description": "`false` when your organization is blocked and the action would be refused."
+            "description": "`false` when your organization is blocked (`balance.state` is `BLOCKED`): then transcription, translation, dubbing, sync-dubbing, re-dubbing and speech are refused with `403`, whatever they cost. `true` otherwise."
           }
         },
         "required": [
@@ -23645,8 +24373,8 @@
         "properties": {
           "text": {
             "type": "string",
-            "description": "Text to speak, at most 3000 characters.",
-            "maxLength": 3000
+            "description": "Text to speak, at most 500 characters (the limit of the text-to-speech tool of Studio).",
+            "maxLength": 500
           },
           "voiceId": {
             "type": "string",
@@ -23654,7 +24382,16 @@
           },
           "engine": {
             "type": "string",
-            "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`."
+            "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+            "enum": [
+              "eleven_v2",
+              "eleven_v3",
+              "eleven_v4",
+              "eleven_v4_turbo",
+              "azure_tts",
+              "voiseed",
+              "gemini_2_5_flash_tts"
+            ]
           },
           "languageCode": {
             "type": "string",
@@ -23665,7 +24402,8 @@
             "description": "Words to say a certain way, at most 200 together with the sets.",
             "items": {
               "$ref": "#/components/schemas/SpeechPronunciation"
-            }
+            },
+            "maxItems": 200
           },
           "pronunciationIds": {
             "type": "array",
@@ -23673,15 +24411,20 @@
             "items": {
               "type": "string",
               "format": "uuid"
-            }
+            },
+            "maxItems": 10
           },
           "stability": {
             "type": "number",
-            "description": "Voice stability, where the engine has it."
+            "description": "Voice stability, from 0 to 1, where the engine has it.",
+            "minimum": 0,
+            "maximum": 1
           },
           "similarity": {
             "type": "number",
-            "description": "Voice similarity, where the engine has it."
+            "description": "Voice similarity, from 0 to 1, where the engine has it.",
+            "minimum": 0,
+            "maximum": 1
           },
           "seed": {
             "type": "integer",
@@ -23721,7 +24464,16 @@
           },
           "engine": {
             "type": "string",
-            "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`."
+            "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+            "enum": [
+              "eleven_v2",
+              "eleven_v3",
+              "eleven_v4",
+              "eleven_v4_turbo",
+              "azure_tts",
+              "voiseed",
+              "gemini_2_5_flash_tts"
+            ]
           }
         },
         "required": [
@@ -23774,6 +24526,7 @@
               "eleven_v4",
               "eleven_v4_turbo",
               "azure_tts",
+              "voiseed",
               "gemini_2_5_flash_tts"
             ],
             "description": "Text-to-speech engine that new projects dub with. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
@@ -23827,6 +24580,7 @@
               "eleven_v4",
               "eleven_v4_turbo",
               "azure_tts",
+              "voiseed",
               "gemini_2_5_flash_tts"
             ],
             "description": "Text-to-speech engine that new projects dub with. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
@@ -24157,7 +24911,7 @@
           },
           "warnings": {
             "type": "array",
-            "description": "Cues that were skipped, for example a cue that ends before it starts or has no text.",
+            "description": "Cues that were skipped, for example a cue that ends before it starts, has no duration or has no text.",
             "items": {
               "type": "object",
               "properties": {

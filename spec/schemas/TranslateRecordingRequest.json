@@ -17,7 +17,7 @@
         "type": "string"
       },
       "default": [],
-      "description": "Subset of `languages` to record as intentionally not translated (tracked on the recording so it shows as deliberately skipped, not pending or failed) instead of actually running translation for it"
+      "description": "Subset of `languages` whose subtitles you provide yourself (upload them with `POST .../subtitles/upload` or `PUT .../subtitles` first): Studio does not translate them. They are tracked as provided, not pending or failed. A language that the recording does not have yet is charged like any new translation language."
     },
     "tmsProjectTemplateUid": {
       "type": "string",

@@ -39,7 +39,7 @@
     },
     "allowed": {
       "type": "boolean",
-      "description": "`false` when your organization is blocked and the action would be refused."
+      "description": "`false` when your organization is blocked (`balance.state` is `BLOCKED`): then transcription, translation, dubbing, sync-dubbing, re-dubbing and speech are refused with `403`, whatever they cost. `true` otherwise."
     }
   },
   "required": [

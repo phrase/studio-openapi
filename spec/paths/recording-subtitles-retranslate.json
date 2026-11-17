@@ -126,7 +126,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -134,7 +134,7 @@
             },
             "examples": {
               "e403": {
-                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                 "value": {
                   "success": false,
                   "statusCode": 403,

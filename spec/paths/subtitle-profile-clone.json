@@ -4,7 +4,7 @@
       "Subtitle Profiles"
     ],
     "summary": "Clone a subtitle profile",
-    "description": "Copy a subtitle profile, a default or one of your organization, into your own profiles under the name \"<name> (copy)\". Returns the copy.",
+    "description": "Copy a subtitle profile, a default or one of your organization, into your own profiles under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Returns the copy.",
     "operationId": "cloneSubtitleProfile",
     "security": [
       {
@@ -58,6 +58,26 @@
                   "charactersPerSecond": 20,
                   "createdAt": "2026-01-01T00:00:00.000Z",
                   "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
                 }
               }
             }

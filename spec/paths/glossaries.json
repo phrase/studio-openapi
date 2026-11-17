@@ -4,7 +4,7 @@
       "Glossaries"
     ],
     "summary": "Get Glossaries",
-    "description": "Retrieve the glossaries of your organization. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "description": "Retrieve the glossaries of your organization. Members of the organization can read every item of the organization.",
     "operationId": "getGlossaries",
     "security": [
       {
@@ -76,16 +76,6 @@
       },
       "401": {
         "description": "Unauthorized (invalid API key)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            }
-          }
-        }
-      },
-      "403": {
-        "description": "Forbidden (access denied)",
         "content": {
           "application/json": {
             "schema": {

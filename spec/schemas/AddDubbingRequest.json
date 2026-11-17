@@ -9,7 +9,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate) — this is not checked, so an untranslated language is silently accepted but produces no dubbing output. Each language must also be supported by the project's configured TTS provider, which IS checked — an unsupported language fails the whole request with 400."
+      "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate): a language that is not translated is refused with `400` that names it, and nothing is started for any language of the request. Each language must also be supported by the project's configured TTS provider; an unsupported language fails the whole request with `400`."
     },
     "ignoredLanguages": {
       "type": "array",

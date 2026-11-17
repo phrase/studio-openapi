@@ -5,12 +5,14 @@
     "source": {
       "type": "string",
       "description": "The word or phrase as written.",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 512
     },
     "target": {
       "type": "string",
       "description": "How it is spoken.",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 512
     },
     "notation": {
       "type": "string",

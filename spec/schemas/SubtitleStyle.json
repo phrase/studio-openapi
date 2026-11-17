@@ -7,7 +7,8 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks."
+      "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks.",
+      "pattern": "^(custom:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|(?!custom:)[^,\\r\\n{}\\\\]{1,128})$"
     },
     "fontSize": {
       "type": "number",
@@ -55,7 +56,8 @@
     "textColor": {
       "type": "string",
       "maxLength": 25,
-      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
+      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+      "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
     },
     "backgroundType": {
       "type": "string",
@@ -70,7 +72,8 @@
     "backgroundColor": {
       "type": "string",
       "maxLength": 25,
-      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted."
+      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+      "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
     },
     "delta": {
       "type": "number",

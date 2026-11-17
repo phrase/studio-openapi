@@ -4,7 +4,7 @@
       "Subtitles"
     ],
     "summary": "Upload a subtitle file",
-    "description": "Replaces the subtitles of one track with the cues of an `.srt` or `.vtt` file (at most 10 MB), parsed like the Upload subtitles action of the Studio editor: each cue becomes a segment with the speaker `Unknown`, and its words are timed along the cue. The result is saved like `PUT …/subtitles` and goes through the same checks, so a file whose cues overlap or fall outside the recording is refused with `400`. Send `multipart/form-data`. Needs write access to the track.",
+    "description": "Replaces the subtitles of one track with the cues of an `.srt` or `.vtt` file (at most 10 MB), parsed like the Upload subtitles action of the Studio editor: each cue becomes a segment with the speaker `Unknown`, and its words are timed along the cue. The result is saved like `PUT …/subtitles` and goes through the same checks, so a file whose cues overlap or fall outside the recording is refused with `400`. A cue that ends before it starts, has no duration or has no text is skipped and listed in `warnings`; a file without any usable cue is refused with `400`. Send `multipart/form-data`. Needs write access to the track.",
     "operationId": "uploadSubtitleFile",
     "security": [
       {
@@ -109,7 +109,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -117,7 +117,7 @@
             },
             "examples": {
               "e403": {
-                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "summary": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
                 "value": {
                   "success": false,
                   "statusCode": 403,
@@ -130,7 +130,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {

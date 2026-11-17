@@ -30,6 +30,7 @@
               "eleven_v4",
               "eleven_v4_turbo",
               "azure_tts",
+              "voiseed",
               "gemini_2_5_flash_tts"
             ],
             "description": "Text-to-speech provider the voice is for. Defaults to the default provider of Studio. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."

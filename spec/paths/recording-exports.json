@@ -4,7 +4,7 @@
       "Exports"
     ],
     "summary": "Export a recording",
-    "description": "Ask for a file that Studio makes from a recording: a video with the subtitles burned in, a dubbed video or dubbed audio, the dubbed audio as stems or per speaker, or the original audio. A file that is ready at once (the original audio, a bilingual Word document) answers `200` with `downloadUrl`. Anything that has to be rendered answers `202` with `statusUrl`: poll it until `status` is `done` and take `downloadUrl`, or `failed` and read `errorMessage`. Asking again for the same file while it renders returns the same `exportId`. Subtitle files are not rendered by a job; read them with `GET .../exports/subtitles`. Needs read access to the steps and languages the file is made from.\n\nThis replaces `GET /v1/recordings/{recordingId}`.",
+    "description": "Ask for a file that Studio makes from a recording: a video with the subtitles burned in, a dubbed video or dubbed audio, the dubbed audio as stems or per speaker, or the original audio. A file that is ready at once (the original audio, a bilingual Word document) answers `200` with `downloadUrl`. Anything that has to be rendered answers `202` with `statusUrl`: poll it until `status` is `done` and take `downloadUrl`, or `failed` and read `errorMessage`. Asking again for the same file while it renders returns the same `exportId`. Subtitle files are not rendered by a job; read them with `GET .../exports/subtitles`. Needs read access to the steps and languages the file is made from.",
     "operationId": "createExport",
     "security": [
       {
@@ -164,7 +164,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -184,7 +184,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {

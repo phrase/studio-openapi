@@ -90,16 +90,6 @@
           }
         }
       },
-      "403": {
-        "description": "Forbidden (access denied)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            }
-          }
-        }
-      },
       "500": {
         "description": "Internal server error",
         "content": {

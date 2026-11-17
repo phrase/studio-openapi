@@ -4,7 +4,7 @@
       "Insights"
     ],
     "summary": "Get Insights",
-    "description": "Retrieve the insights of your organization, with their items. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "description": "Retrieve the insights of your organization, with their items. Members of the organization can read every item of the organization.",
     "operationId": "getInsights",
     "security": [
       {
@@ -179,26 +179,6 @@
                 "value": {
                   "statusCode": 401,
                   "message": "Unauthorized",
-                  "timestamp": "2025-01-01T00:00:00.000Z"
-                }
-              }
-            }
-          }
-        }
-      },
-      "403": {
-        "description": "Forbidden (key lacks access to this resource)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            },
-            "examples": {
-              "forbidden": {
-                "summary": "Access denied",
-                "value": {
-                  "statusCode": 403,
-                  "message": "Forbidden",
                   "timestamp": "2025-01-01T00:00:00.000Z"
                 }
               }

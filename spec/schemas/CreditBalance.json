@@ -13,7 +13,7 @@
     },
     "state": {
       "type": "string",
-      "description": "How the balance stands: `OK`, `WARNING` (running low), `BLOCKED` (no credits, actions that cost credits are refused). `null` when unknown.",
+      "description": "How the balance stands: `OK`, `WARNING` (running low), `BLOCKED` (no credits left). A blocked organization cannot start transcription, translation, dubbing or text-to-speech; reading, editing the text of subtitles and exporting still work. `null` when unknown.",
       "nullable": true,
       "enum": [
         "OK",

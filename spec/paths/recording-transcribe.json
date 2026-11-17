@@ -4,7 +4,7 @@
       "Results"
     ],
     "summary": "Transcribe a recording again",
-    "description": "Run the transcription of a recording again, for example with another source language. This uses credits and replaces the transcript. It answers `202` with `statusUrl`; poll the status until `transcription` is `done`. Needs write access to the transcription step.",
+    "description": "Run the transcription of a recording again, for example with another source language. This replaces the transcript. It uses no credits, because the language is not new (the first transcription is charged when the recording is added), but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`. It answers `202` with `statusUrl`; poll the status until `transcription` is `done`. Needs write access to the transcription step.",
     "operationId": "transcribeRecording",
     "security": [
       {
@@ -114,7 +114,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item. Also returned when your organization has no credits left (`No remaining minutes available`).",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
         "content": {
           "application/json": {
             "schema": {
@@ -134,7 +134,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {
