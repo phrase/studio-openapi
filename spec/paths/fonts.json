@@ -80,27 +80,6 @@
           }
         }
       },
-      "403": {
-        "description": "Forbidden: your organization is blocked.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            },
-            "examples": {
-              "e403": {
-                "summary": "Forbidden: your organization is blocked.",
-                "value": {
-                  "success": false,
-                  "statusCode": 403,
-                  "message": "You are not authorized to access this resource",
-                  "timestamp": "2026-01-01T00:00:00.000Z"
-                }
-              }
-            }
-          }
-        }
-      },
       "500": {
         "description": "Internal server error.",
         "content": {

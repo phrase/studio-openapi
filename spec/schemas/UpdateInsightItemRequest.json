@@ -4,8 +4,9 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Title of the item.",
-      "minLength": 1
+      "description": "Title of the item, at most 256 characters.",
+      "minLength": 1,
+      "maxLength": 256
     },
     "content": {
       "type": "string",

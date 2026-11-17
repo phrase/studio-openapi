@@ -77,16 +77,6 @@
             "ttsProvider": {
               "type": "string",
               "description": "Text-to-speech engine for dubbing, an id from `GET /v1/tts/engines`."
-            },
-            "createdAt": {
-              "type": "string",
-              "description": "Creation time.",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "description": "Last update time.",
-              "format": "date-time"
             }
           }
         },

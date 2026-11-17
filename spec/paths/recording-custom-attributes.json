@@ -51,23 +51,34 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "description": "Custom attributes.",
-              "items": {
-                "$ref": "../schemas/CustomAttribute.json"
+              "type": "object",
+              "description": "The list is in `data`.",
+              "required": [
+                "data"
+              ],
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Custom attributes.",
+                  "items": {
+                    "$ref": "../schemas/CustomAttribute.json"
+                  }
+                }
               }
             },
             "examples": {
               "example": {
                 "summary": "Example",
-                "value": [
-                  {
-                    "tagName": "Pricing",
-                    "description": "Prices are discussed.",
-                    "score": 4,
-                    "reference": "00:02:10"
-                  }
-                ]
+                "value": {
+                  "data": [
+                    {
+                      "tagName": "Pricing",
+                      "description": "Prices are discussed.",
+                      "score": 4,
+                      "reference": "00:02:10"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -114,7 +125,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -134,7 +145,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {

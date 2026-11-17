@@ -4,7 +4,7 @@
       "Insights"
     ],
     "summary": "Clone an insight",
-    "description": "Copy an insight, with its items, into your own insights under the name \"<name> (copy)\". Any member of the organization may clone. Returns the copy.",
+    "description": "Copy an insight, with its items, into your own insights under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
     "operationId": "cloneInsight",
     "security": [
       {
@@ -55,6 +55,26 @@
                   ],
                   "createdAt": "2026-01-01T00:00:00.000Z",
                   "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
                 }
               }
             }

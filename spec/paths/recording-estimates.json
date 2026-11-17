@@ -4,7 +4,7 @@
       "Credits"
     ],
     "summary": "Estimate the cost of an action",
-    "description": "Price a `translate`, `dubbing` or `transcribe` before you start it. Only `translate` costs credits. `transcribe` here is a retranscription of a recording that exists, which is free; the first transcription is charged when the recording is added and has no estimate. Nothing is started and nothing is charged. A language that is already translated, ignored, or the source language costs `0`. Needs the same access as the action itself.",
+    "description": "Price a `translate`, `dubbing` or `transcribe` before you start it. Only `translate` costs credits. `transcribe` here is a retranscription of a recording that exists, which is free; the first transcription is charged when the recording is added and has no estimate. Nothing is started and nothing is charged. A language that is already translated costs `0`. The source language of the recording cannot be translated into: asking for it answers `400`. A new language costs credits even when you provide its subtitles yourself. Needs the same access as the action itself. The answer works for an organization without credits too: `allowed` is then `false` and `balance.state` is `BLOCKED`.",
     "operationId": "createCostEstimate",
     "security": [
       {
@@ -139,7 +139,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project is not shared with you, or your share does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -159,7 +159,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {

@@ -61,6 +61,26 @@
           }
         }
       },
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
       "401": {
         "description": "Unauthorized (invalid API key).",
         "content": {
@@ -355,6 +375,26 @@
     "responses": {
       "204": {
         "description": "Insight deleted"
+      },
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
       },
       "401": {
         "description": "Unauthorized (invalid API key).",

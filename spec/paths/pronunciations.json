@@ -4,7 +4,7 @@
       "Pronunciations"
     ],
     "summary": "Get Pronunciations",
-    "description": "Retrieve the pronunciation sets of your organization, with their pairs. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "description": "Retrieve the pronunciation sets of your organization, with their pairs. Members of the organization can read every item of the organization.",
     "operationId": "getPronunciations",
     "security": [
       {
@@ -83,16 +83,6 @@
           }
         }
       },
-      "403": {
-        "description": "Forbidden (access denied)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            }
-          }
-        }
-      },
       "500": {
         "description": "Internal server error",
         "content": {
@@ -110,7 +100,7 @@
       "Pronunciations"
     ],
     "summary": "Create a pronunciation set",
-    "description": "Create a pronunciation set. With `pairs` the set and all its pairs are created in one call (up to 10000), which is the way to load a whole list before dubbing. Members of the organization can read every item of the organization. Items of other organizations answer `404`. Returns the created set with the ids of its pairs.",
+    "description": "Create a pronunciation set. With `pairs` the set and all its pairs are created in one call (up to 10000), which is the way to load a whole list before dubbing. Members of the organization can read every item of the organization. Returns the created set with the ids of its pairs.",
     "operationId": "createPronunciation",
     "security": [
       {

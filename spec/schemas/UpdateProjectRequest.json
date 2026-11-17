@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "description": "Partial update payload for project preferences and visibility. Only fields present in the body are applied; omitted fields are preserved.",
+  "description": "Partial update payload for project preferences and visibility. Only fields present in the body are applied; omitted fields are preserved. The model types of Studio (`insightsModelType`, `translationModelType`) follow from the model names and cannot be set: they are accepted and ignored.",
   "properties": {
     "name": {
       "type": "string",
@@ -34,17 +34,18 @@
         "eleven_v4",
         "eleven_v4_turbo",
         "azure_tts",
+        "voiseed",
         "gemini_2_5_flash_tts"
       ],
       "description": "Text-to-speech provider for dubbing. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
     },
     "mtProfileId": {
       "type": "string",
-      "description": "Phrase TMS machine translation profile uid, for the translation model `plai` only. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it. Send an empty string to remove it. For `aita` Studio chooses the profile itself (the first one of your Phrase TMS connection, or the one already set while it still exists), so do not send it; a GPT model has none. Sending it for any other model is refused with `400`."
+      "description": "Phrase TMS machine translation profile uid, for the translation model `plai` only. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it. An empty string is refused with `400`. For `aita` Studio chooses the profile itself (the first one of your Phrase TMS connection, or the one already set while it still exists), so do not send it; a GPT model has none. Sending it for any other model is refused with `400`."
     },
     "translationMemoryId": {
       "type": "string",
-      "description": "Phrase TMS translation memory uid, for the translation models `plai` and `aita`. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it. Send an empty string to remove it. Changing to a GPT model removes it; setting it while the model is a GPT model is refused with `400`."
+      "description": "Phrase TMS translation memory uid, for the translation models `plai` and `aita`. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it. An empty string is refused with `400`. Changing to a GPT model removes it; setting it while the model is a GPT model is refused with `400`."
     },
     "isPublic": {
       "type": "boolean",

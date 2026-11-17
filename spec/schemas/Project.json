@@ -85,7 +85,7 @@
     },
     "reviewProgress": {
       "type": "object",
-      "description": "Review progress per step (`TRANSCRIPTION`, `TRANSLATION`, `DUBBING`) and language, returned by the project list and the project detail. For a shared project only the steps and languages of the share are listed. Present when the project has reviewable segments.",
+      "description": "Review progress per step (`TRANSCRIPTION`, `TRANSLATION`, `DUBBING`) and language, returned by the project list and the project detail. The project detail lists only the steps and languages of your share of a shared project; the project list counts every step and language of the project. Present when the project has reviewable segments.",
       "additionalProperties": {
         "type": "object",
         "description": "Counts per language code.",

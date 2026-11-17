@@ -63,7 +63,8 @@
         "schema": {
           "type": "number",
           "minimum": 0,
-          "default": 60
+          "default": 60,
+          "maximum": 86400
         }
       }
     ],
@@ -139,7 +140,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -159,7 +160,7 @@
         }
       },
       "404": {
-        "description": "Not found, or not visible to you.",
+        "description": "The recording does not exist in this project.",
         "content": {
           "application/json": {
             "schema": {

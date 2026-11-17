@@ -137,7 +137,7 @@
     },
     "layout": {
       "type": "string",
-      "description": "Video layout the profile is made for.",
+      "description": "Video layout the profile is made for. Read only: the API does not change it.",
       "enum": [
         "landscape",
         "portrait",

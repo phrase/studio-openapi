@@ -19,7 +19,7 @@
         "name": "status",
         "in": "query",
         "required": false,
-        "description": "Filter by project status.",
+        "description": "Filter by project status. `RECENTLY_COMPLETED` lists the projects that finished a step in the last 24 hours.",
         "schema": {
           "type": "string",
           "enum": [
@@ -28,7 +28,8 @@
             "PENDING",
             "IN_PROGRESS",
             "COMPLETED",
-            "FAILED"
+            "FAILED",
+            "RECENTLY_COMPLETED"
           ],
           "default": "ALL"
         }
@@ -180,27 +181,6 @@
           }
         }
       },
-      "403": {
-        "description": "Forbidden (access denied)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            },
-            "examples": {
-              "forbidden": {
-                "summary": "Access denied",
-                "value": {
-                  "success": false,
-                  "statusCode": 403,
-                  "message": "Access denied",
-                  "timestamp": "2025-01-01T00:00:00.000Z"
-                }
-              }
-            }
-          }
-        }
-      },
       "500": {
         "description": "Internal server error",
         "content": {
@@ -229,7 +209,7 @@
       "Projects"
     ],
     "summary": "Create Project",
-    "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Upload files with the `files` parts of the request. `fileUrls` also works for direct links to media files: an `https://` link that anyone can download and that ends in an audio or video file, not a web page. Uploading files is more robust than links.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.\n\nSupported sources: files you upload and direct links to audio or video files. The file is checked after it is downloaded: if it has no audio or video stream the request is rejected with `400` and no project is created.\n\nErrors of the upload, as `{ success, statusCode, message }`:\n- `400` `The file at the URL is not an audio or video file`: the link points to a web page or another kind of file.\n- `400` `The URL could not be downloaded: the server answered <status>`: the server of the link refused, for example with `404` or `403`.\n- `400` `Invalid fileUrls entry: ...`: the link is not an `https://` URL or points to a host that is not allowed.\n- `413` a file is larger than 20 GB.\n- `502` the server of the link failed or could not be reached, or the project could not be started.\n\nCredits: the transcription of every recording uses `ceil(duration / 60)` minutes. A project whose organization has no credits left is refused with `403`.",
+    "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Upload files with the `files` parts of the request. `fileUrls` also works for direct links to media files: an `https://` link that anyone can download and that ends in an audio or video file, not a web page. Uploading files is more robust than links.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.\n\nSupported sources: files you upload and direct links to audio or video files. The file is checked after it is downloaded: if it has no audio or video stream the request is rejected with `400` and no project is created.\n\nErrors of the upload, as `{ success, statusCode, message }`:\n- `400` `The file at the URL is not an audio or video file`: the link points to a web page or another kind of file.\n- `400` `The URL could not be downloaded: the server answered <status>`: the server of the link refused, for example with `404` or `403`.\n- `400` `Invalid fileUrls entry: ...`: the link is not an `https://` URL or points to a host that is not allowed.\n- `400` `Unsupported file type. Allowed: mp4, mov, mp3, wav, m4a`: a file part of another type.\n- `400` `Invalid JSON in: <fields>`: `expectedLanguages`, `insights`, `glossary`, `safeCommunications`, `pronunciations` or `fileUrls` is not valid JSON.\n- `400` `The recording is longer than 180 minutes`: a recording may be at most 180 minutes long.\n- `400` `Maximum 50 files allowed`: a project takes at most 50 files, uploads and links together.\n- `413` a file is larger than 20 GB.\n- `502` the server of the link failed or could not be reached, or the project could not be started.\n\nCredits: the transcription of every recording uses `ceil(duration / 60)` minutes. A project whose organization has no credits left is refused with `403`.",
     "operationId": "createProject",
     "security": [
       {
@@ -914,7 +894,7 @@
                 }
               },
               "fileUrls": {
-                "description": "External file URLs to import. Provide as JSON array or JSON string. If provided, uploaded files in this request are ignored for processing (but still count towards the 5-item limit).",
+                "description": "External file URLs to import. Provide as JSON array or JSON string. If provided, uploaded files in this request are ignored for processing (but still count towards the limit of 50 files).",
                 "type": "array",
                 "items": {
                   "type": "string",
@@ -1123,6 +1103,33 @@
                   "message": "Upload failed",
                   "timestamp": "2025-01-01T00:00:00.000Z"
                 }
+              },
+              "too_long": {
+                "summary": "Recording longer than 180 minutes (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "The recording is longer than 180 minutes",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "unsupported_type": {
+                "summary": "File type not supported (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Unsupported file type. Allowed: mp4, mov, mp3, wav, m4a",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "invalid_json": {
+                "summary": "A field is not valid JSON (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Invalid JSON in: expectedLanguages",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
               }
             }
           }
@@ -1172,7 +1179,7 @@
                 "value": {
                   "success": false,
                   "statusCode": 413,
-                  "message": "File too large. Max size is 5GB per file",
+                  "message": "File too large. Max size is 20GB per file",
                   "timestamp": "2025-01-01T00:00:00.000Z"
                 }
               }

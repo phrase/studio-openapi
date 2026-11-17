@@ -4,7 +4,7 @@
       "Subtitle Profiles"
     ],
     "summary": "Get Subtitle Profiles",
-    "description": "Retrieve the subtitle profiles of your organization, together with the defaults of Studio. A default you edited is listed in place of the default, with `default` true and `sourceProfileId` set. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "description": "Retrieve the subtitle profiles of your organization, together with the defaults of Studio. A default you edited is listed in place of the default, with `default` true and `sourceProfileId` set. Members of the organization can read every item of the organization.",
     "operationId": "getSubtitleProfiles",
     "security": [
       {
@@ -102,26 +102,6 @@
                 "value": {
                   "statusCode": 401,
                   "message": "Unauthorized",
-                  "timestamp": "2025-01-01T00:00:00.000Z"
-                }
-              }
-            }
-          }
-        }
-      },
-      "403": {
-        "description": "Forbidden (access denied)",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            },
-            "examples": {
-              "forbidden": {
-                "summary": "Access denied",
-                "value": {
-                  "statusCode": 403,
-                  "message": "Access denied",
                   "timestamp": "2025-01-01T00:00:00.000Z"
                 }
               }

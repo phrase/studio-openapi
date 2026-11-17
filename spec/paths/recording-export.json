@@ -67,19 +67,19 @@
           }
         }
       },
-      "404": {
-        "description": "No export with this id for this recording, or (for a share limited to some steps or languages) not started by you.",
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "../schemas/ErrorResponse.json"
             },
             "examples": {
-              "e404": {
-                "summary": "No export with this id for this recording.",
+              "invalid_id": {
+                "summary": "Invalid id",
                 "value": {
-                  "statusCode": 404,
-                  "message": "Status not found",
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
                   "timestamp": "2026-01-01T00:00:00.000Z"
                 }
               }
@@ -108,7 +108,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -120,6 +120,26 @@
                 "value": {
                   "statusCode": 403,
                   "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "No export with this id for this recording, or (for a share limited to some steps or languages) not started by you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "No export with this id for this recording.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Status not found",
                   "timestamp": "2026-01-01T00:00:00.000Z"
                 }
               }

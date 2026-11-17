@@ -112,7 +112,7 @@
         }
       },
       "403": {
-        "description": "Forbidden: you may not change this item.",
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
         "content": {
           "application/json": {
             "schema": {
@@ -124,26 +124,6 @@
                 "value": {
                   "statusCode": 403,
                   "message": "You are not authorized to modify this item",
-                  "timestamp": "2026-01-01T00:00:00.000Z"
-                }
-              }
-            }
-          }
-        }
-      },
-      "404": {
-        "description": "Not found, or not visible to you.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../schemas/ErrorResponse.json"
-            },
-            "examples": {
-              "e404": {
-                "summary": "Not found, or not visible to you.",
-                "value": {
-                  "statusCode": 404,
-                  "message": "Not found",
                   "timestamp": "2026-01-01T00:00:00.000Z"
                 }
               }

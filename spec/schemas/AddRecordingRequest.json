@@ -9,7 +9,9 @@
     },
     "fileName": {
       "type": "string",
-      "description": "The `fileName` you asked the upload url for."
+      "description": "The `fileName` you asked the upload url for: a name with an extension and no path, at most 255 characters.",
+      "pattern": "^[^/\\\\\\u0000]+\\.[A-Za-z0-9]{2,5}$",
+      "maxLength": 255
     },
     "contentType": {
       "type": "string",

@@ -9,7 +9,7 @@
     },
     "pageSize": {
       "type": "integer",
-      "description": "Maximum number of items on a page.",
+      "description": "Items per page. A list that is not paged answers all its items in one page, and `pageSize` is then the number of items in it.",
       "example": 1000
     },
     "total": {

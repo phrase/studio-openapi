@@ -30,10 +30,11 @@
     "words": {
       "type": "array",
       "minItems": 1,
-      "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports.",
+      "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports. At most 2,500 words per segment.",
       "items": {
         "$ref": "./SubtitleWord.json"
-      }
+      },
+      "maxItems": 2500
     },
     "speaker": {
       "type": "string",
@@ -45,7 +46,8 @@
     },
     "text": {
       "type": "string",
-      "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability)."
+      "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability). At most 5,000 characters.",
+      "maxLength": 5000
     },
     "metadata": {
       "allOf": [
