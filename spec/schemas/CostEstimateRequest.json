@@ -17,13 +17,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "ignoredLanguages": {
-      "type": "array",
-      "description": "Languages you provide the subtitles of yourself, as in the translate request. A language the recording does not have yet costs the same as a translation into it, whoever provides the text.",
-      "items": {
-        "type": "string"
-      }
     }
   },
   "required": [
