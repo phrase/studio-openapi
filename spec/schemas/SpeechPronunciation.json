@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "description": "How to say a word.",
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "The word as written in the text.",
+      "maxLength": 512
+    },
+    "target": {
+      "type": "string",
+      "description": "How to say it.",
+      "maxLength": 512
+    },
+    "notation": {
+      "type": "string",
+      "description": "`plain` is a respelling, `ipa` is IPA. Defaults to `plain`.",
+      "enum": [
+        "plain",
+        "ipa"
+      ]
+    }
+  },
+  "required": [
+    "source",
+    "target"
+  ]
+}

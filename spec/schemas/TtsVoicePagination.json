@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "Position in the list. Pass `nextPageToken` as `nextPageToken` for the next page.",
+  "properties": {
+    "page": {
+      "type": "integer",
+      "description": "Page number."
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Items per page."
+    },
+    "total": {
+      "type": "integer",
+      "description": "Voices in the full result."
+    },
+    "totalPages": {
+      "type": "integer",
+      "description": "Pages in the full result."
+    },
+    "nextPageToken": {
+      "type": "string",
+      "description": "Token for the next page. Missing on the last page."
+    }
+  },
+  "required": [
+    "page",
+    "pageSize",
+    "total",
+    "totalPages"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "example": false,
+      "description": "`false`. Only errors of the upload service (`POST /v1/projects`) carry it; other errors have just `statusCode`, `message` and `timestamp`."
+    },
+    "statusCode": {
+      "type": "integer",
+      "example": 400,
+      "description": "HTTP status code of the error."
+    },
+    "message": {
+      "type": "string",
+      "example": "Bad Request",
+      "description": "What went wrong, in words that can be shown to the caller."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2025-01-01T00:00:00.000Z",
+      "description": "When the error happened."
+    }
+  },
+  "required": [
+    "statusCode",
+    "message",
+    "timestamp"
+  ]
+}

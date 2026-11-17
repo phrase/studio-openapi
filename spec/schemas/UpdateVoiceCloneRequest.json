@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "description": "Fields of a voice to change. Send only what changes.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Voice name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the voice sounds like."
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "male",
+        "female"
+      ],
+      "nullable": true,
+      "description": "Gender of the voice."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free labels. Replaces all labels.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Project to relate the voice to.",
+      "format": "uuid"
+    }
+  }
+}

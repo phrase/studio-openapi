@@ -1,0 +1,115 @@
+{
+  "get": {
+    "tags": [
+      "Safe Communications"
+    ],
+    "summary": "Get Safe Communications",
+    "description": "Retrieve the safe communication checks Studio can run on a recording. Use their ids when you create a project, and read the findings with `GET /v1/projects/{projectId}/recordings/{recordingId}/safe-communications`.",
+    "operationId": "getSafeCommunications",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Safe communications retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Safe communication checks you can use.",
+                  "items": {
+                    "$ref": "../schemas/SafeCommunication.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440003",
+                      "name": "Respectful Language",
+                      "description": "Assesses the use of polite, considerate, and civil language while ensuring the absence of derogatory terms, personal attacks, or demeaning phrases towards any individual or group.",
+                      "content": "Score\nOn a scale of 20 to 100, where 20 represents a complete lack of respect and 100 represents the highest standard of respectful communication, how would you rate the following conversation in terms of:\nThe use of polite and considerate language,\nThe absence of derogatory terms, personal attacks, or demeaning phrases,\nThe level of understanding and empathy demonstrated towards all participants,\nThe degree to which the language promotes a positive and inclusive dialogue?\n\nDescription\nDoes the language in the following conversation exhibit Respectful language considering aspects such as politeness, considerateness, and civility, without any use of derogatory terms, personal attacks, or demeaning phrases towards any individual or group?",
+                      "createdAt": "2025-09-10T14:33:02.786Z",
+                      "updatedAt": "2025-09-18T09:55:13.427Z"
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440002",
+                      "name": "Potential Red Flags",
+                      "description": "Identifies content, phrases, or exchanges that could be considered unethical, illegal, or harmful, potentially exposing individuals or organizations to legal, reputational, or security risks.",
+                      "content": "Score\nOn a scale of 0 to 100, how would you rate the following conversation in terms of ethical and legal integrity, with consideration to the following factors:\nThe absence of language or content that could be interpreted as unethical, illegal, or in violation of policies or regulations,\nThe presence of respectful and professional dialogue that upholds the values and reputation of the individuals and the organization,\nThe degree to which the conversation maintains confidentiality, data protection, and respect for personal and proprietary information,\nThe extent to which the conversation aligns with the established norms, values, and codes of conduct of the relevant individuals or organization?\n\nDescription\nDoes the following conversation contain any content, phrases, or exchanges that could be considered unethical, illegal, or harmful, potentially exposing individuals or the organization to risks such as legal liability, reputational damage, or security threats?",
+                      "createdAt": "2025-09-10T14:33:02.655Z",
+                      "updatedAt": "2025-09-18T09:55:13.255Z"
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440001",
+                      "name": "Diversity and Inclusion",
+                      "description": "Evaluates how well the conversation reflects awareness and respect for diversity and inclusion, recognizing and valuing diverse perspectives, experiences, and backgrounds of all participants.",
+                      "content": "Score\nOn a scale of 20 to 100, where 20 indicates no consideration of diversity and inclusion and 100 represents exemplary incorporation of diverse and inclusive practices, how would you rate the conversation in terms of:\nThe representation and integration of diverse perspectives and backgrounds,\nThe level of sensitivity and respect shown towards cultural, racial, gender, and other forms of diversity,\nThe extent to which the conversation promotes equal participation and values contributions from all individuals,\nThe presence of language and attitudes that support and foster an inclusive environment?\n\nDescription\nHow well does the following conversation reflect an awareness and respect for diversity and inclusion, in terms of recognizing, valuing, and integrating diverse perspectives, experiences, and backgrounds of all participants?",
+                      "createdAt": "2025-09-10T14:33:02.522Z",
+                      "updatedAt": "2025-09-18T09:55:13.083Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 3,
+                    "total": 3,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden (access denied)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      }
+    }
+  }
+}

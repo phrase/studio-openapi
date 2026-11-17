@@ -1,0 +1,163 @@
+{
+  "post": {
+    "tags": [
+      "Pronunciations"
+    ],
+    "summary": "Save an imported pronunciation",
+    "description": "Creates a pronunciation with the pairs of a file you read with `POST /v1/pronunciations/import`. Answers `409` when the name is taken in your organization.",
+    "operationId": "confirmPronunciationImport",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/ConfirmPronunciationImportRequest.json"
+          },
+          "examples": {
+            "example": {
+              "summary": "Save the pairs",
+              "value": {
+                "name": "words",
+                "pairs": [
+                  {
+                    "source": "Phrase",
+                    "target": "freɪz",
+                    "notation": "ipa"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "The pronunciation was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Pronunciation.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Tech terms",
+                  "description": "Words our brand says in a fixed way",
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "items": [
+                    {
+                      "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                      "source": "SQL",
+                      "target": "sequel",
+                      "notation": "plain",
+                      "language": "en"
+                    }
+                  ],
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: no name, no pair, or more than 10000 pairs.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: no name, no pair, or more than 10000 pairs.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: a pronunciation with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: a pronunciation with this name already exists in your organization.",
+                "value": {
+                  "success": false,
+                  "statusCode": 409,
+                  "message": "A pronunciation with the name \"words\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

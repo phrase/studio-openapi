@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "description": "Speech engines.",
+  "properties": {
+    "data": {
+      "type": "array",
+      "description": "Engines.",
+      "items": {
+        "$ref": "../schemas/TtsEngine.json"
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

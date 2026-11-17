@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "description": "The cultural review of one language: places in the video that may be sensitive for the audience of that language.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Language that was reviewed.",
+      "example": "es-es"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the review was generated."
+    },
+    "coversVisuals": {
+      "type": "boolean",
+      "description": "`true` when the video pictures were reviewed too, `false` when only the text was."
+    },
+    "flags": {
+      "type": "array",
+      "description": "The places that may be sensitive. Empty when nothing was found.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "description": "Position in the recording, in seconds."
+          },
+          "whatWasSeen": {
+            "type": "string",
+            "description": "What the review saw or read at that position."
+          },
+          "whyItMayBeSensitive": {
+            "type": "string",
+            "description": "Why it may be a problem for the audience."
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "What to change."
+          }
+        },
+        "required": [
+          "timestamp",
+          "whatWasSeen",
+          "whyItMayBeSensitive",
+          "suggestion"
+        ]
+      }
+    }
+  },
+  "required": [
+    "language",
+    "generatedAt",
+    "coversVisuals",
+    "flags"
+  ]
+}

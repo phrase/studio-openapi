@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "The segment whose audio was changed.",
+  "properties": {
+    "segmentId": {
+      "type": "string",
+      "description": "Segment ID."
+    },
+    "url": {
+      "type": "string",
+      "description": "Signed link to the new audio.",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "segmentId",
+    "url"
+  ]
+}

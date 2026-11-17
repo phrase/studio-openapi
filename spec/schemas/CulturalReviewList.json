@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "description": "One review per requested language.",
+      "items": {
+        "$ref": "../schemas/CulturalReview.json"
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

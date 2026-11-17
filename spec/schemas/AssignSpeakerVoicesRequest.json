@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "description": "Voices to assign to speakers.",
+  "properties": {
+    "payload": {
+      "type": "array",
+      "description": "One entry per speaker and language.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "description": "One assignment.",
+        "properties": {
+          "speakerName": {
+            "type": "string",
+            "description": "Speaker to assign the voice to. A name that does not exist yet creates the speaker."
+          },
+          "language": {
+            "type": "string",
+            "description": "Dubbing language the voice is used for."
+          },
+          "voiceId": {
+            "type": "string",
+            "description": "A voice `id` from `GET /v1/voices/clones`, or a voice id of the provider."
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "eleven_v2",
+              "eleven_v3",
+              "eleven_v4",
+              "eleven_v4_turbo",
+              "azure_tts",
+              "gemini_2_5_flash_tts"
+            ],
+            "description": "Text-to-speech provider the voice is for. Defaults to the default provider of Studio. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
+          }
+        },
+        "required": [
+          "speakerName",
+          "language",
+          "voiceId"
+        ]
+      }
+    }
+  },
+  "required": [
+    "payload"
+  ]
+}

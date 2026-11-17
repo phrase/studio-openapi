@@ -1,0 +1,224 @@
+{
+  "get": {
+    "tags": [
+      "Preferences"
+    ],
+    "summary": "Get your default settings",
+    "description": "The default settings of your account: the models for translation and insights, the Phrase TMS machine translation profile and translation memory, and the text-to-speech engine. Until you save something you get the defaults of Studio. They are yours alone: other members of your organization have their own. Which of the machine translation profile and the translation memory apply depends on the translation model, as in Studio: `plai` (Phrase Language AI) takes both, chosen by you; `aita` (AI Translation Agent) takes a translation memory, and Studio chooses its machine translation profile; `gpt-5-mini` and `gpt-4o-mini` take neither.",
+    "operationId": "getPreferences",
+    "security": [
+      {
+        "apiKeyAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Your default settings",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Preference.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "insightsModelType": "GPT",
+                  "insightsModelName": "gpt-5-mini",
+                  "translationModelType": "GPT",
+                  "translationModelName": "gpt-5-mini",
+                  "mtProfileId": "",
+                  "translationMemoryId": "",
+                  "ttsProvider": "eleven_v3"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "patch": {
+    "tags": [
+      "Preferences"
+    ],
+    "summary": "Change your default settings",
+    "description": "Change the default settings of your account. Send only what changes. New projects start with these settings; existing projects keep theirs and are changed with `PATCH /v1/projects/{id}`. Which of the machine translation profile and the translation memory apply depends on the translation model, as in Studio: `plai` (Phrase Language AI) takes both, chosen by you; `aita` (AI Translation Agent) takes a translation memory, and Studio chooses its machine translation profile; `gpt-5-mini` and `gpt-4o-mini` take neither. Changing the model keeps the settings that still apply and clears the ones that do not; sending a setting that does not apply to the model is refused with `400` and says which model it needs. For `aita` the call looks up your machine translation profile in your Phrase TMS connection and answers `400` when there is none, as Studio does not let you save then. An engine that is not available to your organization is refused with `400` (see `GET /v1/tts/engines`). Answers with the settings as they are afterwards.",
+    "operationId": "updatePreferences",
+    "security": [
+      {
+        "apiKeyAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/UpdatePreferenceRequest.json"
+          },
+          "examples": {
+            "plai": {
+              "summary": "Translate with Phrase Language AI and choose the profile and memory",
+              "value": {
+                "translationModelName": "plai",
+                "mtProfileId": "cA2aNh2txyVmZ",
+                "translationMemoryId": "tm-uid-123"
+              }
+            },
+            "aita": {
+              "summary": "Translate with the AI Translation Agent (Studio chooses the profile)",
+              "value": {
+                "translationModelName": "aita",
+                "translationMemoryId": "tm-uid-123"
+              }
+            },
+            "gpt": {
+              "summary": "Translate with a GPT model",
+              "value": {
+                "translationModelName": "gpt-5-mini"
+              }
+            },
+            "engine": {
+              "summary": "Dub new projects with another engine",
+              "value": {
+                "ttsProvider": "azure_tts"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The settings after the change",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Preference.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "insightsModelType": "GPT",
+                  "insightsModelName": "gpt-5-mini",
+                  "translationModelType": "CUSTOM",
+                  "translationModelName": "plai",
+                  "mtProfileId": "cA2aNh2txyVmZ",
+                  "translationMemoryId": "tm-uid-123",
+                  "ttsProvider": "eleven_v3"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a value is not valid, a model Studio does not offer, a profile or memory that does not apply to the model, or no machine translation profile for `aita`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

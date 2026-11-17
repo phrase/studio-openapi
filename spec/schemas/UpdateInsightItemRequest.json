@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "description": "Fields of an insight item to change. Send only what changes.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Title of the item.",
+      "minLength": 1
+    },
+    "content": {
+      "type": "string",
+      "description": "The prompt text.",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "type": "object",
+  "description": "A saved voice of your organization (\"My voices\") that can be applied to the speaker of a recording.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Voice ID. Use it as `voiceId` when assigning the voice to a speaker.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Voice name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the voice sounds like.",
+      "nullable": true
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "male",
+        "female"
+      ],
+      "nullable": true,
+      "description": "Gender of the voice."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free labels.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Project the voice was made from, if any.",
+      "format": "uuid",
+      "nullable": true
+    },
+    "projectName": {
+      "type": "string",
+      "description": "Name of that project.",
+      "nullable": true
+    },
+    "source": {
+      "type": "string",
+      "description": "How the voice was made, for example from an upload or from a recording."
+    },
+    "previewUrl": {
+      "type": "string",
+      "description": "Short link to a sample of the voice.",
+      "format": "uri"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

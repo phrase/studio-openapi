@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "description": "The glossary applied to a project, together with the terms added on the project itself.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Glossary ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Glossary name."
+    },
+    "items": {
+      "type": "string",
+      "description": "Glossary terms, one per line."
+    },
+    "additionalItems": {
+      "type": "string",
+      "description": "Terms added on the project itself, one per line."
+    }
+  }
+}

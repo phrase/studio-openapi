@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "description": "A new name for a speaker.",
+  "properties": {
+    "oldSpeakerName": {
+      "type": "string",
+      "description": "Current name."
+    },
+    "newSpeakerName": {
+      "type": "string",
+      "description": "New name."
+    }
+  },
+  "required": [
+    "oldSpeakerName",
+    "newSpeakerName"
+  ]
+}

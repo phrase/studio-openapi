@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "description": "Per-segment dubbing settings. Only used on dubbing tracks. Fields that are not listed here are ignored by `PUT`.",
+  "properties": {
+    "volume": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Gain of this segment's dubbing audio, from 0 (mute) to 2 (double)"
+    },
+    "stability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Voice stability of this segment, from 0 to 1. Lower values give a more varied, expressive delivery, higher values a more even one. Overrides the speaker's setting for this segment. Only providers that support it use it (ElevenLabs); others ignore it. A value outside 0–1 is rejected with `400`."
+    },
+    "similarity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "How closely this segment follows the voice it clones, from 0 to 1. Higher values stay closer to the original voice, which can also reproduce its accent. Overrides the speaker's setting for this segment. Only providers that support it use it (ElevenLabs); others ignore it. A value outside 0–1 is rejected with `400`."
+    },
+    "needsRedub": {
+      "type": "boolean",
+      "description": "True when the text changed after the audio of this segment was generated"
+    },
+    "ttsDuration": {
+      "type": "number",
+      "readOnly": true,
+      "description": "Duration of the generated audio in seconds. Returned by `GET`; accepted and ignored on `PUT`, so a `GET` response can be sent back unchanged."
+    },
+    "originalTtsDuration": {
+      "type": "number",
+      "readOnly": true,
+      "description": "Duration of the audio before it was fitted to the segment, in seconds. Returned by `GET`; ignored on `PUT`."
+    },
+    "estimatedTtsDuration": {
+      "type": "number",
+      "readOnly": true,
+      "description": "Estimated audio duration before synthesis, in seconds. Returned by `GET`; ignored on `PUT`."
+    },
+    "ttsEstimationError": {
+      "type": "number",
+      "readOnly": true,
+      "nullable": true,
+      "description": "Difference between the estimate and the generated audio. Returned by `GET`; ignored on `PUT`."
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "time_begin",
+    "time_end",
+    "words",
+    "speaker",
+    "language"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Segment identifier, stable across edits."
+    },
+    "speaker": {
+      "type": "string",
+      "description": "Speaker identifier (voice id or label)."
+    },
+    "time_begin": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Segment start time in seconds."
+    },
+    "time_end": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Segment end time in seconds."
+    },
+    "words": {
+      "type": "array",
+      "items": {
+        "$ref": "./SubtitleWord.json"
+      },
+      "description": "Word-level text and timings. A word can carry `<b>`, `<i>` and `<u>` styling tags (for example `<i>really</i>`)."
+    },
+    "language": {
+      "type": "string",
+      "description": "Language code of the segment."
+    },
+    "text": {
+      "type": "string",
+      "description": "Human-readable mirror of the segment text. `words` is the source of truth."
+    },
+    "metadata": {
+      "allOf": [
+        {
+          "$ref": "./SegmentMetadata.json"
+        }
+      ],
+      "description": "Review state and per-segment dubbing settings"
+    },
+    "cue_settings": {
+      "allOf": [
+        {
+          "$ref": "./CueSettings.json"
+        }
+      ],
+      "description": "Position of this segment's subtitle on the video. Absent when the subtitle profile position is used."
+    },
+    "style": {
+      "allOf": [
+        {
+          "$ref": "./SubtitleStyle.json"
+        }
+      ],
+      "description": "Optional style of this segment's subtitle, overriding the subtitle profile (font, size, colors, background, position). Omit it to use the subtitle profile; a segment sent without `style` loses the style it had."
+    },
+    "comments": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "$ref": "./SegmentComment.json"
+      },
+      "description": "Reviewer comments of the segment. Absent when the segment has none."
+    }
+  }
+}

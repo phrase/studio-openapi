@@ -1,0 +1,158 @@
+{
+  "type": "object",
+  "description": "Rules and styling that decide how subtitles are cut and shown.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Subtitle profile ID.",
+      "format": "uuid"
+    },
+    "sourceProfileId": {
+      "type": "string",
+      "description": "ID of the profile this one was copied from.",
+      "format": "uuid",
+      "nullable": true
+    },
+    "name": {
+      "type": "string",
+      "description": "Profile name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the profile is for."
+    },
+    "languages": {
+      "type": "array",
+      "description": "Languages the profile is meant for; empty or null means every language.",
+      "nullable": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the profile can be applied to projects."
+    },
+    "default": {
+      "type": "boolean",
+      "description": "True for items that Studio provides to every account. They cannot be edited."
+    },
+    "shared": {
+      "type": "boolean",
+      "description": "True for items that belong to another account of your organization; false for items you own and for Studio's defaults."
+    },
+    "minDuration": {
+      "type": "number",
+      "description": "Minimum duration of a subtitle in seconds."
+    },
+    "maxDuration": {
+      "type": "number",
+      "description": "Maximum duration of a subtitle in seconds."
+    },
+    "maxLineCharacterCount": {
+      "type": "integer",
+      "description": "Maximum number of characters on a line."
+    },
+    "maxGapBetweenWords": {
+      "type": "number",
+      "description": "Longest pause between two words that still stay in one subtitle, in seconds."
+    },
+    "minGapFrames": {
+      "type": "integer",
+      "description": "Minimum gap between two subtitles in frames."
+    },
+    "subtitlePosition": {
+      "type": "string",
+      "description": "Where subtitles are placed on the video.",
+      "enum": [
+        "top",
+        "bottom",
+        "center",
+        "right",
+        "middle",
+        "left"
+      ]
+    },
+    "displaySpeakerNames": {
+      "type": "boolean",
+      "description": "Whether the speaker name is shown in front of the text."
+    },
+    "maxLinesPerScreen": {
+      "type": "integer",
+      "description": "Maximum number of lines shown at the same time."
+    },
+    "charactersPerSecond": {
+      "type": "number",
+      "description": "Maximum reading speed in characters per second."
+    },
+    "fontFamily": {
+      "type": "string",
+      "description": "Font family: a name such as `Arial`, or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`). A custom font that was deleted falls back to Arial in burned-in video."
+    },
+    "fontSize": {
+      "type": "number",
+      "description": "Font size."
+    },
+    "fontWeight": {
+      "type": "string",
+      "description": "Font weight."
+    },
+    "fontStyle": {
+      "type": "string",
+      "description": "Font style."
+    },
+    "textAlign": {
+      "type": "string",
+      "description": "Text alignment."
+    },
+    "textColor": {
+      "type": "string",
+      "description": "Text color as a CSS color."
+    },
+    "backgroundType": {
+      "type": "string",
+      "description": "How the text is separated from the video.",
+      "enum": [
+        "none",
+        "box",
+        "outline",
+        "wrap"
+      ]
+    },
+    "backgroundColor": {
+      "type": "string",
+      "description": "Background color as a CSS color."
+    },
+    "verticalPositioning": {
+      "type": "boolean",
+      "description": "Whether subtitles are positioned vertically from the edge instead of by the placement setting."
+    },
+    "delta": {
+      "type": "number",
+      "description": "Vertical offset of the subtitles."
+    },
+    "deltaX": {
+      "type": "number",
+      "description": "Horizontal offset of the subtitles."
+    },
+    "layout": {
+      "type": "string",
+      "description": "Video layout the profile is made for.",
+      "enum": [
+        "landscape",
+        "portrait",
+        "portrait_4_5"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

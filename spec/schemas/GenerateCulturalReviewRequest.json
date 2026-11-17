@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "description": "Languages to review, at most 10. Each must be a translation language of the recording.",
+      "items": {
+        "type": "string",
+        "description": "Language code, for example `es-es`.",
+        "example": "es-es"
+      }
+    }
+  },
+  "required": [
+    "languages"
+  ]
+}

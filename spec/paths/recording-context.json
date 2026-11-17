@@ -1,0 +1,349 @@
+{
+  "get": {
+    "tags": [
+      "Recordings"
+    ],
+    "summary": "Get Video Context",
+    "operationId": "getRecordingContext",
+    "description": "Returns what the video shows, so that tools that only read text (translation, quality checks, assistants) can take it into account.\n\nThe context is created when transcription runs with video analysis enabled, so recordings that were never analysed answer 404 with the reason. Pull it when you need it; Studio does not push it anywhere.\n\n`contextHintUserEdited` is only present after a user has rewritten the detected `contextHint` in Studio; when it is present, prefer it over `contextHint`.\n\nOn-screen text is not part of this response. It is a regular segment of the subtitle tracks (speaker `On Screen Text`, see `metadata.onScreenText`).",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Video context returned",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/RecordingContext.json"
+            },
+            "example": {
+              "contextHint": "This is a sunscreen commercial for a product called 'ACE SUN SPORT'. Numbers like 'SPF 50' are product specifications and should be preserved as such.",
+              "scenes": [
+                {
+                  "description": "A solid green background is displayed.",
+                  "start": 0,
+                  "end": 1
+                },
+                {
+                  "description": "A solid green background with the text 'ACE SUN SPORT' in the middle.",
+                  "start": 1,
+                  "end": 5
+                }
+              ],
+              "generatedAt": "2026-11-10T19:08:01.040Z"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad Request",
+                "value": {
+                  "statusCode": 400,
+                  "message": "projectId must be a UUID",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Unauthorized",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "The project is not shared with you, or your share of the project does not include this step or language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Forbidden",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The project or the recording does not exist.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "recording_not_found": {
+                "summary": "Recording not found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Recording not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "no_video_analysis": {
+                "summary": "The recording has no video analysis yet",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Video analysis not found. It is created when transcription runs with video analysis enabled.",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "patch": {
+    "tags": [
+      "Recordings"
+    ],
+    "summary": "Edit the video context",
+    "description": "Correct what Studio detected in the video, for example a product name or a number that was misread. The detected text `contextHint` is kept; your version `contextHintUserEdited` is stored next to it and is the one to use. Send `null` to remove your version again. Only recordings that were analysed have a context, the others answer `404` with the reason. Needs write access to the transcription step. Answers with the context as it is afterwards.",
+    "operationId": "updateRecordingContext",
+    "security": [
+      {
+        "apiKeyAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/UpdateRecordingContextRequest.json"
+          },
+          "examples": {
+            "edit": {
+              "summary": "Correct the context",
+              "value": {
+                "contextHintUserEdited": "A sunscreen commercial for ACE SUN SPORT; SPF 50 is a product specification."
+              }
+            },
+            "reset": {
+              "summary": "Back to the detected context",
+              "value": {
+                "contextHintUserEdited": null
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The context after the change",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/RecordingContext.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "contextHint": "This is a sunscreen commercial for a product called 'ACE SUN SPORT'.",
+                  "contextHintUserEdited": "A sunscreen commercial for ACE SUN SPORT; SPF 50 is a product specification.",
+                  "scenes": [
+                    {
+                      "description": "A solid green background is displayed.",
+                      "start": 0,
+                      "end": 1
+                    }
+                  ],
+                  "generatedAt": "2026-11-10T19:08:01.040Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: you may not change this item.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

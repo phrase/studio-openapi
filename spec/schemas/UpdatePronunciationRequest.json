@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "description": "Fields of a pronunciation set to change. Send only what changes.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the set is for."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the set can be applied to projects."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "description": "What one language costs.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Language code."
+    },
+    "minutes": {
+      "type": "integer",
+      "description": "Minutes this language uses."
+    },
+    "reason": {
+      "type": "string",
+      "description": "`new_language` is charged; `already_translated`, `ignored` and `not_metered` cost nothing.",
+      "enum": [
+        "new_language",
+        "already_translated",
+        "ignored",
+        "not_metered"
+      ]
+    }
+  },
+  "required": [
+    "language",
+    "minutes",
+    "reason"
+  ]
+}

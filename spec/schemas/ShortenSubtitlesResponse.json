@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "properties": {
+    "suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "segmentId": {
+            "type": "string",
+            "description": "Id of the segment."
+          },
+          "originalText": {
+            "type": "string",
+            "description": "The text of the segment now."
+          },
+          "suggestedText": {
+            "type": "string",
+            "description": "The shorter text, or `null` when no suggestion could be made (see `errorCode`).",
+            "nullable": true
+          },
+          "durationSec": {
+            "type": "number",
+            "description": "Duration of the segment, in seconds."
+          },
+          "errorCode": {
+            "type": "string",
+            "enum": [
+              "SEGMENT_NOT_FOUND",
+              "EMPTY_RESPONSE",
+              "SAME_TEXT",
+              "NOT_SHORTER",
+              "EXCEPTION"
+            ],
+            "description": "Why there is no suggestion."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Details when there is no suggestion."
+          }
+        },
+        "required": [
+          "segmentId",
+          "originalText",
+          "suggestedText",
+          "durationSec"
+        ]
+      },
+      "description": "One suggestion per requested segment."
+    }
+  },
+  "required": [
+    "suggestions"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "description": "Where to upload the file.",
+  "properties": {
+    "recordingId": {
+      "type": "string",
+      "description": "ID of the recording that will be made from the file. Send it back when you add the recording.",
+      "format": "uuid"
+    },
+    "uploadUrl": {
+      "type": "string",
+      "description": "Signed url to `PUT` the file to.",
+      "format": "uri"
+    },
+    "method": {
+      "type": "string",
+      "description": "Always `PUT`.",
+      "enum": [
+        "PUT"
+      ]
+    },
+    "headers": {
+      "type": "object",
+      "description": "Headers to send with the upload. They must match, or storage refuses the file.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "expiresAt": {
+      "type": "string",
+      "description": "When the url stops working, 30 minutes after it was made.",
+      "format": "date-time"
+    },
+    "maxSizeBytes": {
+      "type": "integer",
+      "description": "Largest file that is accepted."
+    }
+  },
+  "required": [
+    "recordingId",
+    "uploadUrl",
+    "method",
+    "headers",
+    "expiresAt",
+    "maxSizeBytes"
+  ]
+}

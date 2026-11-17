@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "description": "Items.",
+      "items": {
+        "$ref": "../schemas/FontFamily.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../schemas/Pagination.json"
+    }
+  },
+  "required": [
+    "data",
+    "pagination"
+  ]
+}

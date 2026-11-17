@@ -1,0 +1,196 @@
+{
+  "post": {
+    "tags": [
+      "Subtitles"
+    ],
+    "summary": "Upload a subtitle file",
+    "description": "Replaces the subtitles of one track with the cues of an `.srt` or `.vtt` file (at most 10 MB), parsed like the Upload subtitles action of the Studio editor: each cue becomes a segment with the speaker `Unknown`, and its words are timed along the cue. The result is saved like `PUT …/subtitles` and goes through the same checks, so a file whose cues overlap or fall outside the recording is refused with `400`. Send `multipart/form-data`. Needs write access to the track.",
+    "operationId": "uploadSubtitleFile",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "../schemas/SubtitleFileUpload.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The subtitles were saved",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SubtitleFileUploadResponse.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "imported": 2,
+                  "warnings": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a file that is not `.srt` or `.vtt`, a file without cues, or cues that are not valid for the track.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a file that is not `.srt` or `.vtt`, a file without cues, or cues that are not valid for the track.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to access this project",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Recording not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "413": {
+        "description": "The file is larger than 10 MB.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e413": {
+                "summary": "File too large",
+                "value": {
+                  "statusCode": 413,
+                  "message": "request file too large",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

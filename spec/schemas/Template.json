@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "A saved set of project settings that a new project can start from. Templates are shared with your organization.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Template ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Template name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the template is for."
+    },
+    "settings": {
+      "$ref": "../schemas/TemplateSettings.json"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

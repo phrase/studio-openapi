@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "description": "A speech engine.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Engine id. Use it as `engine`."
+    },
+    "label": {
+      "type": "string",
+      "description": "Display name.",
+      "nullable": true
+    },
+    "provider": {
+      "type": "string",
+      "description": "Company that runs the engine."
+    },
+    "pronunciationMode": {
+      "type": "string",
+      "description": "How pronunciation is given to the engine: `inline` (IPA is written into the text), `ssml` (as phoneme markup) or `none` (not supported).",
+      "enum": [
+        "inline",
+        "ssml",
+        "none"
+      ]
+    },
+    "supportsEmotionTags": {
+      "type": "boolean",
+      "description": "Whether tags like `[whispers]` are understood."
+    }
+  },
+  "required": [
+    "id",
+    "provider",
+    "pronunciationMode",
+    "supportsEmotionTags"
+  ]
+}

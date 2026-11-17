@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "description": "Per-step progress of a recording. Translations and dubbings are limited to what the caller's share of the project includes.",
+  "properties": {
+    "recordingId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Recording ID."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "done",
+        "failed"
+      ],
+      "description": "Overall state of the visible steps: `failed` if any failed, `done` when all are done, `pending` when none started, otherwise `in_progress`."
+    },
+    "transcription": {
+      "$ref": "./TaskStatus.json"
+    },
+    "translations": {
+      "type": "array",
+      "items": {
+        "$ref": "./TaskStatus.json"
+      },
+      "description": "One entry per translation language."
+    },
+    "dubbings": {
+      "type": "array",
+      "items": {
+        "$ref": "./TaskStatus.json"
+      },
+      "description": "One entry per dubbing language."
+    },
+    "summary": {
+      "$ref": "./TaskStatus.json"
+    }
+  },
+  "required": [
+    "recordingId",
+    "status",
+    "transcription",
+    "translations",
+    "dubbings"
+  ]
+}

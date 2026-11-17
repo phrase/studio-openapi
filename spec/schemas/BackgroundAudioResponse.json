@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "The new background audio.",
+  "properties": {
+    "backgroundAudioUrl": {
+      "type": "string",
+      "description": "Signed link to the background audio.",
+      "format": "uri"
+    },
+    "backgroundWaveformUrl": {
+      "type": "string",
+      "description": "Signed link to its waveform.",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "backgroundAudioUrl"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "required": [
+    "subtitles",
+    "language"
+  ],
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "BCP-47 language code of the track to write"
+    },
+    "source": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when writing the source (transcript) track"
+    },
+    "dubbing": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when writing a dubbing track"
+    },
+    "bgVolume": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Dubbing background-audio volume, 0 (mute) to 2 (double); only honored for dubbing tracks"
+    },
+    "speakerVolumes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Per-speaker volume overrides (dubbing only); values above 2 are treated as 2"
+    },
+    "speakerVoiceSettings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "description": "Per-speaker TTS voice settings (dubbing only)"
+    },
+    "segmentsToRedub": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Segment ids that should be re-synthesized after this update"
+    },
+    "enqueueTtsUpdate": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true (default), the dubbing segments listed in `segmentsToRedub` are queued for TTS regeneration from their `words`. Set to false to save edits without re-synthesis (for example, text-only fixes) — you must still send the full `words` array for every segment."
+    },
+    "subtitles": {
+      "type": "array",
+      "description": "Full segment list for the target language track. The endpoint performs a bulk replace, so the array must contain every segment in the final state, not just the edited ones. Every segment must include a non-empty `words` array; omitting a segment deletes it, and an empty `words` array drops the segment on the next read.",
+      "items": {
+        "$ref": "./SubtitleSegment.json"
+      }
+    }
+  }
+}

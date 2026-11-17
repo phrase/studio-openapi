@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "description": "Progress of one processing step for one language.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Language code the step runs for.",
+      "example": "es-es"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "done",
+        "failed"
+      ],
+      "description": "`pending`: not started or waiting for an external step to deliver. `in_progress`: running. `done`: finished. `failed`: stopped, see `errorCode` and `errorMessage`."
+    },
+    "skipped": {
+      "type": "boolean",
+      "description": "True when the language was intentionally not processed."
+    },
+    "errorCode": {
+      "type": "string",
+      "nullable": true,
+      "description": "Machine-readable reason, only set when `status` is `failed`.",
+      "example": "WORKFLOW_DISPATCH_FAILED"
+    },
+    "errorMessage": {
+      "type": "string",
+      "nullable": true,
+      "description": "Human-readable reason, only set when `status` is `failed`.",
+      "example": "The processing could not be started. Please try again."
+    },
+    "tmsJob": {
+      "type": "object",
+      "description": "Translation management job that delivers this translation, present only when the translation runs through one.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Identifier of the translation job."
+        },
+        "status": {
+          "type": "string",
+          "description": "State reported by the translation management system."
+        }
+      },
+      "required": [
+        "uid"
+      ]
+    }
+  },
+  "required": [
+    "language",
+    "status",
+    "skipped",
+    "errorCode",
+    "errorMessage"
+  ]
+}

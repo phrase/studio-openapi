@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "description": "The answer to one item of an insight, for a recording.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Insight ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Insight name."
+    },
+    "itemId": {
+      "type": "string",
+      "description": "Insight item ID.",
+      "format": "uuid"
+    },
+    "itemName": {
+      "type": "string",
+      "description": "Insight item name."
+    },
+    "description": {
+      "type": "string",
+      "description": "The answer Studio gave."
+    }
+  }
+}

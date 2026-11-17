@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "description": "A new insight.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the insight is for."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the insight can be applied to projects."
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

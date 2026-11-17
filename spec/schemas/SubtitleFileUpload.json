@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "description": "A subtitle file for one track.",
+  "properties": {
+    "file": {
+      "type": "string",
+      "format": "binary",
+      "description": "The file: `.srt` or `.vtt`, at most 10 MB."
+    },
+    "language": {
+      "type": "string",
+      "description": "Language of the track the file is for.",
+      "example": "es-es"
+    },
+    "source": {
+      "type": "boolean",
+      "default": false,
+      "description": "`true` to replace the source transcript."
+    },
+    "dubbing": {
+      "type": "boolean",
+      "default": false,
+      "description": "`true` to replace the dubbing track of the language."
+    },
+    "cueSettings": {
+      "type": "string",
+      "enum": [
+        "keep",
+        "discard"
+      ],
+      "default": "keep",
+      "description": "What to do with the position settings of a `.vtt` cue (`line`, `position`, `size`, `align`, `vertical`, `region`): keep them or drop them."
+    }
+  },
+  "required": [
+    "file",
+    "language"
+  ]
+}

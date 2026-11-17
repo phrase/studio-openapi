@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "description": "The dubbing language to bring up to date.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Dubbing language."
+    }
+  },
+  "required": [
+    "language"
+  ]
+}

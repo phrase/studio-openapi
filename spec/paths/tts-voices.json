@@ -1,0 +1,199 @@
+{
+  "get": {
+    "tags": [
+      "Text to speech"
+    ],
+    "summary": "List voices of an engine",
+    "description": "Voices of one engine, including the saved voices of your organization. Page through with `nextPageToken`.",
+    "operationId": "getTtsVoices",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "engine",
+        "in": "query",
+        "required": false,
+        "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "description": "Only voices whose name contains this text.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "pageSize",
+        "in": "query",
+        "required": false,
+        "description": "Items per page, 1 to 100. Default 10. A page can hold more voices than this: some engines look through several pages of the provider to fill it.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      {
+        "name": "nextPageToken",
+        "in": "query",
+        "required": false,
+        "description": "`nextPageToken` of the previous page.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "locale",
+        "in": "query",
+        "required": false,
+        "description": "Only voices for this locale, for example `de-DE`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "gender",
+        "in": "query",
+        "required": false,
+        "description": "Filter from `GET /v1/tts/voices/filters`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "age",
+        "in": "query",
+        "required": false,
+        "description": "Filter from `GET /v1/tts/voices/filters`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "useCase",
+        "in": "query",
+        "required": false,
+        "description": "Filter from `GET /v1/tts/voices/filters`.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Voices",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/TtsVoiceList.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "data": [
+                    {
+                      "id": "af-ZA-AdriNeural",
+                      "name": "Adri",
+                      "category": "online-neural",
+                      "description": "Well-Rounded, Animated, Bright",
+                      "previewUrl": null,
+                      "characteristics": {
+                        "gender": "female"
+                      },
+                      "verifiedLanguages": [
+                        {
+                          "language": "af",
+                          "locale": "af-ZA",
+                          "accent": "Afrikaans (South Africa)"
+                        }
+                      ]
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 10,
+                    "total": 1034,
+                    "totalPages": 104,
+                    "nextPageToken": "1"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

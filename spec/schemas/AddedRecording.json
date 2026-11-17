@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "The recording that was added.",
+  "properties": {
+    "recordingId": {
+      "type": "string",
+      "description": "Recording ID.",
+      "format": "uuid"
+    },
+    "statusUrl": {
+      "type": "string",
+      "description": "Path to poll with `GET` until the transcription is done."
+    }
+  },
+  "required": [
+    "recordingId",
+    "statusUrl"
+  ]
+}

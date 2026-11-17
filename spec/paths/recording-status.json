@@ -1,0 +1,193 @@
+{
+  "get": {
+    "tags": [
+      "Recordings"
+    ],
+    "summary": "Get Recording Status",
+    "description": "Poll how far the processing of a recording is: transcription, each translation language, each dubbing language and the summary, with the reason when a step failed.\n\nThis is the URL returned as `statusUrl` by the translate and dubbing endpoints.\n\n## Reading the result\n\n- `status` is the overall state. Poll until it is `done` or `failed`.\n- Each step has its own `status`. A `failed` step carries `errorCode` and `errorMessage`; on every other state both are `null`.\n- A translation that runs through a translation management job also carries `tmsJob`. It stays `pending` until that job delivers.\n- A step that was requested but not started yet is listed as `pending`.\n\n## Shared projects\n\nIf your share of the project is limited to some languages, only those translation and dubbing languages are listed and the overall `status` is computed from what you can see.",
+    "operationId": "getRecordingStatus",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Recording status",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/RecordingStatus.json"
+            },
+            "examples": {
+              "one_step_failed": {
+                "summary": "Translation to French failed to start",
+                "value": {
+                  "recordingId": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "status": "failed",
+                  "transcription": {
+                    "language": "en",
+                    "status": "done",
+                    "skipped": false,
+                    "errorCode": null,
+                    "errorMessage": null
+                  },
+                  "translations": [
+                    {
+                      "language": "es-es",
+                      "status": "done",
+                      "skipped": false,
+                      "errorCode": null,
+                      "errorMessage": null
+                    },
+                    {
+                      "language": "fr-fr",
+                      "status": "failed",
+                      "skipped": false,
+                      "errorCode": "WORKFLOW_DISPATCH_FAILED",
+                      "errorMessage": "The processing could not be started. Please try again."
+                    }
+                  ],
+                  "dubbings": [
+                    {
+                      "language": "es-es",
+                      "status": "in_progress",
+                      "skipped": false,
+                      "errorCode": null,
+                      "errorMessage": null
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request (invalid ID)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_params": {
+                "summary": "Invalid parameters",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_api_key": {
+                "summary": "Invalid API key",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "You have no access to the project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Access denied",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The recording does not exist in this project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Recording not found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Recording not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

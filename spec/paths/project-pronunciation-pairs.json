@@ -1,0 +1,214 @@
+{
+  "post": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "Add a pronunciation pair to a project",
+    "description": "Add a pair to the pronunciations of this project only, for one language. The first pair of a language creates a pronunciation set for it. Needs write access to the dubbing step of that language. Returns the pronunciation sets of the project.",
+    "operationId": "addProjectPronunciationPair",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "description": "A pair for one language.",
+            "properties": {
+              "languageCode": {
+                "type": "string",
+                "description": "Language the pair is for."
+              },
+              "source": {
+                "type": "string",
+                "description": "The word or phrase as written.",
+                "minLength": 1
+              },
+              "target": {
+                "type": "string",
+                "description": "How it is spoken.",
+                "minLength": 1
+              },
+              "notation": {
+                "type": "string",
+                "enum": [
+                  "plain",
+                  "ipa"
+                ],
+                "description": "How `target` is written. Defaults to `plain`."
+              }
+            },
+            "required": [
+              "languageCode",
+              "source",
+              "target"
+            ]
+          },
+          "examples": {
+            "pair": {
+              "summary": "A Spanish pair",
+              "value": {
+                "languageCode": "es-es",
+                "source": "SQL",
+                "target": "sequel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Pair saved",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "description": "Pronunciation sets of the project.",
+              "items": {
+                "$ref": "../schemas/ProjectPronunciation.json"
+              }
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": [
+                  {
+                    "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                    "name": "Project pronunciations",
+                    "languageCode": "es-es",
+                    "items": [
+                      {
+                        "source": "SQL",
+                        "target": "sequel"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: you may not change this item.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

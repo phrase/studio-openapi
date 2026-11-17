@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "description": "A speaker of a recording and the voices assigned to it.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Speaker ID.",
+      "format": "uuid"
+    },
+    "speakerName": {
+      "type": "string",
+      "description": "Speaker name as used in the subtitles."
+    },
+    "providerVoices": {
+      "type": "object",
+      "description": "Assigned voice per provider and language: `{ provider: { languageCode: voice } }`.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "deletable": {
+      "type": "boolean",
+      "description": "Whether the speaker can be removed without leaving the recording without a speaker."
+    }
+  },
+  "required": [
+    "id",
+    "speakerName",
+    "deletable"
+  ]
+}

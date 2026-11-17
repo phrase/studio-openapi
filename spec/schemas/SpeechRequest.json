@@ -1,0 +1,56 @@
+{
+  "type": "object",
+  "description": "The text to speak.",
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Text to speak, at most 3000 characters.",
+      "maxLength": 3000
+    },
+    "voiceId": {
+      "type": "string",
+      "description": "Voice from `GET /v1/tts/voices` or a saved voice from `GET /v1/voices/clones`."
+    },
+    "engine": {
+      "type": "string",
+      "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`."
+    },
+    "languageCode": {
+      "type": "string",
+      "description": "Language of the text. Needed by some engines, and picks the pronunciation sets for that language."
+    },
+    "pronunciations": {
+      "type": "array",
+      "description": "Words to say a certain way, at most 200 together with the sets.",
+      "items": {
+        "$ref": "../schemas/SpeechPronunciation.json"
+      }
+    },
+    "pronunciationIds": {
+      "type": "array",
+      "description": "Pronunciation sets from `GET /v1/pronunciations` to apply. At most 10.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "stability": {
+      "type": "number",
+      "description": "Voice stability, where the engine has it."
+    },
+    "similarity": {
+      "type": "number",
+      "description": "Voice similarity, where the engine has it."
+    },
+    "seed": {
+      "type": "integer",
+      "description": "Same seed and text give a similar result.",
+      "minimum": 0,
+      "maximum": 4294967295
+    }
+  },
+  "required": [
+    "text",
+    "voiceId"
+  ]
+}

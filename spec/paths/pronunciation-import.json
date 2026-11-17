@@ -1,0 +1,141 @@
+{
+  "post": {
+    "tags": [
+      "Pronunciations"
+    ],
+    "summary": "Read a pronunciation file",
+    "description": "Reads an `.xlsx`, `.csv`, `.pls` or `.xml` file (at most 10 MB) and answers with the pairs it contains, so you can check and correct them. Nothing is saved: send the result to `POST /v1/pronunciations/import/confirm`. Send `multipart/form-data`. A CSV needs the columns `Term` and `IPA` in its first row.",
+    "operationId": "previewPronunciationImport",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "../schemas/PronunciationImportUpload.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "What the file contains",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/PronunciationImportPreview.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "pairs": [
+                    {
+                      "source": "Phrase",
+                      "target": "freɪz",
+                      "notation": "ipa"
+                    }
+                  ],
+                  "invalidRows": [],
+                  "invalidRowCount": 0,
+                  "warnings": [],
+                  "suggestedName": "words"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a file of another type, an empty file, or a file that cannot be read.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a file of another type, an empty file, or a file that cannot be read.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "413": {
+        "description": "The file is larger than 10 MB.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e413": {
+                "summary": "File too large",
+                "value": {
+                  "statusCode": 413,
+                  "message": "request file too large",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
