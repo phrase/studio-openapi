@@ -95,9 +95,10 @@
         },
         "subtitleProfiles": {
           "type": "object",
-          "description": "Subtitle profile ids by language code.",
+          "description": "Subtitle profile ids by language code; an id that is not a UUID is refused with `400`.",
           "additionalProperties": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           }
         },
         "styleGuides": {
@@ -135,9 +136,10 @@
         },
         "pronunciations": {
           "type": "object",
-          "description": "Pronunciation set ids by language code.",
+          "description": "Pronunciation set ids by language code; an id that is not a UUID is refused with `400`.",
           "additionalProperties": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

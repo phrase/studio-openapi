@@ -20398,7 +20398,7 @@
           "words": {
             "type": "array",
             "minItems": 1,
-            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports. At most 2,500 words per segment.",
+            "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports. At most 2,500 words per segment, and at most 5,000 characters in the words together.",
             "items": {
               "$ref": "#/components/schemas/SubtitleWord"
             },
@@ -22798,9 +22798,10 @@
               },
               "subtitleProfiles": {
                 "type": "object",
-                "description": "Subtitle profile ids by language code.",
+                "description": "Subtitle profile ids by language code; an id that is not a UUID is refused with `400`.",
                 "additionalProperties": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid"
                 }
               },
               "styleGuides": {
@@ -22838,9 +22839,10 @@
               },
               "pronunciations": {
                 "type": "object",
-                "description": "Pronunciation set ids by language code.",
+                "description": "Pronunciation set ids by language code; an id that is not a UUID is refused with `400`.",
                 "additionalProperties": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid"
                 }
               }
             },
@@ -24055,13 +24057,6 @@
           "languages": {
             "type": "array",
             "description": "Target languages of `translate` or `dubbing`. Not needed for `transcribe`.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ignoredLanguages": {
-            "type": "array",
-            "description": "Languages you provide the subtitles of yourself, as in the translate request. A language the recording does not have yet costs the same as a translation into it, whoever provides the text.",
             "items": {
               "type": "string"
             }
