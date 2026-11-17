@@ -71,6 +71,17 @@ test('flags schema properties without description but accepts references', () =>
   assert.doesNotMatch(problems, /properties\/owner: missing description/);
 });
 
+test('flags internal fields in a singular example and in an example that is a list', () => {
+  const operation = cleanOperation();
+  operation.responses[200].content['application/json'] = {
+    schema: { type: 'object', description: 'Thing.', example: { accountId: 'private' } },
+    example: [{ organizationId: 'org-1' }],
+  };
+  const problems = checkSpec(specWith(operation)).join('\n');
+  assert.match(problems, /accountId: internal field in an example/);
+  assert.match(problems, /organizationId: internal field in an example/);
+});
+
 test('flags internal fields in schemas and in examples', () => {
   const operation = cleanOperation();
   operation.responses[200].content['application/json'] = {

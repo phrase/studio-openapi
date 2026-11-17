@@ -5,7 +5,8 @@
     "id": {
       "type": "string",
       "description": "Project ID.",
-      "example": "01jzmvc20cjq5hj5saa96ttp2x"
+      "format": "uuid",
+      "example": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
     },
     "name": {
       "type": "string",

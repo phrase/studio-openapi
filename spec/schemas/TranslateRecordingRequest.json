@@ -9,7 +9,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language — the Studio UI excludes it from the picker, but this field does not reject it."
+      "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language: the request is rejected with `400`, and nothing is started for any of its languages."
     },
     "ignoredLanguages": {
       "type": "array",

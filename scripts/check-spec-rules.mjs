@@ -16,6 +16,8 @@ export const INTERNAL_FIELDS = [
   'username',
 ];
 
+// `example` (one value, also an array) and `examples` (named values) both hold sample data a caller reads.
+const IN_EXAMPLE = /\/examples?(\/|\[|$)/;
 const OPERATION_ID = /^[a-z][A-Za-z0-9]+$/;
 
 function checkOperation(path, method, operation, problems) {
@@ -63,7 +65,7 @@ function walk(node, location, problems) {
     }
   }
   for (const [key, value] of Object.entries(node)) {
-    if (INTERNAL_FIELDS.includes(key) && location.includes('/examples')) {
+    if (INTERNAL_FIELDS.includes(key) && IN_EXAMPLE.test(location)) {
       problems.push(`${location}/${key}: internal field in an example`);
     }
     walk(value, `${location}/${key}`, problems);

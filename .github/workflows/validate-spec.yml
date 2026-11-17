@@ -28,11 +28,11 @@ jobs:
 
       - run: npm ci
 
+      - name: schemas/projects.json must be committed and up to date with spec/
+        run: npm run check:generated
+
       - name: Bundle spec/ into schemas/projects.json
         run: npm run bundle
-
-      - name: schemas/projects.json must be committed up to date
-        run: git diff --exit-code -- schemas/projects.json
 
       - name: Lint the published spec
         run: npm run lint

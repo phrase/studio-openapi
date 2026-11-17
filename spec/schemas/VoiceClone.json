@@ -4,8 +4,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "description": "Voice ID. Use it as `voiceId` when assigning the voice to a speaker.",
-      "format": "uuid"
+      "description": "Voice ID. Use it as `voiceId` when assigning the voice to a speaker. A voice with `source` `external` comes from the ElevenLabs account your organization connected: its ID is the ElevenLabs voice ID, not a UUID, and it can be listed and assigned to a speaker but not fetched, renamed or deleted here."
     },
     "name": {
       "type": "string",
@@ -21,7 +20,8 @@
       "enum": [
         "neutral",
         "male",
-        "female"
+        "female",
+        null
       ],
       "nullable": true,
       "description": "Gender of the voice."

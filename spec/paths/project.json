@@ -471,7 +471,7 @@
               }
             },
             "share_project": {
-              "summary": "Mark the project as shared (visible to the API key owner)",
+              "summary": "Make the project visible to every member of the organization",
               "value": {
                 "isPublic": true
               }
