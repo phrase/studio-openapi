@@ -1,0 +1,340 @@
+{
+  "get": {
+    "tags": [
+      "Results"
+    ],
+    "summary": "Get the cultural review",
+    "description": "Returns the last cultural review of a translation language. Needs read access to the translation of the language. Answers `404` when none was generated yet.",
+    "operationId": "getCulturalReview",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "language",
+        "in": "query",
+        "required": true,
+        "description": "Translation language of the review.",
+        "schema": {
+          "type": "string",
+          "example": "es-es"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The review",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/CulturalReview.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "language": "es-es",
+                  "generatedAt": "2026-01-01T00:00:00.000Z",
+                  "coversVisuals": true,
+                  "flags": [
+                    {
+                      "timestamp": 12.4,
+                      "whatWasSeen": "A hand gesture",
+                      "whyItMayBeSensitive": "The gesture is rude in some Spanish-speaking regions.",
+                      "suggestion": "Blur or cut the shot."
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: language is missing or not valid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: language is missing or not valid.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to access this project",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "No review was generated for this language, or the recording is not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "No review was generated for this language, or the recording is not visible to you.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Results"
+    ],
+    "summary": "Generate cultural reviews",
+    "description": "Asks the AI to review the recording for the audience of each language, the same review as in the Studio Insights panel. Only the translation languages of the recording can be reviewed, as Studio offers them; any other language answers `400`. It answers when the reviews are ready and replaces the earlier review of those languages. Needs write access to the translation of every language. Answers `400` when the recording has no transcript and no video analysis yet.",
+    "operationId": "generateCulturalReview",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/GenerateCulturalReviewRequest.json"
+          },
+          "examples": {
+            "example": {
+              "summary": "Review Spanish",
+              "value": {
+                "languages": [
+                  "es-es"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "One review per language",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/CulturalReviewList.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "data": [
+                    {
+                      "language": "es-es",
+                      "generatedAt": "2026-01-01T00:00:00.000Z",
+                      "coversVisuals": true,
+                      "flags": [
+                        {
+                          "timestamp": 12.4,
+                          "whatWasSeen": "A hand gesture",
+                          "whyItMayBeSensitive": "The gesture is rude in some Spanish-speaking regions.",
+                          "suggestion": "Blur or cut the shot."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: no language, more than 10 languages, a language that is not a translation language of the recording, or nothing to review yet.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: no language, more than 10 languages, a language that is not a translation language of the recording, or nothing to review yet.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to access this project",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Recording not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1258 @@
+{
+  "get": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "List Projects",
+    "description": "List your projects, paged. Without `teamProjects` you get the projects you own; with `teamProjects=true` you get the projects shared with you or public in your organization. Filter by `status` or `search`. Use a returned `id` in the other project endpoints.",
+    "operationId": "listProjects",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "description": "Filter by project status.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ALL",
+            "ARCHIVED",
+            "PENDING",
+            "IN_PROGRESS",
+            "COMPLETED",
+            "FAILED"
+          ],
+          "default": "ALL"
+        }
+      },
+      {
+        "name": "teamProjects",
+        "in": "query",
+        "required": false,
+        "description": "When true, list team projects — projects shared with you, plus projects made public within your organization (this includes your own public projects). Your own private (unshared) projects are not team projects and are not returned when this flag is set; use the default listing (flag omitted) to retrieve them.",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "description": "Free-text search in project name.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "description": "Page number (min 1).",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "in": "query",
+        "required": false,
+        "description": "Items per page (1-1000).",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 1000
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Projects retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Projects on this page.",
+                  "items": {
+                    "$ref": "../schemas/Project.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "01jzmvc20cjq5hj5saa96ttp2x",
+                      "name": "Meeting Recording",
+                      "archived": false,
+                      "status": "COMPLETED",
+                      "firstRecordingId": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "sourceLanguage": "en",
+                      "expectedLanguages": [],
+                      "subtitleProfileId": "584ba46d-66f9-48da-9b96-f4ebe1f8fbca",
+                      "mediaType": "VIDEO",
+                      "duration": 182.4,
+                      "fileCount": 1,
+                      "recordingTypes": [
+                        "TRANSCRIPTION",
+                        "TRANSLATION"
+                      ],
+                      "isPublic": false,
+                      "createdAt": "2026-01-12T09:30:00.000Z",
+                      "updatedAt": "2026-01-12T09:45:10.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 1000,
+                    "total": 1,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request (invalid query parameters)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_query": {
+                "summary": "Invalid query",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_api_key": {
+                "summary": "Invalid API key",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden (access denied)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Access denied",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "success": false,
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "Create Project",
+    "description": "Creates an empty project and redirects the client to the upload service to upload files. After upload completion, the service will finalize the project automatically. Upload files with the `files` parts of the request. `fileUrls` also works for direct links to media files: an `https://` link that anyone can download and that ends in an audio or video file, not a web page. Uploading files is more robust than links.\n\nThis endpoint does not accept translation or dubbing languages — a project is created transcription-only. Once transcription completes, call `POST /v1/projects/{projectId}/recordings/{recordingId}/translate` to add translation languages, then `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to add dubbing languages.\n\nUpload behavior and limits:\n- 10-minute inactivity timeout per upload stream.\n- If the client connection drops, the upload is aborted and cannot resume; retry from the start.\n- Multi-hour uploads are supported as long as data keeps flowing and the connection stays open.\n\nSupported sources: files you upload and direct links to audio or video files. The file is checked after it is downloaded: if it has no audio or video stream the request is rejected with `400` and no project is created.\n\nErrors of the upload, as `{ success, statusCode, message }`:\n- `400` `The file at the URL is not an audio or video file`: the link points to a web page or another kind of file.\n- `400` `The URL could not be downloaded: the server answered <status>`: the server of the link refused, for example with `404` or `403`.\n- `400` `Invalid fileUrls entry: ...`: the link is not an `https://` URL or points to a host that is not allowed.\n- `413` a file is larger than 20 GB.\n- `502` the server of the link failed or could not be reached, or the project could not be started.\n\nCredits: the transcription of every recording uses `ceil(duration / 60)` minutes. A project whose organization has no credits left is refused with `403`.",
+    "operationId": "createProject",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "title",
+        "in": "query",
+        "required": false,
+        "description": "Project title",
+        "schema": {
+          "type": "string",
+          "default": "Untitled Project"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "sourceLanguage": {
+                "type": "string",
+                "description": "Source language code — the language actually spoken in the recording. Always specify one explicitly.",
+                "enum": [
+                  "am",
+                  "am-et",
+                  "ar",
+                  "ar-001",
+                  "ar-145",
+                  "ar-ae",
+                  "ar-arabizi",
+                  "ar-bh",
+                  "ar-dj",
+                  "ar-dz",
+                  "ar-eg",
+                  "ar-eh",
+                  "ar-er",
+                  "ar-il",
+                  "ar-iq",
+                  "ar-jo",
+                  "ar-km",
+                  "ar-kw",
+                  "ar-latn",
+                  "ar-lb",
+                  "ar-ly",
+                  "ar-ma",
+                  "ar-mod",
+                  "ar-mr",
+                  "ar-om",
+                  "ar-ps",
+                  "ar-qa",
+                  "ar-sa",
+                  "ar-sd",
+                  "ar-sn",
+                  "ar-so",
+                  "ar-ss",
+                  "ar-sy",
+                  "ar-tn",
+                  "ar-ye",
+                  "as",
+                  "as-in",
+                  "as-latn",
+                  "az",
+                  "az-arab",
+                  "az-arab-ir",
+                  "az-az",
+                  "az-cyrl",
+                  "az-cyrl-az",
+                  "az-latn",
+                  "az-latn-az",
+                  "ba",
+                  "ba-ru",
+                  "bg",
+                  "bg-bg",
+                  "bg-latn",
+                  "bg-latn-bg",
+                  "br",
+                  "ca",
+                  "ca-ad",
+                  "ca-es",
+                  "ca-es-valencia",
+                  "cs",
+                  "cs-cz",
+                  "cy",
+                  "cy-gb",
+                  "da",
+                  "da-dk",
+                  "da-fo",
+                  "da-gl",
+                  "de",
+                  "de-at",
+                  "de-be",
+                  "de-ch",
+                  "de-de",
+                  "de-dk",
+                  "de-it",
+                  "de-li",
+                  "de-lu",
+                  "de-nl",
+                  "el",
+                  "el-cy",
+                  "el-gr",
+                  "el-latn",
+                  "el-latn-gr",
+                  "en",
+                  "en-001",
+                  "en-029",
+                  "en-039",
+                  "en-150",
+                  "en-151",
+                  "en-154",
+                  "en-155",
+                  "en-ae",
+                  "en-af",
+                  "en-ag",
+                  "en-ai",
+                  "en-al",
+                  "en-am",
+                  "en-aq",
+                  "en-ar",
+                  "en-as",
+                  "en-au",
+                  "en-aw",
+                  "en-ax",
+                  "en-az",
+                  "en-ba",
+                  "en-bb",
+                  "en-bd",
+                  "en-be",
+                  "en-bh",
+                  "en-bl",
+                  "en-bm",
+                  "en-bn",
+                  "en-bq",
+                  "en-br",
+                  "en-bs",
+                  "en-bt",
+                  "en-bw",
+                  "en-bz",
+                  "en-ca",
+                  "en-cc",
+                  "en-ch",
+                  "en-ck",
+                  "en-cl",
+                  "en-cn",
+                  "en-co",
+                  "en-cw",
+                  "en-cx",
+                  "en-cy",
+                  "en-cz",
+                  "en-de",
+                  "en-dk",
+                  "en-dm",
+                  "en-dz",
+                  "en-eg",
+                  "en-er",
+                  "en-es",
+                  "en-et",
+                  "en-fi",
+                  "en-fj",
+                  "en-fk",
+                  "en-fm",
+                  "en-fo",
+                  "en-fr",
+                  "en-gb",
+                  "en-gd",
+                  "en-ge",
+                  "en-gf",
+                  "en-gg",
+                  "en-gh",
+                  "en-gi",
+                  "en-gl",
+                  "en-gm",
+                  "en-gp",
+                  "en-gq",
+                  "en-gr",
+                  "en-gs",
+                  "en-gu",
+                  "en-gw",
+                  "en-gy",
+                  "en-hk",
+                  "en-hm",
+                  "en-ht",
+                  "en-hu",
+                  "en-id",
+                  "en-ie",
+                  "en-il",
+                  "en-im",
+                  "en-in",
+                  "en-io",
+                  "en-iq",
+                  "en-is",
+                  "en-it",
+                  "en-je",
+                  "en-jm",
+                  "en-jo",
+                  "en-jp",
+                  "en-ke",
+                  "en-kh",
+                  "en-ki",
+                  "en-km",
+                  "en-kn",
+                  "en-kr",
+                  "en-kw",
+                  "en-ky",
+                  "en-kz",
+                  "en-la",
+                  "en-lb",
+                  "en-lc",
+                  "en-lk",
+                  "en-lr",
+                  "en-ls",
+                  "en-ly",
+                  "en-ma",
+                  "en-me",
+                  "en-mg",
+                  "en-mh",
+                  "en-mk",
+                  "en-mm",
+                  "en-mn",
+                  "en-mo",
+                  "en-mp",
+                  "en-mq",
+                  "en-ms",
+                  "en-mt",
+                  "en-mu",
+                  "en-mv",
+                  "en-mw",
+                  "en-mx",
+                  "en-my",
+                  "en-mz",
+                  "en-na",
+                  "en-nf",
+                  "en-ng",
+                  "en-nl",
+                  "en-no",
+                  "en-np",
+                  "en-nr",
+                  "en-nu",
+                  "en-nz",
+                  "en-om",
+                  "en-pe",
+                  "en-pg",
+                  "en-ph",
+                  "en-pk",
+                  "en-pm",
+                  "en-pn",
+                  "en-pr",
+                  "en-pt",
+                  "en-pw",
+                  "en-qa",
+                  "en-rs",
+                  "en-ru",
+                  "en-rw",
+                  "en-sa",
+                  "en-sb",
+                  "en-sc",
+                  "en-sd",
+                  "en-se",
+                  "en-sg",
+                  "en-sh",
+                  "en-si",
+                  "en-sk",
+                  "en-sl",
+                  "en-so",
+                  "en-sr",
+                  "en-ss",
+                  "en-sx",
+                  "en-sy",
+                  "en-sz",
+                  "en-tc",
+                  "en-th",
+                  "en-tk",
+                  "en-tl",
+                  "en-tm",
+                  "en-tn",
+                  "en-to",
+                  "en-tr",
+                  "en-tt",
+                  "en-tv",
+                  "en-tw",
+                  "en-tz",
+                  "en-ug",
+                  "en-um",
+                  "en-us",
+                  "en-vc",
+                  "en-vg",
+                  "en-vi",
+                  "en-vn",
+                  "en-vu",
+                  "en-wf",
+                  "en-ws",
+                  "en-ye",
+                  "en-za",
+                  "en-zm",
+                  "en-zw",
+                  "es",
+                  "es-001",
+                  "es-419",
+                  "es-ad",
+                  "es-ar",
+                  "es-aw",
+                  "es-bb",
+                  "es-bo",
+                  "es-bz",
+                  "es-cl",
+                  "es-co",
+                  "es-cr",
+                  "es-cu",
+                  "es-do",
+                  "es-ec",
+                  "es-es",
+                  "es-gq",
+                  "es-gt",
+                  "es-hn",
+                  "es-ic",
+                  "es-jm",
+                  "es-mx",
+                  "es-ni",
+                  "es-pa",
+                  "es-pe",
+                  "es-pr",
+                  "es-py",
+                  "es-sv",
+                  "es-tt",
+                  "es-us",
+                  "es-uy",
+                  "es-ve",
+                  "et",
+                  "et-ee",
+                  "eu",
+                  "eu-es",
+                  "fa",
+                  "fa-af",
+                  "fa-ir",
+                  "fa-latn",
+                  "fa-latn-ir",
+                  "fi",
+                  "fi-fi",
+                  "fi-se",
+                  "fo",
+                  "fo-fo",
+                  "fr",
+                  "fr-001",
+                  "fr-002",
+                  "fr-011",
+                  "fr-015",
+                  "fr-017",
+                  "fr-ad",
+                  "fr-be",
+                  "fr-bf",
+                  "fr-bi",
+                  "fr-bj",
+                  "fr-bl",
+                  "fr-ca",
+                  "fr-cd",
+                  "fr-cf",
+                  "fr-cg",
+                  "fr-ch",
+                  "fr-ci",
+                  "fr-cm",
+                  "fr-dj",
+                  "fr-dz",
+                  "fr-fr",
+                  "fr-ga",
+                  "fr-gf",
+                  "fr-gn",
+                  "fr-gp",
+                  "fr-gq",
+                  "fr-ht",
+                  "fr-km",
+                  "fr-lb",
+                  "fr-lu",
+                  "fr-ma",
+                  "fr-mc",
+                  "fr-mf",
+                  "fr-mg",
+                  "fr-ml",
+                  "fr-mq",
+                  "fr-mr",
+                  "fr-mu",
+                  "fr-nc",
+                  "fr-ne",
+                  "fr-pf",
+                  "fr-pm",
+                  "fr-re",
+                  "fr-rw",
+                  "fr-sc",
+                  "fr-sn",
+                  "fr-td",
+                  "fr-tf",
+                  "fr-tg",
+                  "fr-tn",
+                  "fr-wf",
+                  "fr-yt",
+                  "gu",
+                  "gu-in",
+                  "ha",
+                  "ha-latn-ne",
+                  "ha-latn-ng",
+                  "he",
+                  "he-il",
+                  "he-ru",
+                  "hi",
+                  "hi-fj",
+                  "hi-in",
+                  "hi-latn",
+                  "hu",
+                  "hu-hu",
+                  "hy",
+                  "hy-am",
+                  "hy-latn",
+                  "hy-latn-am",
+                  "id",
+                  "id-id",
+                  "is",
+                  "is-is",
+                  "it",
+                  "it-ch",
+                  "it-it",
+                  "it-sm",
+                  "it-va",
+                  "ja",
+                  "ja-jp",
+                  "ja-us",
+                  "jw",
+                  "ka",
+                  "ka-ge",
+                  "kk",
+                  "kk-cyrl-kz",
+                  "kk-kz",
+                  "kk-latn",
+                  "km",
+                  "km-kh",
+                  "km-vn",
+                  "kn",
+                  "kn-in",
+                  "ko",
+                  "ko-kp",
+                  "ko-kr",
+                  "ko-us",
+                  "la",
+                  "lb",
+                  "lb-lu",
+                  "lv",
+                  "lv-lv",
+                  "lv-ru",
+                  "ml",
+                  "ml-in",
+                  "mn",
+                  "mn-mn",
+                  "mn-mong",
+                  "mn-mong-cn",
+                  "mr",
+                  "mr-in",
+                  "mt",
+                  "mt-mt",
+                  "ne",
+                  "ne-np",
+                  "nl",
+                  "nl-001",
+                  "nl-be",
+                  "nl-cw",
+                  "nl-nl",
+                  "nl-sr",
+                  "nn",
+                  "nn-no",
+                  "no",
+                  "no-no",
+                  "no-no-ny",
+                  "pa",
+                  "pa-arab",
+                  "pa-arab-pk",
+                  "pa-ca",
+                  "pa-guru",
+                  "pa-guru-in",
+                  "pa-guru-pk",
+                  "pa-in",
+                  "pa-pk",
+                  "pl",
+                  "pl-pl",
+                  "ps",
+                  "ps-af",
+                  "pt",
+                  "pt-001",
+                  "pt-ao",
+                  "pt-br",
+                  "pt-cv",
+                  "pt-gw",
+                  "pt-mz",
+                  "pt-pt",
+                  "pt-st",
+                  "pt-tl",
+                  "pt-us",
+                  "ro",
+                  "ro-md",
+                  "ro-ro",
+                  "ru",
+                  "ru-by",
+                  "ru-ee",
+                  "ru-il",
+                  "ru-kg",
+                  "ru-kz",
+                  "ru-latn",
+                  "ru-latn-ru",
+                  "ru-lt",
+                  "ru-lv",
+                  "ru-md",
+                  "ru-ru",
+                  "ru-tj",
+                  "ru-tm",
+                  "ru-ua",
+                  "ru-uz",
+                  "si",
+                  "si-lk",
+                  "sk",
+                  "sk-sk",
+                  "sl",
+                  "sl-si",
+                  "sl-sl",
+                  "sq",
+                  "sq-al",
+                  "sq-mk",
+                  "sq-xk",
+                  "sr",
+                  "sr-ba",
+                  "sr-cyrl",
+                  "sr-cyrl-ba",
+                  "sr-cyrl-me",
+                  "sr-cyrl-rs",
+                  "sr-latn",
+                  "sr-latn-ba",
+                  "sr-latn-cs",
+                  "sr-latn-me",
+                  "sr-latn-rs",
+                  "sr-me",
+                  "sr-rs",
+                  "su",
+                  "sv",
+                  "sv-ax",
+                  "sv-fi",
+                  "sv-se",
+                  "sv-sk",
+                  "sw",
+                  "sw-cd",
+                  "sw-ke",
+                  "sw-tz",
+                  "sw-ug",
+                  "ta",
+                  "ta-in",
+                  "ta-latn",
+                  "ta-latn-in",
+                  "ta-lk",
+                  "ta-my",
+                  "ta-sg",
+                  "te",
+                  "te-in",
+                  "te-latn",
+                  "te-latn-in",
+                  "th",
+                  "th-th",
+                  "tl",
+                  "tl-ph",
+                  "tr",
+                  "tr-tr",
+                  "tt",
+                  "tt-ru",
+                  "uk",
+                  "uk-latn",
+                  "uk-latn-ua",
+                  "uk-pl",
+                  "uk-ua",
+                  "ur",
+                  "ur-bd",
+                  "ur-in",
+                  "ur-latn",
+                  "ur-lk",
+                  "ur-pk",
+                  "uz",
+                  "uz-cyrl",
+                  "uz-cyrl-uz",
+                  "uz-latn",
+                  "uz-latn-uz",
+                  "uz-uz",
+                  "vi",
+                  "vi-us",
+                  "vi-vn",
+                  "yue",
+                  "zh",
+                  "zh-cn",
+                  "zh-hans",
+                  "zh-hans-cn",
+                  "zh-hans-hk",
+                  "zh-hans-kr",
+                  "zh-hans-my",
+                  "zh-hans-sg",
+                  "zh-hans-us",
+                  "zh-hant",
+                  "zh-hant-cn",
+                  "zh-hant-hk",
+                  "zh-hant-tw",
+                  "zh-hk",
+                  "zh-mo",
+                  "zh-my",
+                  "zh-sg",
+                  "zh-tw"
+                ]
+              },
+              "expectedLanguages": {
+                "description": "Additional languages that may be spoken in the recording besides sourceLanguage (for recordings that switch between languages). Provide as a JSON array string in multipart. sourceLanguage and duplicates are ignored.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "subtitleProfiles": {
+                "description": "Array of subtitle profile selections. In multipart, provide this as a JSON array string.",
+                "type": "array",
+                "items": {
+                  "$ref": "../schemas/CreateProjectSubtitleProfile.json"
+                }
+              },
+              "summary": {
+                "type": "boolean",
+                "description": "Enable summary generation"
+              },
+              "customAttributes": {
+                "type": "boolean",
+                "description": "Enable custom attributes extraction"
+              },
+              "insights": {
+                "description": "Requested insight IDs (UUID v4). Provide as JSON array or JSON string.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "glossary": {
+                "description": "Glossary configuration (JSON object or JSON string). When provided as an object in multipart form, use JSON string representation.",
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Existing glossary ID to use for the project"
+                      },
+                      "content": {
+                        "type": "string",
+                        "description": "Glossary content as newline-separated terms (e.g., 'term1\\nterm2\\nterm3')"
+                      }
+                    }
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "safeCommunications": {
+                "description": "Safe communication IDs (UUID v4). Provide as JSON array or JSON string.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "pronunciations": {
+                "description": "Pronunciations to apply. In multipart, provide as JSON array string.",
+                "type": "array",
+                "items": {
+                  "$ref": "../schemas/CreateProjectPronunciation.json"
+                }
+              },
+              "fileUrls": {
+                "description": "External file URLs to import. Provide as JSON array or JSON string. If provided, uploaded files in this request are ignored for processing (but still count towards the 5-item limit).",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "files": {
+                "description": "One or more files to upload (max 50 total across files + fileUrls). Ignored for processing when fileUrls are provided (but still count towards the limit).",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "required": [
+              "sourceLanguage",
+              "subtitleProfiles"
+            ]
+          },
+          "examples": {
+            "direct_upload": {
+              "summary": "Direct file upload (full request example)",
+              "value": {
+                "sourceLanguage": "en",
+                "subtitleProfiles": [
+                  {
+                    "subtitleProfileId": "00000000-0000-0000-0000-000000000001",
+                    "languageCode": "en"
+                  }
+                ],
+                "summary": false,
+                "customAttributes": true,
+                "insights": [
+                  "00000000-0000-0000-0000-000000000002",
+                  "00000000-0000-0000-0000-000000000003"
+                ],
+                "glossary": {
+                  "id": "00000000-0000-0000-0000-000000000004",
+                  "content": "term1\\nterm2\\nterm3"
+                },
+                "safeCommunications": [
+                  "00000000-0000-0000-0000-000000000005",
+                  "00000000-0000-0000-0000-000000000006"
+                ],
+                "pronunciations": [
+                  {
+                    "pronunciationId": "00000000-0000-0000-0000-000000000007",
+                    "languageCode": "en"
+                  }
+                ]
+              }
+            },
+            "url_import": {
+              "summary": "Import from external URLs (full request example)",
+              "value": {
+                "sourceLanguage": "en",
+                "subtitleProfiles": [
+                  {
+                    "subtitleProfileId": "00000000-0000-0000-0000-000000000001",
+                    "languageCode": "en"
+                  }
+                ],
+                "summary": false,
+                "customAttributes": true,
+                "insights": [
+                  "00000000-0000-0000-0000-000000000002",
+                  "00000000-0000-0000-0000-000000000003"
+                ],
+                "glossary": {
+                  "id": "00000000-0000-0000-0000-000000000004",
+                  "content": "term1\\nterm2\\nterm3"
+                },
+                "safeCommunications": [
+                  "00000000-0000-0000-0000-000000000005",
+                  "00000000-0000-0000-0000-000000000006"
+                ],
+                "pronunciations": [
+                  {
+                    "pronunciationId": "00000000-0000-0000-0000-000000000007",
+                    "languageCode": "en"
+                  }
+                ],
+                "fileUrls": [
+                  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Upload accepted and project initialized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Project ID"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "examples": {
+              "ok_by_uploads": {
+                "summary": "Success (direct uploads)",
+                "value": {
+                  "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                }
+              },
+              "ok_by_file_urls": {
+                "summary": "Success (fileUrls)",
+                "value": {
+                  "id": "01jzmvc20cjq5hj5saa96ttp2x"
+                }
+              }
+            }
+          }
+        }
+      },
+      "307": {
+        "description": "Redirect to external upload service",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "URL to redirect to for file upload"
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is invalid, or a `fileUrls` link is not an audio or video file, cannot be downloaded or is not allowed. The message says which.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "no_files": {
+                "summary": "No files provided (redirect endpoint)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "There are no files",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "malformed_multipart": {
+                "summary": "Malformed multipart payload (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Malformed multipart payload",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "validation_failed": {
+                "summary": "Validation failed (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Validation failed",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "max_files": {
+                "summary": "Too many files (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Maximum 50 files allowed",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "max_files_combined": {
+                "summary": "Too many total inputs (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Maximum 50 files allowed (uploads + fileUrls)",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "at_least_one": {
+                "summary": "No files or URLs (upload service)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "At least one file must be provided (file uploads or fileUrls)",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "upload_failed": {
+                "summary": "Upload failed (generic)",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "Upload failed",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. Also returned when your organization has no credits left (`No remaining minutes available`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "413": {
+        "description": "A file is larger than 20 GB.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "file_too_large": {
+                "summary": "Max size exceeded per file",
+                "value": {
+                  "success": false,
+                  "statusCode": 413,
+                  "message": "File too large. Max size is 5GB per file",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "415": {
+        "description": "Unsupported Media Type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unsupported_content_type": {
+                "summary": "Content-Type must be multipart/form-data",
+                "value": {
+                  "success": false,
+                  "statusCode": 415,
+                  "message": "Content-Type must be multipart/form-data",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "502": {
+        "description": "The server of a `fileUrls` link failed or could not be reached, or the project could not be started.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "start_error": {
+                "summary": "Error calling start endpoint",
+                "value": {
+                  "success": false,
+                  "statusCode": 502,
+                  "message": "Error calling start endpoint",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "503": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "upload_service_unavailable": {
+                "summary": "Upload service not configured",
+                "value": {
+                  "success": false,
+                  "statusCode": 503,
+                  "message": "Single-shot upload URL is not configured",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

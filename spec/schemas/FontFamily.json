@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "description": "A custom font: a family with one or more files (Regular, Bold, Italic and so on).",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Family ID. Use it to add styles, rename or delete the family."
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the family."
+    },
+    "fontFamily": {
+      "type": "string",
+      "description": "The value to send as `fontFamily` in a subtitle profile, or on a single subtitle, to use this font in burned-in video: `custom:` and the family ID."
+    },
+    "shared": {
+      "type": "boolean",
+      "description": "`true` when another member of your organization uploaded the font. Everyone in the organization can use it; the uploader or an organization manager changes it."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the family was created."
+    },
+    "files": {
+      "type": "array",
+      "description": "The files of the family, by weight and then italic.",
+      "items": {
+        "$ref": "../schemas/FontFile.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "fontFamily",
+    "shared",
+    "createdAt",
+    "files"
+  ]
+}

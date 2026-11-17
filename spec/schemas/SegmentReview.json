@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "Review state of a segment. `PUT` stores it exactly as sent and the reviewer is not verified. Unlike the Studio editor, the API does not set a segment back to `PENDING` when its text changes, so send `PENDING` yourself for segments you rewrite.",
+  "required": [
+    "status"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "REVIEWED"
+      ],
+      "description": "`REVIEWED` once a reviewer approved the segment, `PENDING` otherwise."
+    },
+    "reviewedBy": {
+      "type": "object",
+      "description": "The reviewer",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Identifier of the reviewer."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the reviewer."
+        }
+      }
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the segment was reviewed"
+    }
+  }
+}

@@ -1,0 +1,428 @@
+{
+  "get": {
+    "tags": [
+      "Subtitle Profiles"
+    ],
+    "summary": "Get a subtitle profile",
+    "description": "Retrieve one subtitle profile. A default of Studio is found by its own id, or by the id of the personal copy you made of it. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "operationId": "getSubtitleProfile",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Subtitle profile ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subtitle profile retrieved",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SubtitleProfile.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Two lines",
+                  "description": "For social video",
+                  "languages": [
+                    "es-es"
+                  ],
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "minDuration": 0.7,
+                  "maxDuration": 7,
+                  "maxLineCharacterCount": 42,
+                  "maxGapBetweenWords": 3,
+                  "minGapFrames": 2,
+                  "subtitlePosition": "bottom",
+                  "displaySpeakerNames": false,
+                  "maxLinesPerScreen": 2,
+                  "charactersPerSecond": 20,
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "patch": {
+    "tags": [
+      "Subtitle Profiles"
+    ],
+    "summary": "Update a subtitle profile",
+    "description": "Change fields of a subtitle profile. Send only what changes. Your own profile, or a profile of another member when you are a manager of the organization, is changed in place. A default profile of Studio is not changed: the change is stored as a personal copy that replaces the default in your list, and the response is that copy. Anyone else gets `403`. Deleting is not available through the API.",
+    "operationId": "updateSubtitleProfile",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Subtitle profile ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/UpdateSubtitleProfileRequest.json"
+          },
+          "examples": {
+            "lines": {
+              "summary": "Allow three lines",
+              "value": {
+                "maxLinesPerScreen": 3
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Subtitle profile updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SubtitleProfile.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Two lines",
+                  "description": "For social video",
+                  "languages": [
+                    "es-es"
+                  ],
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "minDuration": 0.7,
+                  "maxDuration": 7,
+                  "maxLineCharacterCount": 42,
+                  "maxGapBetweenWords": 3,
+                  "minGapFrames": 2,
+                  "subtitlePosition": "bottom",
+                  "displaySpeakerNames": false,
+                  "maxLinesPerScreen": 2,
+                  "charactersPerSecond": 20,
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: you may not change this item.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "tags": [
+      "Subtitle Profiles"
+    ],
+    "summary": "Delete a subtitle profile",
+    "description": "Deletes a subtitle profile of your organization. The owner or an organization manager can delete it; for anyone else the profile is not found. The default profiles that ship with Studio cannot be deleted, they answer `404`: change one with `PATCH` to get your own copy. Projects that used the deleted profile no longer have it.",
+    "operationId": "deleteSubtitleProfile",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Subtitle profile ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "204": {
+        "description": "The subtitle profile was deleted"
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found: the profile does not exist, is a default profile, or you may not manage it.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found: the profile does not exist, is a default profile, or you may not manage it.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

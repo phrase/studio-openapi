@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "description": "A new pronunciation set, optionally with its pairs.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the set is for."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the set can be applied to projects. Ignored when `pairs` is sent: such a set is created active."
+    },
+    "pairs": {
+      "type": "array",
+      "description": "Pairs to create with the set, up to 10000. With them the set is created in one call, which is the way to load a whole list. Each pair needs `source`, `target` and `notation`.",
+      "maxItems": 10000,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "../schemas/PronunciationPairInput.json"
+          }
+        ],
+        "required": [
+          "source",
+          "target",
+          "notation"
+        ]
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "description": "Your default settings. New projects start with them; a project can change them for itself with `PATCH /v1/projects/{id}`.",
+  "properties": {
+    "insightsModelType": {
+      "type": "string",
+      "enum": [
+        "GPT",
+        "CUSTOM"
+      ],
+      "description": "Provider type of the model: `GPT` for the GPT models, `CUSTOM` for `plai` and `aita`. It follows from the model."
+    },
+    "insightsModelName": {
+      "type": "string",
+      "description": "Model that writes summaries and insights: `gpt-5-mini` or `gpt-4o-mini`."
+    },
+    "translationModelType": {
+      "type": "string",
+      "enum": [
+        "GPT",
+        "CUSTOM"
+      ],
+      "description": "Provider type of the model: `GPT` for the GPT models, `CUSTOM` for `plai` and `aita`. It follows from the model."
+    },
+    "translationModelName": {
+      "type": "string",
+      "description": "Model that translates: `aita` (AI Translation Agent), `plai` (Phrase Language AI), `gpt-5-mini` or `gpt-4o-mini`."
+    },
+    "mtProfileId": {
+      "type": "string",
+      "description": "Phrase TMS machine translation profile uid. Only `plai` and `aita` use one; an empty string means none is set.",
+      "minLength": 0
+    },
+    "translationMemoryId": {
+      "type": "string",
+      "description": "Phrase TMS translation memory uid. Only `plai` and `aita` use one; an empty string means none is set.",
+      "minLength": 0
+    },
+    "ttsProvider": {
+      "type": "string",
+      "enum": [
+        "eleven_v2",
+        "eleven_v3",
+        "eleven_v4",
+        "eleven_v4_turbo",
+        "azure_tts",
+        "gemini_2_5_flash_tts"
+      ],
+      "description": "Text-to-speech engine that new projects dub with. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
+    }
+  },
+  "required": [
+    "insightsModelType",
+    "insightsModelName",
+    "translationModelType",
+    "translationModelName",
+    "mtProfileId",
+    "translationMemoryId",
+    "ttsProvider"
+  ]
+}

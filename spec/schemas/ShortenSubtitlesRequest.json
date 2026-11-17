@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Language of the track.",
+      "example": "es-es"
+    },
+    "segmentIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "description": "Ids of the segments to shorten, at most 500.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "type": "boolean",
+      "default": false,
+      "description": "`true` for the source transcript."
+    },
+    "dubbing": {
+      "type": "boolean",
+      "default": false,
+      "description": "`true` for the dubbing track of the language."
+    }
+  },
+  "required": [
+    "language",
+    "segmentIds"
+  ]
+}

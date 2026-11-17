@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "required": [
+    "languages"
+  ],
+  "properties": {
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language — the Studio UI excludes it from the picker, but this field does not reject it."
+    },
+    "ignoredLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Subset of `languages` to record as intentionally not translated (tracked on the recording so it shows as deliberately skipped, not pending or failed) instead of actually running translation for it"
+    },
+    "tmsProjectTemplateUid": {
+      "type": "string",
+      "description": "Phrase TMS project template uid. Get it from the Phrase TMS API (project templates); Studio has no endpoint that lists it."
+    },
+    "subtitleProfiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Subtitle profile id per language code. List available ids with GET /v1/subtitle-profiles."
+    },
+    "styleGuides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Style guide ids by language code. Get them from the Style Guides API; Studio has no endpoint that lists them."
+    },
+    "termBases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Phrase TMS term base uids by language code. Get them from the Phrase TMS API (term bases); Studio has no endpoint that lists them."
+    }
+  }
+}

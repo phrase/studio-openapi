@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "description": "A tag Studio found in a recording.",
+  "properties": {
+    "tagName": {
+      "type": "string",
+      "description": "Name of the tag."
+    },
+    "description": {
+      "type": "string",
+      "description": "Why the tag applies."
+    },
+    "score": {
+      "type": "number",
+      "description": "How strongly it applies."
+    },
+    "reference": {
+      "type": "string",
+      "description": "Where in the recording."
+    }
+  }
+}

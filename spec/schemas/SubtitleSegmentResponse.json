@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "required": [
+    "subtitles",
+    "participantNames"
+  ],
+  "properties": {
+    "participantNames": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Names of the speakers that appear in the track."
+    },
+    "bgVolume": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Volume of the background audio of a dubbing track, from 0 to 2."
+    },
+    "speakerVolumes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Volume of each speaker of a dubbing track, by speaker identifier."
+    },
+    "speakerVoiceSettings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "description": "Voice settings of each speaker of a dubbing track, by speaker identifier."
+    },
+    "subtitles": {
+      "type": "array",
+      "items": {
+        "$ref": "./SubtitleSegmentResponseItem.json"
+      },
+      "description": "The segments of the track."
+    }
+  }
+}

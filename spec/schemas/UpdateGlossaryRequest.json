@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "description": "Fields of a glossary to change. Send only what changes.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the glossary is for."
+    },
+    "items": {
+      "type": "string",
+      "description": "Terms, one per line. Replaces all terms."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the glossary can be applied to projects."
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "description": "An insight applied to a project.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Insight ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Insight name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the insight extracts."
+    },
+    "items": {
+      "type": "array",
+      "description": "The prompts of the insight.",
+      "items": {
+        "type": "object",
+        "description": "One prompt of the insight.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Insight item ID.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Prompt name."
+          },
+          "content": {
+            "type": "string",
+            "description": "Prompt text."
+          }
+        }
+      }
+    }
+  }
+}

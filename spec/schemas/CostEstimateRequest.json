@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "The action to price.",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "`translate` is charged: every new language costs `ceil(duration / 60)` minutes. `dubbing` and `transcribe` cost `0`: `transcribe` here means transcribing a recording that exists again (retranscription). The first transcription of a file is charged when you add the recording with `POST /v1/projects/{projectId}/recordings`, and cannot be estimated beforehand.",
+      "enum": [
+        "translate",
+        "dubbing",
+        "transcribe"
+      ]
+    },
+    "languages": {
+      "type": "array",
+      "description": "Target languages of `translate` or `dubbing`. Not needed for `transcribe`.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ignoredLanguages": {
+      "type": "array",
+      "description": "Languages you will skip, as in the translate request. They cost nothing.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "action"
+  ]
+}

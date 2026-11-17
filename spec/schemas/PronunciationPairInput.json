@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "description": "A pair of a written form and how it is spoken.",
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "The word or phrase as written.",
+      "maxLength": 512,
+      "minLength": 1
+    },
+    "target": {
+      "type": "string",
+      "description": "How it is spoken: plain text spelling, or IPA when `notation` is `ipa`.",
+      "maxLength": 512,
+      "minLength": 1
+    },
+    "notation": {
+      "type": "string",
+      "enum": [
+        "plain",
+        "ipa"
+      ],
+      "description": "How `target` is written. Defaults to `plain`."
+    }
+  },
+  "required": [
+    "source",
+    "target"
+  ]
+}

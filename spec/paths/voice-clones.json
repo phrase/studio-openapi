@@ -1,0 +1,137 @@
+{
+  "get": {
+    "tags": [
+      "Voices"
+    ],
+    "summary": "Get voice clones",
+    "description": "Retrieve the saved voices (\"My voices\") of your organization. Use a voice `id` as `voiceId` in `PUT /v1/projects/{projectId}/recordings/{recordingId}/speakers` to dub a speaker with it. Creating a voice needs a recorded consent and is only possible in Studio.",
+    "operationId": "getVoiceClones",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "description": "Only voices whose name or description contains this text.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "projectId",
+        "in": "query",
+        "required": false,
+        "description": "Only voices made from this project.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Voices retrieved",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Items.",
+                  "items": {
+                    "$ref": "../schemas/VoiceClone.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "data": [
+                    {
+                      "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "name": "Narrator",
+                      "description": null,
+                      "gender": "female",
+                      "tags": [
+                        "narration"
+                      ],
+                      "projectId": null,
+                      "projectName": null,
+                      "source": "UPLOAD",
+                      "previewUrl": "https://example.com/preview.mp3",
+                      "createdAt": "2026-01-01T00:00:00.000Z",
+                      "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 1,
+                    "total": 1,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

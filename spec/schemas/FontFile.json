@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "description": "One font file of a family.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "File ID. Use it to download, rename or delete the file."
+    },
+    "name": {
+      "type": "string",
+      "description": "Label of the file inside the family."
+    },
+    "originalFileName": {
+      "type": "string",
+      "description": "Name of the uploaded file."
+    },
+    "mimeType": {
+      "type": "string",
+      "description": "`font/ttf` or `font/otf`."
+    },
+    "fileSize": {
+      "type": "integer",
+      "description": "Size in bytes."
+    },
+    "weight": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Weight read from the font file (400 regular, 700 bold). `null` when it is not known."
+    },
+    "italic": {
+      "type": "boolean",
+      "nullable": true,
+      "description": "`true` for an italic style. `null` when it is not known."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the file was uploaded."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "originalFileName",
+    "mimeType",
+    "fileSize",
+    "weight",
+    "italic",
+    "createdAt"
+  ]
+}

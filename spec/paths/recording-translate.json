@@ -1,0 +1,188 @@
+{
+  "post": {
+    "tags": [
+      "Recordings"
+    ],
+    "summary": "Translate Recording",
+    "description": "Add one or more target translation languages to a recording that already exists, without recreating the project. Use this instead of `POST /v1/projects` whenever the project already exists — for example the caller forgot a language at creation time, the user asks for another language later, or the caller only learns which language is needed after seeing the transcript.\n\n## Precondition: source transcription must be complete\n\nTranslation reads the recording's transcript, so it can only run after transcription has finished. This is **not enforced synchronously** by this endpoint — a call made too early is accepted and queued, but produces no usable result. Before calling this endpoint, poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until `transcription.status` is `done`.\n\n## Re-requesting a language\n\nA language already in the recording's translation languages is not skipped — it is retranslated (logged as a retranslation rather than an initial translation). Only include a language in `languages` if you actually want it (re-)translated; use `ignoredLanguages` to record a language as intentionally not translated without omitting it from tracking.\n\n## Language support\n\n`languages` accepts any BCP-47-style code Phrase Studio has translation support for — effectively all locales except the literal `auto` placeholder. Do not pass the recording's own source language: it is rejected with `400` (see `source_language_as_target` below), like an unsupported code. Nothing is started for any language of a rejected request.\n\n## After translation completes\n\nCall `POST /v1/projects/{projectId}/recordings/{recordingId}/dubbing` to dub any of the resulting languages — dubbing requires the language to be translated first.\n\n## Response\n\nThe call answers `202 Accepted` as soon as the work is queued, not when it is done. The body's `statusUrl` is the path to poll (`GET`, same credentials) until the result you need is ready. If the work could not be started, the step is listed as `failed` with `errorCode` and `errorMessage` instead of the call failing.",
+    "operationId": "translateRecording",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/TranslateRecordingRequest.json"
+          },
+          "examples": {
+            "add_translation_language": {
+              "summary": "Add Czech as a translation target language",
+              "value": {
+                "languages": [
+                  "cs"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "202": {
+        "description": "Translation was queued for the requested languages. Poll `statusUrl` for the progress.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/AcceptedResponse.json"
+            },
+            "examples": {
+              "accepted": {
+                "summary": "Queued",
+                "value": {
+                  "statusUrl": "/v1/projects/6f1d2c3e-8b4a-4c5d-9e7f-123456789abd/recordings/6f1d2c3e-8b4a-4c5d-9e7f-123456789abc/status"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "The request is invalid: a language is not a valid subtitle language, or it is the source language of the recording.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad Request",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "source_language_as_target": {
+                "summary": "The source language as a translation target",
+                "value": {
+                  "statusCode": 400,
+                  "message": "en is the source language of this recording and cannot be a translation target",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Unauthorized",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "The project is not shared with you, or your share of the project does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Forbidden",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The project or the recording does not exist.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Not Found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Project or recording not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "internal_server_error": {
+                "summary": "Internal server error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "description": "Where a segment's subtitle is placed on the video, in WebVTT cue-setting notation. Every field is optional; a segment without `cue_settings` uses the position of the subtitle profile. Examples: top left `{\"align\":\"left\",\"line\":\"8%\",\"position\":\"5%\"}`, bottom center `{\"line\":\"85%\"}`. Studio's burn-in and the editor preview place the top of the subtitle box at `line` and the edge picked by `align` at `position`; vertical subtitle profiles ignore the position. Percentages outside 0–100% are clamped to the video when the subtitle is rendered.",
+  "additionalProperties": false,
+  "properties": {
+    "align": {
+      "type": "string",
+      "enum": [
+        "start",
+        "center",
+        "end",
+        "left",
+        "right"
+      ],
+      "description": "Horizontal text alignment"
+    },
+    "line": {
+      "type": "string",
+      "pattern": "^-?\\d{1,10}(\\.\\d{1,6})?%?$",
+      "description": "Vertical position: a percentage of the video height (`\"8%\"`, `\"85%\"`) or a WebVTT line number (`\"0\"`, `\"-1\"`)"
+    },
+    "position": {
+      "type": "string",
+      "pattern": "^\\d{1,10}(\\.\\d{1,6})?%$",
+      "description": "Horizontal position as a percentage of the video width (`\"5%\"`, `\"95%\"`)"
+    },
+    "size": {
+      "type": "string",
+      "pattern": "^\\d{1,10}(\\.\\d{1,6})?%$",
+      "description": "Width of the subtitle box as a percentage of the video width"
+    },
+    "vertical": {
+      "type": "string",
+      "enum": [
+        "rl",
+        "lr"
+      ],
+      "description": "Vertical writing direction"
+    },
+    "region": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+      "description": "WebVTT region identifier"
+    }
+  }
+}

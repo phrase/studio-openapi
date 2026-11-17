@@ -1,0 +1,214 @@
+{
+  "get": {
+    "tags": [
+      "Exports"
+    ],
+    "summary": "Export subtitles as text",
+    "description": "Get the subtitles of a language as an SRT or VTT file, or as a plain transcript (`txt`), in the response body. In the transcript every line is `Speaker name: text`, lines are separated by a blank line, and texts that are shown on screen are labelled `On Screen Text`; `paragraphBreakThreshold` adds a paragraph break where the speech pauses that long. Use `source=true` for the source-language transcript and `dubbing=true` for the dubbing track. For the structure with word timings use `GET .../subtitles` instead. Needs read access to the step and language of the track.",
+    "operationId": "exportSubtitles",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "language",
+        "in": "query",
+        "required": true,
+        "description": "Subtitle language.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "format",
+        "in": "query",
+        "required": false,
+        "description": "File format. Defaults to `srt`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "srt",
+            "vtt",
+            "txt"
+          ],
+          "default": "srt"
+        }
+      },
+      {
+        "name": "source",
+        "in": "query",
+        "required": false,
+        "description": "Read the source-language transcript instead of a translation.",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "dubbing",
+        "in": "query",
+        "required": false,
+        "description": "Read the dubbing track instead of the translation.",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "paragraphBreakThreshold",
+        "in": "query",
+        "required": false,
+        "description": "Seconds of silence that start a new paragraph. Only for `txt`.",
+        "schema": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subtitles",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ExternalTextExport.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "language": "es-es",
+                  "format": "srt",
+                  "content": "1\n00:00:00,150 --> 00:00:01,900\nHola, esto es una prueba."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: you may not change this item.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

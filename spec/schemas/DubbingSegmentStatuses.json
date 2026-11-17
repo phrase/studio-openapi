@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "description": "The state of the segments of a dubbing.",
+  "properties": {
+    "segments": {
+      "type": "array",
+      "description": "One entry per segment that is being, or was last, dubbed again.",
+      "items": {
+        "type": "object",
+        "description": "One segment.",
+        "properties": {
+          "segmentId": {
+            "type": "string",
+            "description": "Segment ID."
+          },
+          "status": {
+            "type": "string",
+            "description": "State of the segment, for example `DONE`."
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "segments"
+  ]
+}

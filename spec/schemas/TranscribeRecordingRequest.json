@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "description": "Settings for transcribing the recording again.",
+  "properties": {
+    "ignored": {
+      "type": "boolean",
+      "description": "Skip transcription and keep the recording as it is."
+    },
+    "sourceLanguage": {
+      "type": "string",
+      "description": "Language spoken in the recording."
+    },
+    "expectedLanguages": {
+      "type": "array",
+      "description": "Other languages that may be spoken.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "glossaryId": {
+      "type": "string",
+      "description": "Glossary to apply.",
+      "format": "uuid"
+    },
+    "videoAnalysis": {
+      "type": "boolean",
+      "description": "Analyse the video as well."
+    },
+    "subtitleProfiles": {
+      "type": "object",
+      "description": "Subtitle profile id by language code.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "get": {
+    "tags": [
+      "Text to speech"
+    ],
+    "summary": "List speech engines",
+    "description": "The engines you can generate speech with, and how each one takes pronunciation. Some engines are switched on or off per organization: this list holds only the engines your organization may use, and the other endpoints refuse an engine that is not in it with `400`.",
+    "operationId": "getTtsEngines",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Engines",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/TtsEngineList.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "data": [
+                    {
+                      "id": "eleven_v3",
+                      "label": "Eleven v3",
+                      "provider": "elevenlabs",
+                      "pronunciationMode": "inline",
+                      "supportsEmotionTags": true
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

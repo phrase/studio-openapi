@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "description": "Values you can filter voices by, for example `gender`, `age`, `useCase`. Which filters exist depends on the engine.",
+  "additionalProperties": {
+    "type": "array",
+    "items": {
+      "type": "string"
+    }
+  }
+}

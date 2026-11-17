@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "description": "Split the dubbed audio of one segment in two.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Dubbing language."
+    },
+    "originalSegmentId": {
+      "type": "string",
+      "description": "Segment to split."
+    },
+    "newSegmentId": {
+      "type": "string",
+      "description": "ID of the new second part."
+    },
+    "splitTime": {
+      "type": "number",
+      "description": "Where to split, in seconds.",
+      "minimum": 0
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration of the new part in seconds.",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "language",
+    "originalSegmentId",
+    "newSegmentId",
+    "splitTime",
+    "duration"
+  ]
+}

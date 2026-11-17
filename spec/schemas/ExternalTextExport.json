@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "description": "A subtitle or transcript file as text.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Language of the content."
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "srt",
+        "vtt",
+        "txt"
+      ],
+      "description": "Format of `content`."
+    },
+    "content": {
+      "type": "string",
+      "description": "The whole file. Speaker names are included when the subtitle profile of the language shows them."
+    }
+  },
+  "required": [
+    "language",
+    "format",
+    "content"
+  ]
+}

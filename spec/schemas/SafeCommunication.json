@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "A check that scores a recording against a communication guideline.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Safe communication ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the check."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the check looks for."
+    },
+    "content": {
+      "type": "string",
+      "description": "The guideline text the recording is scored against."
+    },
+    "default": {
+      "type": "boolean",
+      "description": "True for items that Studio provides to every account. They cannot be edited."
+    },
+    "shared": {
+      "type": "boolean",
+      "description": "True for items that belong to another account of your organization; false for items you own and for Studio's defaults."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

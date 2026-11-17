@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "description": "One prompt of an insight.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Insight item ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Prompt name."
+    },
+    "content": {
+      "type": "string",
+      "description": "Prompt text."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

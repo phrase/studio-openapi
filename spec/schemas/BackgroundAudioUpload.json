@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "A new background audio for a dubbing language.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Dubbing language the background is for."
+    },
+    "file": {
+      "type": "string",
+      "description": "The audio file: MP3, WAV or M4A, at most 300 MB.",
+      "format": "binary"
+    }
+  },
+  "required": [
+    "language",
+    "file"
+  ]
+}

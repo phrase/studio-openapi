@@ -1,0 +1,94 @@
+{
+  "type": "object",
+  "description": "A media file of a project with the languages it is processed into.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Recording ID."
+    },
+    "projectId": {
+      "type": "string",
+      "description": "ID of the project the recording belongs to."
+    },
+    "name": {
+      "type": "string",
+      "description": "Recording name."
+    },
+    "type": {
+      "type": "string",
+      "description": "Media type of the file."
+    },
+    "extension": {
+      "type": "string",
+      "description": "File extension."
+    },
+    "sourceLanguage": {
+      "type": "string",
+      "description": "Source language code."
+    },
+    "expectedLanguages": {
+      "type": "array",
+      "description": "Additional languages that may be spoken in the recording besides the source language.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "translationLanguages": {
+      "type": "array",
+      "description": "Target translation languages.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dubbingLanguages": {
+      "type": "array",
+      "description": "Target dubbing languages.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "numSpeakers": {
+      "type": "integer",
+      "description": "Number of speakers, when known.",
+      "nullable": true
+    },
+    "summaryEnabled": {
+      "type": "boolean",
+      "description": "Whether a summary is generated."
+    },
+    "customAttributesEnabled": {
+      "type": "boolean",
+      "description": "Whether custom attributes are extracted."
+    },
+    "insightsEnabled": {
+      "type": "boolean",
+      "description": "Whether insights are generated."
+    },
+    "safeCommunicationsEnabled": {
+      "type": "boolean",
+      "description": "Whether safe communication checks run."
+    },
+    "sourceDuration": {
+      "type": "number",
+      "description": "Duration of the original file in seconds."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration of the processed file in seconds."
+    },
+    "fps": {
+      "type": "number",
+      "description": "Frames per second of a video file."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

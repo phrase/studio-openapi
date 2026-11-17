@@ -1,0 +1,252 @@
+{
+  "get": {
+    "tags": [
+      "Glossaries"
+    ],
+    "summary": "Get Glossaries",
+    "description": "Retrieve the glossaries of your organization. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "operationId": "getGlossaries",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Glossaries retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Glossaries you can use.",
+                  "items": {
+                    "$ref": "../schemas/Glossary.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "00cd5cdb-ce8b-423a-a9b8-ca5dd5db7442",
+                      "name": "company names",
+                      "description": null,
+                      "items": "OTOMATA\nNike\nHP\nNvidia",
+                      "active": true,
+                      "createdAt": "2025-11-06T10:15:59.738Z",
+                      "updatedAt": "2025-11-06T10:15:59.738Z"
+                    },
+                    {
+                      "id": "99af75c5-b606-4aee-a3db-ee149c662ea6",
+                      "name": "test",
+                      "description": null,
+                      "items": "voila violing ding dong",
+                      "active": true,
+                      "createdAt": "2025-11-06T09:43:17.888Z",
+                      "updatedAt": "2025-11-06T09:43:17.888Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 2,
+                    "total": 2,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden (access denied)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Glossaries"
+    ],
+    "summary": "Create a glossary",
+    "description": "Create a glossary in your organization. Everyone in the organization can read it; only you and managers can change it. Returns the created item, with its id.",
+    "operationId": "createGlossary",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreateGlossaryRequest.json"
+          },
+          "examples": {
+            "glossary": {
+              "summary": "A glossary",
+              "value": {
+                "name": "Brand terms",
+                "items": "Phrase\nStudio"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "A glossary created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Glossary.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Brand terms",
+                  "description": null,
+                  "items": "Phrase\nStudio",
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

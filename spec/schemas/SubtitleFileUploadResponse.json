@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "imported": {
+      "type": "integer",
+      "description": "Number of subtitles that were saved."
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Cues that were skipped, for example a cue that ends before it starts or has no text.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": "integer",
+            "description": "Line of the file, `0` when it is not known."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the cue was skipped."
+          }
+        },
+        "required": [
+          "line",
+          "reason"
+        ]
+      }
+    }
+  },
+  "required": [
+    "imported",
+    "warnings"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "description": "A reviewer comment on a segment, as written in the Studio editor.",
+  "required": [
+    "id",
+    "authorId",
+    "authorName",
+    "text",
+    "createdAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Comment identifier, unique within the segment. Use a new UUID for a comment you create."
+    },
+    "authorId": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Identifier of the author. Stored as sent and not verified."
+    },
+    "authorName": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Display name of the author. Stored as sent and not verified."
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Comment text"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 creation time"
+    },
+    "resolved": {
+      "type": "boolean",
+      "description": "True once the comment is resolved; omit for an open comment"
+    }
+  }
+}

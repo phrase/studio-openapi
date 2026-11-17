@@ -1,0 +1,309 @@
+{
+  "get": {
+    "tags": [
+      "Subtitle Profiles"
+    ],
+    "summary": "Get Subtitle Profiles",
+    "description": "Retrieve the subtitle profiles of your organization, together with the defaults of Studio. A default you edited is listed in place of the default, with `default` true and `sourceProfileId` set. Members of the organization can read every item of the organization. Items of other organizations answer `404`.",
+    "operationId": "getSubtitleProfiles",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subtitle profiles retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Subtitle profiles you can use.",
+                  "items": {
+                    "$ref": "../schemas/SubtitleProfile.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "584ba46d-66f9-48da-9b96-f4ebe1f8fbca",
+                      "sourceProfileId": null,
+                      "name": "Default - Landscape",
+                      "description": "Default profile for landscape videos.",
+                      "languages": null,
+                      "active": true,
+                      "default": true,
+                      "shared": false,
+                      "minDuration": 0.5,
+                      "maxDuration": 7,
+                      "maxLineCharacterCount": 42,
+                      "maxGapBetweenWords": 1,
+                      "minGapFrames": 2,
+                      "subtitlePosition": "bottom",
+                      "displaySpeakerNames": false,
+                      "maxLinesPerScreen": 2,
+                      "charactersPerSecond": 17,
+                      "fontFamily": "Arial",
+                      "fontSize": 24,
+                      "fontWeight": "normal",
+                      "fontStyle": "normal",
+                      "textAlign": "center",
+                      "textColor": "#FFFFFF",
+                      "backgroundType": "box",
+                      "backgroundColor": "#000000",
+                      "verticalPositioning": false,
+                      "delta": 3,
+                      "deltaX": 0,
+                      "layout": "landscape",
+                      "createdAt": "2026-01-01T08:00:00.000Z",
+                      "updatedAt": "2026-01-01T08:00:00.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 1,
+                    "total": 1,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_api_key": {
+                "summary": "Invalid API key",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden (access denied)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Access denied",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Subtitle Profiles"
+    ],
+    "summary": "Create a subtitle profile",
+    "description": "Create a subtitle profile. Fields you leave out take the defaults of Studio. Returns the created profile, with its id.",
+    "operationId": "createSubtitleProfile",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreateSubtitleProfileRequest.json"
+          },
+          "examples": {
+            "profile": {
+              "summary": "A two line profile",
+              "value": {
+                "name": "Two lines",
+                "maxLinesPerScreen": 2,
+                "maxLineCharacterCount": 42
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Subtitle profile created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SubtitleProfile.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Two lines",
+                  "description": "For social video",
+                  "languages": [
+                    "es-es"
+                  ],
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "minDuration": 0.7,
+                  "maxDuration": 7,
+                  "maxLineCharacterCount": 42,
+                  "maxGapBetweenWords": 3,
+                  "minGapFrames": 2,
+                  "subtitlePosition": "bottom",
+                  "displaySpeakerNames": false,
+                  "maxLinesPerScreen": 2,
+                  "charactersPerSecond": 20,
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

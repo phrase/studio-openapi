@@ -1,0 +1,172 @@
+{
+  "post": {
+    "tags": [
+      "Subtitles"
+    ],
+    "summary": "Suggest shorter subtitles",
+    "description": "Asks the AI for a shorter text of each segment, with the same rules as the Shorten action of the Studio editor (reading speed and the line limits of the subtitle profile). Nothing is saved: send the texts you accept with `PUT …/subtitles`. A segment that could not be shortened has `suggestedText` `null` and an `errorCode`. Needs write access to the track.",
+    "operationId": "shortenSubtitles",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/ShortenSubtitlesRequest.json"
+          },
+          "examples": {
+            "example": {
+              "summary": "Shorten one segment",
+              "value": {
+                "language": "es-es",
+                "segmentIds": [
+                  "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "One suggestion per segment",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ShortenSubtitlesResponse.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "suggestions": [
+                    {
+                      "segmentId": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "originalText": "This sentence is rather long for the time on screen.",
+                      "suggestedText": "This sentence is long for the time.",
+                      "durationSec": 2.1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: no segment ids, more segment ids than allowed, or a field with the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: no segment ids, more segment ids than allowed, or a field with the wrong type.",
+                "value": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: the share of the project does not include this step or language, or your organization is blocked.",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "You are not authorized to access this project",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found: the recording is not visible to you, or it has no track or segment to work on.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found: the recording is not visible to you, or it has no track or segment to work on.",
+                "value": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Recording not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "description": "What to export. `type` decides which other fields are needed; a request that lacks one is refused with `400`.",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "burned_in_video",
+        "dubbed_video",
+        "dubbed_videos",
+        "dubbed_audio",
+        "dubbed_audio_stems",
+        "dubbed_audio_by_speaker",
+        "source_audio",
+        "bilingual_docx"
+      ],
+      "description": "`burned_in_video`: the original video with the subtitles of `language` burned in (needs `language`). `dubbed_video`: the video with the dubbing of `dubbingLanguage`, optionally with `subtitleLanguage` burned in. `dubbed_videos`: one dubbed video per entry of `languages`, up to 5. `dubbed_audio`: the mixed dubbed audio of `dubbingLanguage`. `dubbed_audio_stems`: the dubbed speech and the background as separate files. `dubbed_audio_by_speaker`: one dubbed audio file per speaker. `source_audio`: the audio of the original recording. `bilingual_docx`: a Word document with the source text next to its translation (needs `language`, the translation language; `includeTimecode` adds a time column). It is made on the spot, so it answers `200` with its link."
+    },
+    "language": {
+      "type": "string",
+      "description": "Subtitle language: the language to burn in for `burned_in_video`, the translation language for `bilingual_docx`."
+    },
+    "source": {
+      "type": "boolean",
+      "description": "Use the source-language subtitles (the transcript) instead of the translation."
+    },
+    "dubbing": {
+      "type": "boolean",
+      "description": "Use the subtitles of the dubbing track instead of the translation. For `burned_in_video`."
+    },
+    "dubbingLanguage": {
+      "type": "string",
+      "description": "Language of the dubbing. For `dubbed_video`, `dubbed_audio`, `dubbed_audio_stems` and `dubbed_audio_by_speaker`."
+    },
+    "subtitleLanguage": {
+      "type": "string",
+      "description": "Subtitle language to burn into a dubbed video. Optional."
+    },
+    "languages": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "Dubbing languages. For `dubbed_videos`.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "includeTimecode": {
+      "type": "boolean",
+      "description": "Add a time column to the document. For `bilingual_docx`."
+    }
+  },
+  "required": [
+    "type"
+  ]
+}

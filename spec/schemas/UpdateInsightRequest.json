@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "description": "Fields of an insight to change. Send only what changes.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the insight is for."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the insight can be applied to projects."
+    }
+  }
+}

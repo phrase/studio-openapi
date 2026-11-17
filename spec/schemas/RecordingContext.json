@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "description": "What the video shows, produced by analysing the video during transcription.",
+  "required": [
+    "contextHint",
+    "scenes",
+    "generatedAt"
+  ],
+  "properties": {
+    "contextHint": {
+      "type": "string",
+      "description": "Short description of the video and how its text should be read, as detected."
+    },
+    "contextHintUserEdited": {
+      "type": "string",
+      "description": "The context rewritten by a user in Studio. Only present when a user edited it; prefer it over `contextHint`."
+    },
+    "scenes": {
+      "type": "array",
+      "description": "What is on screen over time.",
+      "items": {
+        "type": "object",
+        "required": [
+          "description",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "What is visible during the scene"
+          },
+          "start": {
+            "type": "number",
+            "description": "Scene start in seconds"
+          },
+          "end": {
+            "type": "number",
+            "description": "Scene end in seconds"
+          }
+        }
+      }
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the analysis was created"
+    }
+  }
+}
