@@ -50,6 +50,22 @@
     "isPublic": {
       "type": "boolean",
       "description": "When true, every member of the organization can open the project (read access to all its steps and languages). When false, that organization-wide share is revoked; shares with individual members are not changed."
+    },
+    "insightsModelType": {
+      "type": "string",
+      "enum": [
+        "GPT",
+        "CUSTOM"
+      ],
+      "description": "Accepted and ignored: the type of the insights model follows from `insightsModelName`."
+    },
+    "translationModelType": {
+      "type": "string",
+      "enum": [
+        "GPT",
+        "CUSTOM"
+      ],
+      "description": "Accepted and ignored: the type of the translation model follows from `translationModelName`."
     }
   },
   "additionalProperties": false

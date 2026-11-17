@@ -33,7 +33,8 @@
     },
     "maxSizeBytes": {
       "type": "integer",
-      "description": "Largest file that is accepted."
+      "description": "Largest file that is accepted.",
+      "format": "int64"
     }
   },
   "required": [

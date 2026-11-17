@@ -26,6 +26,11 @@ test('a complete operation passes', () => {
   assert.deepEqual(checkSpec(specWith(cleanOperation())), []);
 });
 
+test('flags an anonymous security alternative, which lets a caller in without a key', () => {
+  const operation = { ...cleanOperation(), security: [{ apiKeyAuth: [] }, {}] };
+  assert.match(checkSpec(specWith(operation)).join('\n'), /security has an anonymous alternative/);
+});
+
 test('flags a missing description, summary and operationId', () => {
   const operation = cleanOperation();
   delete operation.description;

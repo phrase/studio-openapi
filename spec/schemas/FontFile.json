@@ -21,7 +21,8 @@
     },
     "fileSize": {
       "type": "integer",
-      "description": "Size in bytes."
+      "description": "Size in bytes.",
+      "format": "int64"
     },
     "weight": {
       "type": "integer",

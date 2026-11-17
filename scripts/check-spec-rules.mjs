@@ -30,6 +30,9 @@ function checkOperation(path, method, operation, problems) {
   }
   if (!operation.tags?.length) problems.push(`${where}: missing tags`);
   if (!operation.security?.length) problems.push(`${where}: missing security`);
+  if (operation.security?.some((requirement) => Object.keys(requirement ?? {}).length === 0)) {
+    problems.push(`${where}: security has an anonymous alternative`);
+  }
 
   const codes = Object.keys(operation.responses ?? {});
   if (!codes.some((code) => /^[23]/.test(code))) problems.push(`${where}: no success or redirect response`);

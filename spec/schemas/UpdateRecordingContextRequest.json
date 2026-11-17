@@ -6,7 +6,9 @@
       "type": "string",
       "nullable": true,
       "maxLength": 400,
-      "description": "Your version of `contextHint`, at most 400 characters and not blank. Tools that read the context take it instead of the detected text. Send `null` to go back to the detected one."
+      "description": "Your version of `contextHint`, at most 400 characters and not blank. Tools that read the context take it instead of the detected text. Send `null` to go back to the detected one.",
+      "minLength": 1,
+      "pattern": "\\S"
     }
   },
   "required": [
