@@ -17,7 +17,7 @@
           },
           "reason": {
             "type": "string",
-            "description": "Why the cue was skipped."
+            "description": "Why the cue was skipped, followed by its time range and its text (shortened to 60 characters), for example `Segment skipped: shorter than 0.3s (00:01:02.100-00:01:02.300) \"Too short\"`."
           }
         },
         "required": [

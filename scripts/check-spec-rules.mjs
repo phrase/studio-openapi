@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const METHODS = ['get', 'put', 'post', 'delete', 'patch'];
+const METHODS = ['get', 'put', 'post', 'delete', 'patch', 'head', 'options', 'trace'];
 
 // Identifiers of Studio's inner workings; an API caller never needs them, so they must not appear in the spec.
 export const INTERNAL_FIELDS = [
