@@ -31,6 +31,15 @@ test('flags an anonymous security alternative, which lets a caller in without a 
   assert.match(checkSpec(specWith(operation)).join('\n'), /security has an anonymous alternative/);
 });
 
+test('checks every HTTP method of a path, not only the common ones', () => {
+  for (const method of ['head', 'options', 'trace']) {
+    const operation = cleanOperation();
+    delete operation.security;
+    const spec = { ...specWith(operation), paths: { '/v1/things': { [method]: operation } } };
+    assert.match(checkSpec(spec).join('\n'), /missing security/, method);
+  }
+});
+
 test('flags a missing description, summary and operationId', () => {
   const operation = cleanOperation();
   delete operation.description;
