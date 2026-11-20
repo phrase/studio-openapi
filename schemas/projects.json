@@ -3445,12 +3445,12 @@
                         "text": "Hello and welcome.",
                         "words": [
                           {
-                            "word": "Hello",
+                            "word": "Hello ",
                             "time_begin": 0,
                             "time_end": 0.5
                           },
                           {
-                            "word": "and",
+                            "word": "and ",
                             "time_begin": 0.5,
                             "time_end": 0.8
                           },
@@ -3486,17 +3486,17 @@
                         "text": "Merhaba ve hoş geldiniz.",
                         "words": [
                           {
-                            "word": "Merhaba",
+                            "word": "Merhaba ",
                             "time_begin": 0,
                             "time_end": 0.6
                           },
                           {
-                            "word": "ve",
+                            "word": "ve ",
                             "time_begin": 0.6,
                             "time_end": 0.8
                           },
                           {
-                            "word": "hoş",
+                            "word": "hoş ",
                             "time_begin": 0.8,
                             "time_end": 1.2
                           },
@@ -3728,13 +3728,13 @@
                           "text": "Hola y bienvenidos.",
                           "words": [
                             {
-                              "word": "Hola",
+                              "word": "Hola ",
                               "time_begin": 0.5,
                               "time_end": 0.9,
                               "is_eos": false
                             },
                             {
-                              "word": "y",
+                              "word": "y ",
                               "time_begin": 0.9,
                               "time_end": 1,
                               "is_eos": false
