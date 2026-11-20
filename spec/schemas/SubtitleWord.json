@@ -8,7 +8,7 @@
   "properties": {
     "word": {
       "type": "string",
-      "description": "Word text, at most 500 characters.",
+      "description": "Word text, at most 500 characters. In a language that separates words with spaces, send one word per entry and keep the space that separates it from its neighbour at the start or end of the entry (`Hello ` then `world`); a whole sentence in one entry works for export but gives up word-level timing. In a language written without spaces (for example Japanese, Chinese or Thai) entries are joined exactly as sent.",
       "maxLength": 500
     },
     "time_begin": {
