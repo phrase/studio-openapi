@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "A safe communication check applied to a project.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Safe communication ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the check."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the check looks for."
+    }
+  }
+}

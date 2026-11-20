@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "description": "An earlier saved state of a subtitle track.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Version ID. Use it with `GET .../subtitles/versions/{versionId}`."
+    },
+    "savedAt": {
+      "type": "string",
+      "description": "When it was saved.",
+      "format": "date-time"
+    },
+    "savedBy": {
+      "type": "object",
+      "description": "Who saved it. Changes made through the API are saved as `API`.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifier of the author.",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the author."
+        }
+      }
+    },
+    "segmentCount": {
+      "type": "integer",
+      "description": "Segments in that version."
+    },
+    "reviewedSegmentCount": {
+      "type": "integer",
+      "description": "Reviewed segments in that version."
+    }
+  },
+  "required": [
+    "id",
+    "savedAt",
+    "segmentCount"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "description": "A new item of an insight: one question or prompt to answer about a recording.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Title of the item, at most 256 characters.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "content": {
+      "type": "string",
+      "description": "The prompt text.",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "name",
+    "content"
+  ]
+}

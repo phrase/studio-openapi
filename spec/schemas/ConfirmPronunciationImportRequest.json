@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Name of the new pronunciation."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the new pronunciation."
+    },
+    "pairs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "description": "The pairs to save, usually the `pairs` of the preview, with your corrections.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "The term."
+          },
+          "target": {
+            "type": "string",
+            "description": "How it is said."
+          },
+          "notation": {
+            "type": "string",
+            "enum": [
+              "plain",
+              "ipa"
+            ],
+            "description": "`plain` is the text as it is said, `ipa` is a phonetic transcription."
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "notation"
+        ]
+      }
+    }
+  },
+  "required": [
+    "name",
+    "pairs"
+  ]
+}

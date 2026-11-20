@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "description": "The original file of a recording and its audio tracks.",
+  "properties": {
+    "sourceFileUrl": {
+      "type": "string",
+      "description": "Signed link to the original file, valid for three hours.",
+      "format": "uri"
+    },
+    "audioTracks": {
+      "type": "array",
+      "description": "Audio tracks of the recording: the original and one dubbed track per dubbed language.",
+      "items": {
+        "type": "object",
+        "description": "One audio track.",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "Language of the track; `source_language` for the original."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "original",
+              "dubbed"
+            ],
+            "description": "Whether it is the original audio or a dubbing."
+          },
+          "url": {
+            "type": "string",
+            "description": "Signed link to the audio, valid for three hours.",
+            "format": "uri"
+          },
+          "waveform": {
+            "type": "string",
+            "description": "Signed link to the waveform data, valid for three hours.",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "language",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "sourceFileUrl",
+    "audioTracks"
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "type": "object",
+  "description": "Fields of a subtitle profile to change. Send only what changes. Editing a default profile of Studio stores a personal copy of it for you, which then replaces the default in your list.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Profile name.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the profile is for."
+    },
+    "languages": {
+      "type": "array",
+      "description": "Languages the profile is meant for; empty or null means every language.",
+      "nullable": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the profile can be applied to projects."
+    },
+    "minDuration": {
+      "type": "number",
+      "description": "Minimum duration of a subtitle in seconds.",
+      "minimum": 0
+    },
+    "maxDuration": {
+      "type": "number",
+      "description": "Maximum duration of a subtitle in seconds.",
+      "minimum": 0
+    },
+    "maxLineCharacterCount": {
+      "type": "integer",
+      "description": "Maximum number of characters on a line.",
+      "minimum": 1
+    },
+    "maxGapBetweenWords": {
+      "type": "number",
+      "description": "Longest pause between two words that still stay in one subtitle, in seconds.",
+      "minimum": 0
+    },
+    "minGapFrames": {
+      "type": "integer",
+      "description": "Minimum gap between two subtitles in frames.",
+      "minimum": 0
+    },
+    "subtitlePosition": {
+      "type": "string",
+      "description": "Where subtitles are placed on the video.",
+      "enum": [
+        "top",
+        "bottom",
+        "center",
+        "right",
+        "middle",
+        "left"
+      ]
+    },
+    "displaySpeakerNames": {
+      "type": "boolean",
+      "description": "Whether the speaker name is shown in front of the text."
+    },
+    "maxLinesPerScreen": {
+      "type": "integer",
+      "description": "Maximum number of lines shown at the same time.",
+      "minimum": 1
+    },
+    "charactersPerSecond": {
+      "type": "number",
+      "description": "Maximum reading speed in characters per second.",
+      "minimum": 1
+    },
+    "fontFamily": {
+      "type": "string",
+      "description": "Font family: a name of 1-128 characters without commas, braces, backslashes or line breaks (such as `Arial`), or `custom:<id>` for a custom font (the `fontFamily` value of `GET /v1/fonts`) that you can use. A custom font that does not exist or is not yours is refused with `400`. A custom font that was deleted later falls back to Arial in burned-in video.",
+      "maxLength": 128
+    },
+    "fontSize": {
+      "type": "number",
+      "description": "Font size.",
+      "minimum": 1
+    },
+    "fontWeight": {
+      "type": "string",
+      "description": "Font weight.",
+      "enum": [
+        "normal",
+        "bold"
+      ]
+    },
+    "fontStyle": {
+      "type": "string",
+      "description": "Font style.",
+      "enum": [
+        "normal",
+        "italic"
+      ]
+    },
+    "textAlign": {
+      "type": "string",
+      "description": "Text alignment.",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ]
+    },
+    "textColor": {
+      "type": "string",
+      "description": "Text color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+      "maxLength": 25,
+      "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
+    },
+    "backgroundType": {
+      "type": "string",
+      "description": "How the text is separated from the video.",
+      "enum": [
+        "none",
+        "box",
+        "outline",
+        "wrap"
+      ]
+    },
+    "backgroundColor": {
+      "type": "string",
+      "description": "Background color: `#RRGGBB`, or `rgb()`/`rgba()` with channels 0-255 and an alpha from 0 to 1 (for example `rgba(0, 0, 0, 0.5)`); `backgroundColor` and `textColor` may also be empty.",
+      "maxLength": 25,
+      "pattern": "^(|#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
+    },
+    "verticalPositioning": {
+      "type": "boolean",
+      "description": "Whether subtitles are positioned vertically from the edge instead of by the placement setting."
+    },
+    "delta": {
+      "type": "number",
+      "description": "Vertical offset of the subtitles.",
+      "minimum": 0
+    },
+    "deltaX": {
+      "type": "number",
+      "description": "Horizontal offset of the subtitles.",
+      "minimum": -50,
+      "maximum": 50
+    }
+  }
+}

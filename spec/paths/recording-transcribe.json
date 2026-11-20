@@ -1,0 +1,178 @@
+{
+  "post": {
+    "tags": [
+      "Results"
+    ],
+    "summary": "Transcribe a recording again",
+    "description": "Run the transcription of a recording again, for example with another source language. This replaces the transcript. It uses no credits, because the language is not new (the first transcription is charged when the recording is added), but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`. It answers `202` with `statusUrl`; poll the status until `transcription` is `done`. Needs write access to the transcription step.",
+    "operationId": "transcribeRecording",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/TranscribeRecordingRequest.json"
+          },
+          "examples": {
+            "language": {
+              "summary": "Another source language",
+              "value": {
+                "sourceLanguage": "de"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "202": {
+        "description": "Queued",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/AcceptedResponse.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "statusUrl": "/v1/projects/6f1d2c3e-8b4a-4c5d-9e7f-123456789abc/recordings/0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d/status"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language. Also returned when your organization has no credits left (`No remaining minutes available`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The recording does not exist in this project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

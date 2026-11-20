@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "description": "A set of prompts that extracts structured information from a recording.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Insight ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Insight name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the insight extracts."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the insight can be applied to projects."
+    },
+    "default": {
+      "type": "boolean",
+      "description": "True for items that Studio provides to every account. They cannot be edited."
+    },
+    "shared": {
+      "type": "boolean",
+      "description": "True for items that belong to another account of your organization; false for items you own and for Studio's defaults."
+    },
+    "items": {
+      "type": "array",
+      "description": "The prompts of the insight.",
+      "items": {
+        "$ref": "./InsightItem.json"
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

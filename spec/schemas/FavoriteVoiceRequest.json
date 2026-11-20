@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "description": "The voice to add to the favorites of your organization.",
+  "properties": {
+    "voiceId": {
+      "type": "string",
+      "description": "Voice id from `GET /v1/tts/voices`."
+    },
+    "engine": {
+      "type": "string",
+      "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+      "enum": [
+        "eleven_v2",
+        "eleven_v3",
+        "eleven_v4",
+        "eleven_v4_turbo",
+        "azure_tts",
+        "voiseed",
+        "gemini_2_5_flash_tts"
+      ]
+    }
+  },
+  "required": [
+    "voiceId"
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "get": {
+    "tags": [
+      "Insights"
+    ],
+    "summary": "Get Insights",
+    "description": "Retrieve the insights of your organization, with their items. Members of the organization can read every item of the organization.",
+    "operationId": "getInsights",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Insights retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Insights you can use.",
+                  "items": {
+                    "$ref": "../schemas/Insight.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655445001",
+                      "name": "Earnings Call",
+                      "description": "Curated prompts to analyze quarterly earnings calls, focusing on growth drivers, risk factors, and forward-looking guidance to inform strategic decisions.",
+                      "active": true,
+                      "createdAt": "2025-09-12T10:59:01.426Z",
+                      "updatedAt": "2025-09-18T12:55:15.134Z",
+                      "items": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445103",
+                          "name": "Future Outlook and Strategic Initiatives",
+                          "content": "Based on this quarter's performance and current market trends, what is the company's outlook for the upcoming quarters? Can you provide more details on any planned strategic initiatives or investments that are expected to drive future growth or improve operational efficiency?",
+                          "createdAt": "2025-09-12T10:59:02.097Z",
+                          "updatedAt": "2025-09-18T12:55:15.993Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445102",
+                          "name": "Challenges and Risk Management",
+                          "content": "What were the main challenges faced this quarter, and how have they impacted the financial results? Additionally, how is the company addressing these challenges, and what risk management strategies are being implemented to mitigate potential future risks?",
+                          "createdAt": "2025-09-12T10:59:01.958Z",
+                          "updatedAt": "2025-09-18T12:55:15.822Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445101",
+                          "name": "Growth and Revenue Drivers",
+                          "content": "Can you elaborate on the primary drivers behind this quarter's revenue growth or decline? Specifically, how do factors such as market demand, pricing changes, new customer acquisition, or product/service mix have impacted the earnings results?",
+                          "createdAt": "2025-09-12T10:59:01.827Z",
+                          "updatedAt": "2025-09-18T12:55:15.650Z"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655445002",
+                      "name": "Company Presentation",
+                      "description": "Prompts designed to extract actionable insights from company presentations, covering implementation steps, emerging trends, and lessons learned for better execution.",
+                      "active": true,
+                      "createdAt": "2025-09-12T10:59:01.560Z",
+                      "updatedAt": "2025-09-18T12:55:15.306Z",
+                      "items": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445203",
+                          "name": "Lessons from Successes and Failures",
+                          "content": "Can you share a personal experience or a case study where the approach you advocated led to significant outcomes, either successful or otherwise? What were the key lessons learned, and how can these insights inform future strategy or decision-making?",
+                          "createdAt": "2025-09-12T10:59:02.518Z",
+                          "updatedAt": "2025-09-18T12:55:16.507Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445202",
+                          "name": "Future Implications and Trends",
+                          "content": "From your perspective, how might the trends or innovations you discussed today evolve over the next few years? What do you foresee as the potential long-term impact on our industry, and how should professionals or organizations prepare to adapt?",
+                          "createdAt": "2025-09-12T10:59:02.362Z",
+                          "updatedAt": "2025-09-18T12:55:16.336Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445201",
+                          "name": "Insights on Implementation",
+                          "content": "Based on the strategies or solutions you presented, could you suggest practical steps for implementation in a [specific context relevant to your field or interest]? How do these steps account for common obstacles or industry-specific challenges?",
+                          "createdAt": "2025-09-12T10:59:02.229Z",
+                          "updatedAt": "2025-09-18T12:55:16.165Z"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655445003",
+                      "name": "General",
+                      "description": "Universal analysis prompts to summarize objectives, key arguments, and underlying assumptions for any conversation or meeting context.",
+                      "active": true,
+                      "createdAt": "2025-09-12T10:59:01.692Z",
+                      "updatedAt": "2025-09-18T12:55:15.478Z",
+                      "items": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445303",
+                          "name": "Underlying Assumptions and Future Implications",
+                          "content": "What assumptions were underlying the participants' viewpoints or decisions, and how might these impact future actions or decisions? Are there any potential long-term implications or follow-up actions discussed or implied?",
+                          "createdAt": "2025-09-12T10:59:02.914Z",
+                          "updatedAt": "2025-09-18T12:55:17.023Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445302",
+                          "name": "Key Points and Arguments",
+                          "content": "What were the main points or arguments presented by each participant? How did these contribute to the progression of the conversation, and were there any pivotal moments or turning points?",
+                          "createdAt": "2025-09-12T10:59:02.782Z",
+                          "updatedAt": "2025-09-18T12:55:16.850Z"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445301",
+                          "name": "Objective and Outcomes",
+                          "content": "What were the primary objectives or goals of this conversation? Were these objectives met, and what were the key outcomes or decisions made?",
+                          "createdAt": "2025-09-12T10:59:02.650Z",
+                          "updatedAt": "2025-09-18T12:55:16.678Z"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "cf85c4e5-66e3-4f37-a8a1-e0c62b74b32a",
+                      "name": "test",
+                      "description": "my test insight\n",
+                      "active": true,
+                      "createdAt": "2025-11-06T17:15:27.209Z",
+                      "updatedAt": "2025-11-06T17:15:27.209Z",
+                      "items": [
+                        {
+                          "id": "1b600ac7-088e-46c3-afc7-006c1a63243a",
+                          "name": "this is test prompt",
+                          "content": "this is test prompt",
+                          "createdAt": "2025-11-06T17:15:42.018Z",
+                          "updatedAt": "2025-11-06T17:15:42.018Z"
+                        }
+                      ]
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 4,
+                    "total": 4,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid or missing API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Invalid API key",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Insights"
+    ],
+    "summary": "Create an insight",
+    "description": "Create an insight in your organization. Everyone in the organization can read it; only you and managers can change it. Returns the created item, with its id.",
+    "operationId": "createInsight",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreateInsightRequest.json"
+          },
+          "examples": {
+            "insight": {
+              "summary": "An insight",
+              "value": {
+                "name": "Marketing review",
+                "description": "Questions for every video"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "An insight created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Insight.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Marketing review",
+                  "description": "Questions for every video",
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "items": [
+                    {
+                      "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                      "name": "Tone",
+                      "content": "Describe the tone of the video.",
+                      "createdAt": "2026-01-01T00:00:00.000Z",
+                      "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  ],
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

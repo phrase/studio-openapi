@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "description": "The outcome of a safe communication check on a recording.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Safe communication ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the check."
+    },
+    "score": {
+      "type": "number",
+      "description": "Score of the check."
+    },
+    "description": {
+      "type": "string",
+      "description": "Explanation of the score."
+    }
+  }
+}

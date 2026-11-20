@@ -1,0 +1,508 @@
+{
+  "put": {
+    "tags": [
+      "Subtitles"
+    ],
+    "summary": "Update Subtitle",
+    "description": "Replace the subtitle segments of a recording's language track. The request body must contain **every** segment in the final state — the endpoint performs a bulk replace, not a partial patch. Any segment you omit is removed from the track. Use this to push subtitle edits made externally (for example, by AI editing tools) back into Studio.\n\n## `words` is the source of truth — never send empty `words`\n\nEach segment's `words` array (word-level text and timings) is authoritative. Subtitle rendering **and** dubbing text-to-speech are generated from `words`; the segment-level `text` field is only a human-readable mirror and is **ignored** when rendering subtitles or synthesizing speech.\n\nA segment whose `words` array is empty is treated as having no content: it is **silently dropped the next time the track is read**, and for dubbing nothing is synthesized for it. This is the most common cause of a track that “comes back empty” after an update. Never submit `\"words\": []` unless you intend to remove that segment's content.\n\nTo change what a segment says — for example, shortening a dubbing line — rewrite its `words` array, not just `text`. Mirror the change in `text` for readability, but the `words` entries are what actually change the rendered subtitle and the generated audio.\n\n## Recommended workflow\n\n1. `GET` the track to fetch the current segments with their word-level timings.\n2. Edit the `words` array of the segment(s) you want to change (and mirror the new text in `text`). Leave every other segment untouched.\n3. `PUT` the **full** segment array back. For a dubbing redub, list the changed segment ids in `segmentsToRedub` and keep `enqueueTtsUpdate=true` so their audio is regenerated from the new `words`.\n\nTo edit text without triggering re-synthesis, set `enqueueTtsUpdate` to `false` — but still send the full `words` array for every segment.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\nVersions saved with an API key are listed as **API** in Studio's Version History; the author is not taken from the request body.\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.\n\n## Review state and QA warnings\n\n**Review state.** `metadata.review` holds `status` (`PENDING` or `REVIEWED`), `reviewedBy` and `reviewedAt`, per segment, on every track. To mark a segment as reviewed, `GET` the track, set `metadata.review` to `{ \"status\": \"REVIEWED\", \"reviewedBy\": { \"id\": \"<uuid>\", \"name\": \"<name>\" }, \"reviewedAt\": \"<ISO date-time>\" }` on that segment and `PUT` the full track back. The server stores the review exactly as sent and does not verify the reviewer. It does **not** change the review when you change the text of a segment: the Studio editor sets a segment back to `PENDING` when a person edits it, but this endpoint stores what you send, so set `PENDING` yourself on every segment whose text you rewrite. A segment sent without `metadata.review` counts as not reviewed.\n\n**Review progress.** `reviewProgress` on `GET /v1/projects` and on `GET /v1/projects/{id}` counts `reviewedSegments` against `totalSegments` for each step and language, recomputed from the segments of every track on each `PUT`. A shared project only lists the steps and languages its share includes.\n\n**QA warnings.** QA warnings are not stored or returned by the API. Studio computes them per segment from the rules of the project's subtitle profile (`GET /v1/subtitle-profiles`), and a caller can do the same. A segment breaks a rule when:\n\n* its longest line has more than `maxLineCharacterCount` characters;\n* its characters per second (characters of the text divided by its duration) is above `charactersPerSecond`;\n* its duration is below `minDuration`, or below `minGapFrames` frames at the frame rate of the recording (`fps`);\n* its duration is above `maxDuration`;\n* it has more than `maxLinesPerScreen` lines;\n* two consecutive words are further apart than `maxGapBetweenWords` seconds.\n\n## What is checked\n\nThe same checks as in the Studio editor, in Studio and in this API:\n\n* The track: `source=true` takes the source language of the recording; a translation track takes any language but the source language, also one the recording does not have yet (save its subtitles first, then call `POST .../translate` with it in `ignoredLanguages`, which adds the language and charges it); a dubbing track (`dubbing=true`) needs a language that is translated already. `source` and `dubbing` cannot both be `true`.\n* A segment is at least 0.3 seconds long.\n* Two segments of one speaker do not overlap. On-screen texts are left out of this: they may overlap each other and the spoken segments.\n\nWhat is stored already is not held against you: a segment that is sent back exactly as it was stored (same id, same start and end) is accepted even when it is shorter than 0.3 seconds or overlaps another stored segment, so a recording whose transcription made such a segment can still be saved after you edit another one. A segment that you change, or a new one, has to pass. Anything refused answers `400` with the segment and the reason, and nothing is saved.\n\n## Limits\n\nAt most 20,000 segments in one save, at most 2,500 words in a segment, a segment text of at most 5,000 characters, a word of at most 500 characters, and at most 200 speakers in `speakerVolumes` and `speakerVoiceSettings`. A request over a limit answers `400` and nothing is saved.\n\n## Credits\n\nSaving the text uses no credits. A save with `segmentsToRedub` and `enqueueTtsUpdate` makes new speech: an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403` for it.",
+    "operationId": "updateSubtitles",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/UpdateSubtitleRequest.json"
+          },
+          "examples": {
+            "source_text_edit": {
+              "summary": "Replace a source-language transcript segment without TTS regeneration",
+              "value": {
+                "language": "en",
+                "source": true,
+                "dubbing": false,
+                "enqueueTtsUpdate": false,
+                "subtitles": [
+                  {
+                    "id": "seg-1",
+                    "key": "seg-1_en_true_false",
+                    "time_begin": 0,
+                    "time_end": 1.8,
+                    "speaker": "speaker_1",
+                    "language": "en",
+                    "text": "Hello and welcome.",
+                    "words": [
+                      {
+                        "word": "Hello ",
+                        "time_begin": 0,
+                        "time_end": 0.5
+                      },
+                      {
+                        "word": "and ",
+                        "time_begin": 0.5,
+                        "time_end": 0.8
+                      },
+                      {
+                        "word": "welcome.",
+                        "time_begin": 0.8,
+                        "time_end": 1.8,
+                        "is_eos": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "dubbing_redub": {
+              "summary": "Update a dubbing track and queue specific segments for re-synthesis",
+              "value": {
+                "language": "tr",
+                "source": false,
+                "dubbing": true,
+                "enqueueTtsUpdate": true,
+                "segmentsToRedub": [
+                  "seg-1"
+                ],
+                "subtitles": [
+                  {
+                    "id": "seg-1",
+                    "key": "seg-1_tr_false_true",
+                    "time_begin": 0,
+                    "time_end": 1.8,
+                    "speaker": "voice-uid-123",
+                    "language": "tr",
+                    "text": "Merhaba ve hoş geldiniz.",
+                    "words": [
+                      {
+                        "word": "Merhaba ",
+                        "time_begin": 0,
+                        "time_end": 0.6
+                      },
+                      {
+                        "word": "ve ",
+                        "time_begin": 0.6,
+                        "time_end": 0.8
+                      },
+                      {
+                        "word": "hoş ",
+                        "time_begin": 0.8,
+                        "time_end": 1.2
+                      },
+                      {
+                        "word": "geldiniz.",
+                        "time_begin": 1.2,
+                        "time_end": 1.8,
+                        "is_eos": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Subtitles updated successfully"
+      },
+      "400": {
+        "description": "Bad request: a field is invalid, the language is not available on the recording, a segment is shorter than 0.3 seconds, or two segments of one speaker overlap. The message names the segment.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad Request",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "language_not_available": {
+                "summary": "Language not available for the requested task",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Language 'fr' is not available for translation on this recording. Available languages: tr, es",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "source_dubbing_conflict": {
+                "summary": "source and dubbing both true",
+                "value": {
+                  "statusCode": 400,
+                  "message": "source and dubbing cannot both be true",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Unauthorized",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project is not shared with you, or your share of the project does not include this step or language. Also returned when `segmentsToRedub` is sent and your organization has no credits left (`No remaining minutes available`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Forbidden",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The project or the recording does not exist.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Not Found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Project or recording not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "internal_server_error": {
+                "summary": "Internal server error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "get": {
+    "tags": [
+      "Subtitles"
+    ],
+    "summary": "Get Subtitle",
+    "description": "Retrieve the structured subtitle segments of a recording's language track in JSON form (with word-level timings). The response shape mirrors the PUT request body — use this before `PUT` to fetch the current segments, edit the `words` array of the segment(s) you want to change (word-level text and timings are the source of truth; editing `text` alone has no effect), and send the full array back. The `source` and `dubbing` query flags pick which track to read: source transcription, target translation, or dubbing.\n\n## Position, styling and comments\n\nEach segment can carry what the Studio editor offers, and the same fields are returned by `GET` and accepted by `PUT`:\n\n* **Position** — `cue_settings` (see `CueSettings`).\n* **Style** — `style` (see `SubtitleStyle`): font, size, colors, background and position of this segment's subtitle, overriding the subtitle profile.\n* **Word styles** — `<b>`, `<i>` and `<u>` tags inside `words[].word`.\n* **Review state** — `metadata.review` (`status`, `reviewedBy`, `reviewedAt`).\n* **Per-segment dubbing settings** — `metadata.dubbing` (`volume`, `stability`, `similarity`, `needsRedub`). The audio durations it also returns are read-only and ignored on `PUT`.\n* **Comments** — `comments`. A segment that sends no `comments` keeps the comments stored in Studio; an array replaces them (comments missing from it are deleted) and an empty array deletes all of them.\n* **On-screen text** — text detected in the video is returned as ordinary segments with `speaker` set to `On Screen Text` and `metadata.onScreenText` set to `true`. They carry a `cue_settings` position, are never dubbed and may overlap each other (and the spoken segments) in time. Send them back unchanged with the rest of the track; a `PUT` that leaves them out removes them. Assigning a segment to the `On Screen Text` speaker and setting `metadata.onScreenText` makes it on-screen text.\n\nBecause `PUT` replaces the whole track, send back the `cue_settings`, `style` and `comments` you got from `GET` for the segments you did not change.\n\n## Review state and QA warnings\n\n**Review state.** `metadata.review` holds `status` (`PENDING` or `REVIEWED`), `reviewedBy` and `reviewedAt`, per segment, on every track. To mark a segment as reviewed, `GET` the track, set `metadata.review` to `{ \"status\": \"REVIEWED\", \"reviewedBy\": { \"id\": \"<uuid>\", \"name\": \"<name>\" }, \"reviewedAt\": \"<ISO date-time>\" }` on that segment and `PUT` the full track back. The server stores the review exactly as sent and does not verify the reviewer. It does **not** change the review when you change the text of a segment: the Studio editor sets a segment back to `PENDING` when a person edits it, but this endpoint stores what you send, so set `PENDING` yourself on every segment whose text you rewrite. A segment sent without `metadata.review` counts as not reviewed.\n\n**Review progress.** `reviewProgress` on `GET /v1/projects` and on `GET /v1/projects/{id}` counts `reviewedSegments` against `totalSegments` for each step and language, recomputed from the segments of every track on each `PUT`. A shared project only lists the steps and languages its share includes.\n\n**QA warnings.** QA warnings are not stored or returned by the API. Studio computes them per segment from the rules of the project's subtitle profile (`GET /v1/subtitle-profiles`), and a caller can do the same. A segment breaks a rule when:\n\n* its longest line has more than `maxLineCharacterCount` characters;\n* its characters per second (characters of the text divided by its duration) is above `charactersPerSecond`;\n* its duration is below `minDuration`, or below `minGapFrames` frames at the frame rate of the recording (`fps`);\n* its duration is above `maxDuration`;\n* it has more than `maxLinesPerScreen` lines;\n* two consecutive words are further apart than `maxGapBetweenWords` seconds.\n\n\n## Language scoping\n\nThe `language` value must match the requested task type for the recording:\n* When `source=true` and `dubbing=false` (transcription), `language` must equal the recording source language.\n* When `source=false` and `dubbing=false` (translation), `language` must be one of the recording translation languages.\n* When `source=false` and `dubbing=true` (dubbing), `language` must be one of the recording translation languages.\n* `source=true` and `dubbing=true` together is invalid.\n\nMismatched combinations return `400` with a descriptive message rather than reaching the underlying file lookup.",
+    "operationId": "getSubtitles",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "language",
+        "in": "query",
+        "required": true,
+        "description": "BCP-47 language code of the track to read",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source",
+        "in": "query",
+        "required": false,
+        "description": "Set to true to read the source (transcription) track",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "dubbing",
+        "in": "query",
+        "required": false,
+        "description": "Set to true to read the dubbing track",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subtitle track returned",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SubtitleSegmentResponse.json"
+            },
+            "examples": {
+              "translation": {
+                "summary": "A translation track",
+                "value": {
+                  "participantNames": [
+                    "Ada"
+                  ],
+                  "subtitles": [
+                    {
+                      "id": "seg-1",
+                      "speaker": "speaker-1",
+                      "time_begin": 0.5,
+                      "time_end": 3.2,
+                      "language": "es",
+                      "text": "Hola y bienvenidos.",
+                      "words": [
+                        {
+                          "word": "Hola ",
+                          "time_begin": 0.5,
+                          "time_end": 0.9,
+                          "is_eos": false
+                        },
+                        {
+                          "word": "y ",
+                          "time_begin": 0.9,
+                          "time_end": 1.0,
+                          "is_eos": false
+                        },
+                        {
+                          "word": "bienvenidos.",
+                          "time_begin": 1.0,
+                          "time_end": 3.2,
+                          "is_eos": true
+                        }
+                      ]
+                    },
+                    {
+                      "id": "seg-2",
+                      "speaker": "speaker-1",
+                      "time_begin": 3.6,
+                      "time_end": 6.0,
+                      "language": "es",
+                      "text": "Empecemos.",
+                      "words": [
+                        {
+                          "word": "Empecemos.",
+                          "time_begin": 3.6,
+                          "time_end": 6.0,
+                          "is_eos": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad Request",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "language_not_available": {
+                "summary": "Language not available for the requested task",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Language 'fr' is not available for translation on this recording. Available languages: tr, es",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              },
+              "source_dubbing_conflict": {
+                "summary": "source and dubbing both true",
+                "value": {
+                  "statusCode": 400,
+                  "message": "source and dubbing cannot both be true",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Unauthorized",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "The project is not shared with you, or your share of the project does not include this step or language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Forbidden",
+                "value": {
+                  "statusCode": 403,
+                  "message": "Access denied",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The project or the recording does not exist, or there are no subtitles for the language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Not Found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Subtitles not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "internal_server_error": {
+                "summary": "Internal server error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "imported": {
+      "type": "integer",
+      "description": "Number of subtitles that were saved."
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Cues that were skipped, for example a cue that ends before it starts, has no duration, has no text or is shorter than 0.3 seconds.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": "integer",
+            "description": "Line of the file, `0` when it is not known."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the cue was skipped, followed by its time range and its text (shortened to 60 characters), for example `Segment skipped: shorter than 0.3s (00:01:02.100-00:01:02.300) \"Too short\"`."
+          }
+        },
+        "required": [
+          "line",
+          "reason"
+        ]
+      }
+    }
+  },
+  "required": [
+    "imported",
+    "warnings"
+  ]
+}

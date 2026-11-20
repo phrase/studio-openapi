@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "description": "A written form and how to say it, for one language.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Pair ID.",
+      "format": "uuid"
+    },
+    "source": {
+      "type": "string",
+      "description": "Written form of the term.",
+      "maxLength": 512
+    },
+    "target": {
+      "type": "string",
+      "description": "How the term is pronounced, written in the given notation.",
+      "maxLength": 512
+    },
+    "notation": {
+      "type": "string",
+      "description": "Notation of `target`: plain respelling or IPA.",
+      "enum": [
+        "plain",
+        "ipa"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "description": "Language the pair applies to."
+    }
+  }
+}

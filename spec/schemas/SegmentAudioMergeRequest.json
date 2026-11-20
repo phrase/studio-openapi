@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "description": "Merge the dubbed audio of two segments.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Dubbing language."
+    },
+    "survivingSegmentId": {
+      "type": "string",
+      "description": "Segment that keeps the merged audio."
+    },
+    "removedSegmentId": {
+      "type": "string",
+      "description": "Segment whose audio is merged into it and removed."
+    },
+    "gapDuration": {
+      "type": "number",
+      "description": "Silence between the two in seconds.",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "language",
+    "survivingSegmentId",
+    "removedSegmentId"
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "description": "A project with its recordings and the settings applied to it. Settings bound to a language are only listed for the languages a share includes.",
+  "allOf": [
+    {
+      "$ref": "./Project.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "recordings": {
+          "type": "array",
+          "description": "Recordings within the project.",
+          "items": {
+            "$ref": "./Recording.json"
+          }
+        },
+        "glossary": {
+          "$ref": "./ProjectGlossary.json"
+        },
+        "pronunciations": {
+          "type": "array",
+          "description": "Pronunciation sets applied to the project.",
+          "items": {
+            "$ref": "./ProjectPronunciation.json"
+          }
+        },
+        "safeCommunications": {
+          "type": "array",
+          "description": "Safe communication checks applied to the project.",
+          "items": {
+            "$ref": "./ProjectSafeCommunication.json"
+          }
+        },
+        "insights": {
+          "type": "array",
+          "description": "Insights applied to the project.",
+          "items": {
+            "$ref": "./ProjectInsight.json"
+          }
+        },
+        "preferences": {
+          "type": "object",
+          "description": "Models, profiles and text-to-speech provider of the project. Absent when none were set.",
+          "properties": {
+            "insightsModelType": {
+              "type": "string",
+              "enum": [
+                "GPT",
+                "CUSTOM"
+              ],
+              "description": "AI model provider type for insights."
+            },
+            "insightsModelName": {
+              "type": "string",
+              "description": "AI model name for insights."
+            },
+            "translationModelType": {
+              "type": "string",
+              "enum": [
+                "GPT",
+                "CUSTOM"
+              ],
+              "description": "AI model provider type for translation."
+            },
+            "translationModelName": {
+              "type": "string",
+              "description": "AI model name for translation."
+            },
+            "mtProfileId": {
+              "type": "string",
+              "description": "Phrase TMS machine translation profile uid. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it."
+            },
+            "translationMemoryId": {
+              "type": "string",
+              "description": "Phrase TMS translation memory uid. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it."
+            },
+            "ttsProvider": {
+              "type": "string",
+              "description": "Text-to-speech engine for dubbing, an id from `GET /v1/tts/engines`."
+            }
+          }
+        },
+        "subtitleProfiles": {
+          "type": "array",
+          "description": "Subtitle profile used for each language. Ids from `GET /v1/subtitle-profiles`.",
+          "items": {
+            "type": "object",
+            "description": "A profile and its language.",
+            "properties": {
+              "subtitleProfileId": {
+                "type": "string",
+                "description": "Subtitle profile ID.",
+                "format": "uuid"
+              },
+              "languageCode": {
+                "type": "string",
+                "description": "Language the profile is used for."
+              }
+            }
+          }
+        },
+        "styleGuides": {
+          "type": "array",
+          "description": "Style guide ids by language code. Get them from the Style Guides API; Studio has no endpoint that lists them.",
+          "items": {
+            "type": "object",
+            "description": "A style guide and its language.",
+            "properties": {
+              "styleGuideId": {
+                "type": "string",
+                "description": "Style guide ID."
+              },
+              "contentProfileId": {
+                "type": "string",
+                "description": "Content profile ID."
+              },
+              "languageCode": {
+                "type": "string",
+                "description": "Language the style guide is used for."
+              }
+            }
+          }
+        },
+        "termBases": {
+          "type": "array",
+          "description": "Phrase TMS term base uids by language code. Get them from the Phrase TMS API (term bases); Studio has no endpoint that lists them.",
+          "items": {
+            "type": "object",
+            "description": "A term base and its language.",
+            "properties": {
+              "termBaseId": {
+                "type": "string",
+                "description": "Term base ID."
+              },
+              "languageCode": {
+                "type": "string",
+                "description": "Language the term base is used for."
+              }
+            }
+          }
+        },
+        "tmsProject": {
+          "type": "object",
+          "description": "The translation management project the project is linked to. Absent when there is none.",
+          "properties": {
+            "tmsProjectUid": {
+              "type": "string",
+              "description": "Translation management project (TMS UID)."
+            },
+            "tmsProjectTemplateUid": {
+              "type": "string",
+              "description": "Phrase TMS project template uid. Get it from the Phrase TMS API (project templates); Studio has no endpoint that lists it."
+            }
+          }
+        }
+      }
+    }
+  ]
+}

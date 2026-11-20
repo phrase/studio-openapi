@@ -1,0 +1,85 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "time_begin",
+    "time_end",
+    "words",
+    "speaker",
+    "language"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Segment identifier (stable across edits)"
+    },
+    "key": {
+      "type": "string",
+      "description": "Optional and not read by Studio; a dubbing track returned by `GET` has none, so it can be sent back unchanged. Studio's editor writes `${id}_${language}_${source}_${dubbing}`."
+    },
+    "time_begin": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Segment start time in seconds"
+    },
+    "time_end": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Segment end time in seconds"
+    },
+    "words": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Word-level text and timings. **Source of truth** for both subtitle rendering and dubbing text-to-speech. Must be non-empty: a segment submitted with an empty `words` array is dropped the next time the track is read (and produces no dubbing audio). To change a segment's content, edit these entries — not `text`. **Inline styling:** put `<b>…</b>`, `<i>…</i>` or `<u>…</u>` around text inside `word` to make it bold, italic or underlined, for example `<i>really</i>`. A style that spans several words opens in the first word and closes in the last. Keep the tags balanced within a segment and do not change `time_begin` or `time_end` when you only add or remove a style. The tags stay in SRT and VTT exports and are rendered in burned-in subtitles; they are removed for dubbing and for plain-text exports. At most 2,500 words per segment, and at most 5,000 characters in the words together.",
+      "items": {
+        "$ref": "./SubtitleWord.json"
+      },
+      "maxItems": 2500
+    },
+    "speaker": {
+      "type": "string",
+      "description": "Speaker identifier (voice id or label)"
+    },
+    "language": {
+      "type": "string",
+      "description": "BCP-47 language code for the segment"
+    },
+    "text": {
+      "type": "string",
+      "description": "Human-readable mirror of the segment text. **Not authoritative** — it is ignored when rendering subtitles or synthesizing dubbing audio, both of which are derived from `words`. Editing `text` alone has no effect on the output; change `words` instead (and keep `text` in sync for readability). At most 5,000 characters.",
+      "maxLength": 5000
+    },
+    "metadata": {
+      "allOf": [
+        {
+          "$ref": "./SegmentMetadata.json"
+        }
+      ],
+      "description": "Review state and per-segment dubbing settings"
+    },
+    "cue_settings": {
+      "allOf": [
+        {
+          "$ref": "./CueSettings.json"
+        }
+      ],
+      "description": "Optional position of this segment's subtitle on the video. Omit it to use the position of the subtitle profile; a segment sent without `cue_settings` loses the position it had."
+    },
+    "style": {
+      "allOf": [
+        {
+          "$ref": "./SubtitleStyle.json"
+        }
+      ],
+      "description": "Optional style of this segment's subtitle, overriding the subtitle profile (font, size, colors, background, position). Omit it to use the subtitle profile; a segment sent without `style` loses the style it had."
+    },
+    "comments": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "$ref": "./SegmentComment.json"
+      },
+      "description": "Reviewer comments of the segment (at most 200). **Omit the field to keep the comments stored in Studio** for this segment. Send an array to replace them: a comment that is not in the array is deleted, and an empty array deletes all of them. To add a comment, send the current ones plus the new one; to resolve one, send it with `resolved: true`. Comments belong to subtitle tracks (source and translation), not to dubbing tracks."
+    }
+  }
+}

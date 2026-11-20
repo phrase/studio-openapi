@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "Fields of a template to change. Send only what changes. `settings` replaces all settings.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name, unique in your organization.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "description": "What the template is for."
+    },
+    "settings": {
+      "$ref": "../schemas/TemplateSettings.json"
+    }
+  }
+}

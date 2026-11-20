@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "description": "A voice of an engine.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Voice id. Use it as `voiceId`."
+    },
+    "name": {
+      "type": "string",
+      "description": "Name."
+    },
+    "category": {
+      "type": "string",
+      "description": "Kind of voice, set by the engine.",
+      "nullable": true
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description.",
+      "nullable": true
+    },
+    "previewUrl": {
+      "type": "string",
+      "description": "Link to a sample. It stops working after a day.",
+      "nullable": true
+    },
+    "characteristics": {
+      "type": "object",
+      "description": "Gender, age and use case when the engine tells them.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "verifiedLanguages": {
+      "type": "array",
+      "description": "Languages the voice is made for.",
+      "items": {
+        "type": "object",
+        "description": "A language of the voice.",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "Language code."
+          },
+          "locale": {
+            "type": "string",
+            "description": "Locale, for example `de-DE`."
+          },
+          "accent": {
+            "type": "string",
+            "description": "Accent."
+          },
+          "modelId": {
+            "type": "string",
+            "description": "Engine model for this language."
+          },
+          "previewUrl": {
+            "type": "string",
+            "description": "Link to a sample in this language."
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name"
+  ]
+}

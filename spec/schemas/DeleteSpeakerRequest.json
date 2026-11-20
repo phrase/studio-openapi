@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "description": "The speaker to remove.",
+  "properties": {
+    "voiceId": {
+      "type": "string",
+      "description": "`id` of the speaker, from `GET .../speakers`.",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "voiceId"
+  ]
+}

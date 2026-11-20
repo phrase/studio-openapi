@@ -1,0 +1,204 @@
+{
+  "get": {
+    "tags": [
+      "Exports"
+    ],
+    "summary": "Get the dubbed audio of segments",
+    "description": "Signed links to the dubbed audio of the segments that start in a time range, for one language. The range is at most 300 seconds. Needs read access to the dubbing step of the language.",
+    "operationId": "getSegmentAudio",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "language",
+        "in": "query",
+        "required": true,
+        "description": "Dubbing language.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startTime",
+        "in": "query",
+        "required": false,
+        "description": "Start of the range in seconds. Defaults to 0.",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      {
+        "name": "endTime",
+        "in": "query",
+        "required": false,
+        "description": "End of the range in seconds, after `startTime`, at most 300 seconds later. Defaults to 60.",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60,
+          "maximum": 86400
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Segment audio",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/SegmentAudio.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "segments": {
+                    "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc": {
+                      "segmentId": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "url": "https://storage.googleapis.com/bucket/seg.mp3?X-Goog-Signature=..."
+                    }
+                  },
+                  "useNewDubbing": true,
+                  "timeRange": {
+                    "startTime": 0,
+                    "endTime": 60,
+                    "totalSegments": 12,
+                    "segmentsInRange": 5
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The recording does not exist in this project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

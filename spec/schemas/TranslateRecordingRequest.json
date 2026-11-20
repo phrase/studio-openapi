@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "required": [
+    "languages"
+  ],
+  "properties": {
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target languages to (re-)translate. A language already present on the recording is retranslated, not skipped — only list a language here if you want it (re-)run. Any BCP-47-style code with translation support is accepted except the literal `auto` placeholder. Do not pass the recording's source language: the request is rejected with `400`, and nothing is started for any of its languages."
+    },
+    "ignoredLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Subset of `languages` whose subtitles you provide yourself: upload them first with `POST .../subtitles/upload` or `PUT .../subtitles` (the language need not be on the recording yet), then send the language here. Studio does not translate it. It is tracked as provided, not pending or failed. A language that the recording does not have yet is charged like any new translation language."
+    },
+    "tmsProjectTemplateUid": {
+      "type": "string",
+      "description": "Phrase TMS project template uid. Get it from the Phrase TMS API (project templates); Studio has no endpoint that lists it."
+    },
+    "subtitleProfiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Subtitle profile id per language code. List available ids with GET /v1/subtitle-profiles."
+    },
+    "styleGuides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Style guide ids by language code. Get them from the Style Guides API; Studio has no endpoint that lists them."
+    },
+    "termBases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Phrase TMS term base uids by language code. Get them from the Phrase TMS API (term bases); Studio has no endpoint that lists them."
+    }
+  }
+}

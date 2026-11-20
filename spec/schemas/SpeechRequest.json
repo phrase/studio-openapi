@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "description": "The text to speak.",
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Text to speak, at most 500 characters (the limit of the text-to-speech tool of Studio).",
+      "maxLength": 500
+    },
+    "voiceId": {
+      "type": "string",
+      "description": "Voice from `GET /v1/tts/voices` or a saved voice from `GET /v1/voices/clones`."
+    },
+    "engine": {
+      "type": "string",
+      "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+      "enum": [
+        "eleven_v2",
+        "eleven_v3",
+        "eleven_v4",
+        "eleven_v4_turbo",
+        "azure_tts",
+        "voiseed",
+        "gemini_2_5_flash_tts"
+      ]
+    },
+    "languageCode": {
+      "type": "string",
+      "description": "Language of the text. Needed by some engines, and picks the pronunciation sets for that language."
+    },
+    "pronunciations": {
+      "type": "array",
+      "description": "Words to say a certain way, at most 200 together with the sets.",
+      "items": {
+        "$ref": "../schemas/SpeechPronunciation.json"
+      },
+      "maxItems": 200
+    },
+    "pronunciationIds": {
+      "type": "array",
+      "description": "Pronunciation sets from `GET /v1/pronunciations` to apply. At most 10.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "maxItems": 10
+    },
+    "stability": {
+      "type": "number",
+      "description": "Voice stability, from 0 to 1, where the engine has it.",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "similarity": {
+      "type": "number",
+      "description": "Voice similarity, from 0 to 1, where the engine has it.",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "seed": {
+      "type": "integer",
+      "description": "Same seed and text give a similar result.",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "format": "int64"
+    }
+  },
+  "required": [
+    "text",
+    "voiceId"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "description": "A new speaker.",
+  "properties": {
+    "speakerName": {
+      "type": "string",
+      "description": "Name of the speaker as it is used in the subtitles, at most 256 characters.",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "speakerName"
+  ]
+}

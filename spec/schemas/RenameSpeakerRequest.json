@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "A new name for a speaker.",
+  "properties": {
+    "oldSpeakerName": {
+      "type": "string",
+      "description": "Current name."
+    },
+    "newSpeakerName": {
+      "type": "string",
+      "description": "New name, at most 256 characters.",
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "oldSpeakerName",
+    "newSpeakerName"
+  ]
+}

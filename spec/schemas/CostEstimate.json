@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "description": "The price of an action, worked out without starting it.",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "The action that was priced.",
+      "enum": [
+        "translate",
+        "dubbing",
+        "transcribe"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "description": "Always `minutes`.",
+      "enum": [
+        "minutes"
+      ]
+    },
+    "minutes": {
+      "type": "integer",
+      "description": "Total minutes the action would use."
+    },
+    "perLanguage": {
+      "type": "array",
+      "description": "Cost of each language.",
+      "items": {
+        "$ref": "../schemas/LanguageCost.json"
+      }
+    },
+    "balance": {
+      "$ref": "../schemas/CreditBalance.json"
+    },
+    "enoughCredits": {
+      "type": "boolean",
+      "description": "Whether the balance covers `minutes`. `null` when the balance is unknown.",
+      "nullable": true
+    },
+    "allowed": {
+      "type": "boolean",
+      "description": "`false` when your organization is blocked (`balance.state` is `BLOCKED`): then transcription, translation, dubbing, sync-dubbing, re-dubbing and speech are refused with `403`, whatever they cost. `true` otherwise."
+    }
+  },
+  "required": [
+    "action",
+    "unit",
+    "minutes",
+    "perLanguage",
+    "balance",
+    "enoughCredits",
+    "allowed"
+  ]
+}

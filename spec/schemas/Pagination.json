@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "Position of a list response inside the full result set.",
+  "properties": {
+    "page": {
+      "type": "integer",
+      "description": "Number of this page, starting at 1.",
+      "example": 1
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Items per page. A list that is not paged answers all its items in one page, and `pageSize` is then the number of items in it.",
+      "example": 1000
+    },
+    "total": {
+      "type": "integer",
+      "description": "Number of items in the full result set.",
+      "example": 42
+    },
+    "totalPages": {
+      "type": "integer",
+      "description": "Number of pages in the full result set.",
+      "example": 1
+    }
+  },
+  "required": [
+    "page",
+    "pageSize",
+    "total",
+    "totalPages"
+  ]
+}

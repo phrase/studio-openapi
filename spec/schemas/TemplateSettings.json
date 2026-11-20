@@ -1,0 +1,154 @@
+{
+  "type": "object",
+  "description": "What a project created from the template starts with.",
+  "properties": {
+    "sourceLanguage": {
+      "type": "string",
+      "description": "Language spoken in the recordings."
+    },
+    "expectedLanguages": {
+      "type": "array",
+      "description": "Other languages that may be spoken.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "glossaryId": {
+      "type": "string",
+      "description": "Glossary to apply.",
+      "format": "uuid"
+    },
+    "subtitleProfileId": {
+      "type": "string",
+      "description": "Subtitle profile to apply.",
+      "format": "uuid"
+    },
+    "isPublic": {
+      "type": "boolean",
+      "description": "Whether the project is visible to the organization."
+    },
+    "preferences": {
+      "type": "object",
+      "description": "Project preferences such as the models and the text-to-speech provider.",
+      "properties": {
+        "insightsModelType": {
+          "type": "string",
+          "enum": [
+            "GPT",
+            "CUSTOM"
+          ],
+          "description": "AI model provider type for insights."
+        },
+        "insightsModelName": {
+          "type": "string",
+          "description": "AI model name for insights."
+        },
+        "translationModelType": {
+          "type": "string",
+          "enum": [
+            "GPT",
+            "CUSTOM"
+          ],
+          "description": "AI model provider type for translation."
+        },
+        "translationModelName": {
+          "type": "string",
+          "description": "AI model name for translation."
+        },
+        "mtProfileId": {
+          "type": "string",
+          "description": "Phrase TMS machine translation profile uid. Get it from the Phrase TMS API (machine translate profiles); Studio has no endpoint that lists it."
+        },
+        "translationMemoryId": {
+          "type": "string",
+          "description": "Phrase TMS translation memory uid. Get it from the Phrase TMS API (translation memories); Studio has no endpoint that lists it."
+        },
+        "ttsProvider": {
+          "type": "string",
+          "enum": [
+            "eleven_v2",
+            "eleven_v3",
+            "eleven_v4",
+            "eleven_v4_turbo",
+            "azure_tts",
+            "voiseed",
+            "gemini_2_5_flash_tts"
+          ],
+          "description": "Text-to-speech provider for dubbing. Some engines are switched on or off per organization: `GET /v1/tts/engines` lists the ones you can use, and an engine that is not available to your organization is refused with `400`."
+        }
+      }
+    },
+    "translation": {
+      "type": "object",
+      "description": "Translation settings.",
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Languages to translate into.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tmsProjectTemplateUid": {
+          "type": "string",
+          "description": "Phrase TMS project template uid. Get it from the Phrase TMS API (project templates); Studio has no endpoint that lists it."
+        },
+        "subtitleProfiles": {
+          "type": "object",
+          "description": "Subtitle profile ids by language code; an id that is not a UUID is refused with `400`.",
+          "additionalProperties": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "styleGuides": {
+          "type": "object",
+          "description": "Style guide ids by language code. Get them from the Style Guides API; Studio has no endpoint that lists them.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "termBases": {
+          "type": "object",
+          "description": "Phrase TMS term base uids by language code. Get them from the Phrase TMS API (term bases); Studio has no endpoint that lists them.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "languages"
+      ]
+    },
+    "dubbing": {
+      "type": "object",
+      "description": "Dubbing settings. Every dubbing language must also be a translation language or the source language.",
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Languages to dub.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pronunciations": {
+          "type": "object",
+          "description": "Pronunciation set ids by language code; an id that is not a UUID is refused with `400`.",
+          "additionalProperties": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "required": [
+        "languages"
+      ]
+    }
+  },
+  "required": [
+    "sourceLanguage"
+  ]
+}

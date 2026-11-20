@@ -1,0 +1,91 @@
+{
+  "type": "object",
+  "description": "Style of one segment's subtitle, overriding the matching fields of the subtitle profile. Every field is optional: a field that is left out follows the subtitle profile, and a segment sent without `style` loses the style it had. `delta` and `deltaX` (and `subtitlePosition`) place the subtitle the way the subtitle profile does; when any of them is set, the segment's `cue_settings` position is ignored for that segment. Studio's editor preview and burn-in follow the style; SRT and WebVTT exports carry no style. Vertical subtitle profiles ignore it.",
+  "additionalProperties": false,
+  "properties": {
+    "fontFamily": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Font name, or `custom:<id>` for an uploaded custom font. Must not contain commas, braces, backslashes or line breaks.",
+      "pattern": "^(custom:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|(?!custom:)[^,\\r\\n{}\\\\]{1,128})$"
+    },
+    "fontSize": {
+      "type": "number",
+      "minimum": 8,
+      "maximum": 100,
+      "description": "Font size, relative to a 720px-high video like the subtitle profile's"
+    },
+    "fontWeight": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "bold"
+      ],
+      "description": "Font weight."
+    },
+    "fontStyle": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "italic"
+      ],
+      "description": "Font style."
+    },
+    "subtitlePosition": {
+      "type": "string",
+      "enum": [
+        "top",
+        "bottom",
+        "center",
+        "right",
+        "middle",
+        "left"
+      ],
+      "description": "Where the subtitle is anchored horizontally (`left`, `center`, `right`), as in the subtitle profile"
+    },
+    "textAlign": {
+      "type": "string",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "description": "Text alignment."
+    },
+    "textColor": {
+      "type": "string",
+      "maxLength": 25,
+      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+      "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
+    },
+    "backgroundType": {
+      "type": "string",
+      "enum": [
+        "none",
+        "box",
+        "outline",
+        "wrap"
+      ],
+      "description": "How the text is separated from the video."
+    },
+    "backgroundColor": {
+      "type": "string",
+      "maxLength": 25,
+      "description": "`#RRGGBB`, or `rgb()` / `rgba()` for a color with transparency, e.g. `rgba(0, 0, 0, 0.7)` for a 70% opaque black. Eight-digit hex is not accepted.",
+      "pattern": "^(#[0-9a-fA-F]{6}|rgba?\\((25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d), ?(25[0-5]|2[0-4]\\d|1?\\d?\\d)(, ?(0|1|0?\\.\\d+|1\\.0+))?\\))$"
+    },
+    "delta": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Distance from the bottom, in percent of the video height. Higher moves the subtitle up."
+    },
+    "deltaX": {
+      "type": "number",
+      "minimum": -50,
+      "maximum": 50,
+      "description": "Shift from the center, in percent of the video width. Negative moves it left."
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "description": "The file you are going to upload.",
+  "properties": {
+    "fileName": {
+      "type": "string",
+      "description": "Name of the file with its extension: `mp4`, `mov`, `mp3`, `wav` or `m4a`. No path.",
+      "maxLength": 255,
+      "pattern": "^[^/\\\\\\u0000]+\\.[A-Za-z0-9]{2,5}$"
+    },
+    "contentType": {
+      "type": "string",
+      "description": "Media type of the file, for example `video/mp4` or `audio/mpeg`. Taken from the extension when left out."
+    }
+  },
+  "required": [
+    "fileName"
+  ]
+}

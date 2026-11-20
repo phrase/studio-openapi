@@ -1,0 +1,68 @@
+{
+  "type": "object",
+  "description": "The uploaded file to add as a recording, with how to process it.",
+  "properties": {
+    "recordingId": {
+      "type": "string",
+      "description": "The `recordingId` from the upload url.",
+      "format": "uuid"
+    },
+    "fileName": {
+      "type": "string",
+      "description": "The `fileName` you asked the upload url for: a name with an extension and no path, at most 255 characters.",
+      "pattern": "^[^/\\\\\\u0000]+\\.[A-Za-z0-9]{2,5}$",
+      "maxLength": 255
+    },
+    "contentType": {
+      "type": "string",
+      "description": "The `contentType` you asked the upload url for, when you sent one."
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the recording. Defaults to the file name without its extension.",
+      "maxLength": 255
+    },
+    "sourceLanguage": {
+      "type": "string",
+      "description": "Language spoken in the recording."
+    },
+    "expectedLanguages": {
+      "type": "array",
+      "description": "Other languages that may be spoken.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "subtitleProfiles": {
+      "type": "object",
+      "description": "Subtitle profile id by language code, from `GET /v1/subtitle-profiles`.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "glossaryId": {
+      "type": "string",
+      "description": "Glossary to apply, from `GET /v1/glossaries`.",
+      "format": "uuid"
+    },
+    "numSpeakers": {
+      "type": "integer",
+      "description": "Number of speakers, when you know it.",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "ignoreTranscription": {
+      "type": "boolean",
+      "description": "Keep the recording without transcribing it."
+    },
+    "videoAnalysis": {
+      "type": "boolean",
+      "description": "Analyse the video as well."
+    }
+  },
+  "required": [
+    "recordingId",
+    "fileName",
+    "sourceLanguage"
+  ]
+}

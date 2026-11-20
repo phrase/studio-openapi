@@ -1,0 +1,41 @@
+name: Validate spec
+
+on:
+  pull_request:
+    paths:
+      - 'spec/**'
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'redocly.yaml'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/validate-spec.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: schemas/projects.json must be committed and up to date with spec/
+        run: npm run check:generated
+
+      - name: Bundle spec/ into schemas/projects.json
+        run: npm run bundle
+
+      - name: Lint the published spec
+        run: npm run lint
+
+      - name: Run the rule tests
+        run: npm test

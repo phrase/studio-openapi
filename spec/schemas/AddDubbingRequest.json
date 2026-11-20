@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "required": [
+    "languages"
+  ],
+  "properties": {
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target languages to (re-)dub. A language already present on the recording is re-dubbed, not skipped. Each language must already be translated on this recording (see POST .../translate): a language that is not translated is refused with `400` that names it, and nothing is started for any language of the request. Each language must also be supported by the project's configured TTS provider; an unsupported language fails the whole request with `400`."
+    },
+    "ignoredLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Accepted for shape-parity with TranslateRecordingRequest; has no effect on dubbing"
+    },
+    "pronunciations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Pronunciation ruleset id per language code"
+    },
+    "expandToContent": {
+      "type": "boolean",
+      "description": "Audio-only recordings only. When true the voice is not sped up to fit the original timing; each segment grows to the natural length of its speech instead, so the dubbed audio can end up longer than the source. The choice is stored per language and also applies to later single-segment re-dubs. Omit to keep the stored choice (new dubbings default to false). A video recording with true fails with 400."
+    }
+  }
+}

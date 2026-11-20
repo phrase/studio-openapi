@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "description": "What to summarize. Send only what you want added.",
+  "properties": {
+    "summaryEnabled": {
+      "type": "boolean",
+      "description": "Create the summary."
+    },
+    "customAttributes": {
+      "type": "boolean",
+      "description": "Extract custom attributes."
+    },
+    "insights": {
+      "type": "array",
+      "description": "Insight IDs to answer, from `GET /v1/insights`.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "safeCommunications": {
+      "type": "array",
+      "description": "Safe communication IDs to check, from `GET /v1/safe-communications`.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  }
+}

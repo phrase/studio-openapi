@@ -1,0 +1,112 @@
+{
+  "delete": {
+    "tags": [
+      "Text to speech"
+    ],
+    "summary": "Remove a favorite voice",
+    "description": "Remove a voice from the favorites of your organization. Removing a voice that is not a favorite changes nothing.",
+    "operationId": "removeTtsFavoriteVoice",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "voiceId",
+        "in": "path",
+        "required": true,
+        "description": "Voice id.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "engine",
+        "in": "query",
+        "required": false,
+        "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "eleven_v2",
+            "eleven_v3",
+            "eleven_v4",
+            "eleven_v4_turbo",
+            "azure_tts",
+            "voiseed",
+            "gemini_2_5_flash_tts"
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "204": {
+        "description": "The voice is no longer a favorite."
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

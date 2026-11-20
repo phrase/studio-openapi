@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string",
+      "format": "binary",
+      "description": "The file: `.xlsx`, `.csv`, `.pls` or `.xml`, at most 10 MB."
+    }
+  },
+  "required": [
+    "file"
+  ]
+}

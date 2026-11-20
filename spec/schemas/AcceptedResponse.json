@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "description": "Returned when work was queued instead of finished.",
+  "properties": {
+    "statusUrl": {
+      "type": "string",
+      "description": "Path to poll for the progress of the recording. Send a `GET` to it with the same credentials.",
+      "example": "/v1/projects/6f1d2c3e-8b4a-4c5d-9e7f-123456789abd/recordings/6f1d2c3e-8b4a-4c5d-9e7f-123456789abc/status"
+    }
+  },
+  "required": [
+    "statusUrl"
+  ]
+}

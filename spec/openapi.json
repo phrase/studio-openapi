@@ -1,0 +1,638 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Studio API",
+    "description": "Studio turns audio and video into transcriptions, translations, subtitles and dubbing. Use this API to create projects, order translation and dubbing, follow the progress, and download the results.\n\n## Authentication\nSend your Phrase Platform API token with every request, as `X-API-Key: <token>` or as `Authorization: Bearer <token>`. A missing, invalid or expired token is answered with `401`. `403` means the token is valid but the action is not allowed: the item is someone else's, a share does not include the step or language, or your organization is blocked.\n\n## Typical flow\n1. Create a project with `POST /v1/projects`: upload files, or give direct links to media files. It answers with the project `id`. To add a recording to a project that exists, call `POST /v1/projects/{projectId}/recordings/upload-url`, upload the file to the url it returns, then call `POST /v1/projects/{projectId}/recordings`.\n2. Poll `GET /v1/projects/{projectId}/recordings/{recordingId}/status` until the transcription is `done`. Every long step answers `202` and runs in the background: you poll the status, you do not wait on the call.\n3. Optional: `POST /v1/projects/{projectId}/recordings/{recordingId}/estimates` tells what a translation costs before you start it.\n4. Order translation with `POST …/translate`, and wait until the status shows the language as `done`.\n5. Order dubbing with `POST …/dubbing`. A language must be translated before it can be dubbed, otherwise the call answers `400`.\n6. Read and download: `GET …/subtitles` for the text, the result endpoints for summary and insights, `POST …/exports` for a file, then `GET …/exports/{exportId}` until it is `done`.\n\n## Credits\nCredits are minutes. Transcription and every new translation language use `ceil(duration / 60)` minutes of the recording. Dubbing, retranscription and retranslation use none. The estimate endpoint tells the price in advance. When an organization has no credits left, starting work is refused with `403` (`No remaining minutes available`): creating a project, adding a recording, transcribe, translate, dubbing, sync-dubbing and speech. Reading results, estimates and editing the text of subtitles still work. The same goes for a re-dub (`PUT .../subtitles` with `segmentsToRedub`), re-syncing a dubbing and generating speech with `POST /v1/tts/speech`: they make new speech, so a blocked organization is refused for them too.\n\n## Errors\nErrors are JSON: `{ \"statusCode\": 400, \"message\": \"...\", \"timestamp\": \"...\" }`. The `message` says what to change.\n- `400` the request is invalid.\n- `401` the token is missing, invalid or expired.\n- `403` the token is valid but the action is not allowed: your share of a project does not include the step or language, the project does not exist or is not shared with you (project routes do not tell the two apart), or your organization has no credits left for an action that needs them.\n- `404` the item does not exist, or you may not manage it: a recording that is not in the project, or a glossary, template, insight, pronunciation set, subtitle profile, font or voice of your organization that does not exist. Settings of another organization answer `404` too.\n- `409` the request conflicts with what exists: a name that is taken, a recording that was added already, a speaker that is still in use, or a template that a trigger still uses. The message says which.\n- `429` too many requests; wait and try again.\n- `5xx` a failure on our side or at a provider; try again later.\n\n## Where the ids come from\nIds that Studio accepts but does not list belong to other Phrase products. `tmsProjectTemplateUid`, `termBases`, `mtProfileId` and `translationMemoryId` are Phrase TMS uids: get them from the Phrase TMS API (project templates, term bases, translation memories, machine translation profiles). `styleGuides` ids come from the Style Guides API. Both are described at https://developers.phrase.com/en/api/overview. Every other id (projects, recordings, glossaries, insights, pronunciations, templates, subtitle profiles, voices) comes from the list endpoints of this API.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.studio.us.phrase.com",
+      "description": "Production US Environment"
+    },
+    {
+      "url": "https://api.studio.eu.phrase.com",
+      "description": "Production EU Environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Projects",
+      "description": "Create, list, open, rename, archive, copy and delete projects. A project holds one or more recordings. Start here with `POST /v1/projects`."
+    },
+    {
+      "name": "Recordings",
+      "description": "The recordings of a project: add one, follow its status, order translation and dubbing, manage its speakers, delete it. Long steps answer `202`; poll `GET …/status` for the result."
+    },
+    {
+      "name": "Subtitle Profiles",
+      "description": "Subtitle layout rules (line length, reading speed and so on). Pick one per language when you create a project. Members of your organization can read them; the owner or a manager changes them."
+    },
+    {
+      "name": "Fonts",
+      "description": "The custom fonts of your organization, the same as the Custom Fonts settings of Studio: list, rename, delete and download them. Fonts are uploaded in Studio, where you confirm that you have the right to use them. Use the `fontFamily` value of a family (`custom:<id>`) in a subtitle profile to burn subtitles in that font."
+    },
+    {
+      "name": "Pronunciations",
+      "description": "Sets of words with the way to say them, used when text is turned into speech. Members of your organization can read them; the owner or a manager changes them."
+    },
+    {
+      "name": "Glossaries",
+      "description": "Terms and their translations, applied when a recording is translated. Members of your organization can read them; the owner or a manager changes them."
+    },
+    {
+      "name": "Insights",
+      "description": "Questions Studio answers about a recording, such as topics or action items. Members of your organization can read them; the owner or a manager changes them."
+    },
+    {
+      "name": "Safe Communications",
+      "description": "The safe communication checks Studio can run on a recording. List them here, then use their ids when you create a project."
+    },
+    {
+      "name": "Subtitles",
+      "description": "Read and replace the subtitle tracks of a recording (transcription, translation, dubbing), and read their saved versions."
+    },
+    {
+      "name": "Templates",
+      "description": "Saved sets of project settings: languages, preferences and translation settings. Members of your organization can read them; the owner or a manager changes them."
+    },
+    {
+      "name": "Voices",
+      "description": "The saved voices (\"My voices\") of your organization. Use a voice id to dub a speaker with it."
+    },
+    {
+      "name": "Exports",
+      "description": "Get the results as files: subtitles as text or documents, the source media, and the dubbed audio of a segment. A file export can run in the background; poll `GET …/exports/{exportId}` until it is `done`."
+    },
+    {
+      "name": "Results",
+      "description": "The saved results of a recording: summary, custom attributes, insights and safe communications. Order them with `summarize` and `transcribe`; they run in the background."
+    },
+    {
+      "name": "Dubbing audio",
+      "description": "Work on the audio of a dubbed language: bring the dubbing back in line with the translation, merge, split and change the speed of segments, replace the background audio, and read the state of those jobs."
+    },
+    {
+      "name": "Credits",
+      "description": "What an action would cost in credits, before you start it. Nothing is started and nothing is charged."
+    },
+    {
+      "name": "Text to speech",
+      "description": "Turn text into speech with a voice and an engine, and browse the voices: all, recommended and favorites. It does not need a project."
+    },
+    {
+      "name": "Preferences",
+      "description": "Your default settings for new projects: models, translation memory, machine translation profile and text-to-speech engine. A project can change them for itself."
+    }
+  ],
+  "paths": {
+    "/v1/projects": {
+      "$ref": "./paths/projects.json"
+    },
+    "/v1/projects/{id}": {
+      "$ref": "./paths/project.json"
+    },
+    "/v1/subtitle-profiles": {
+      "$ref": "./paths/subtitle-profiles.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/status": {
+      "$ref": "./paths/recording-status.json"
+    },
+    "/v1/pronunciations": {
+      "$ref": "./paths/pronunciations.json"
+    },
+    "/v1/glossaries": {
+      "$ref": "./paths/glossaries.json"
+    },
+    "/v1/insights": {
+      "$ref": "./paths/insights.json"
+    },
+    "/v1/safe-communications": {
+      "$ref": "./paths/safe-communications.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles": {
+      "$ref": "./paths/recording-subtitles.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/translate": {
+      "$ref": "./paths/recording-translate.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/dubbing": {
+      "$ref": "./paths/recording-dubbing.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/context": {
+      "$ref": "./paths/recording-context.json"
+    },
+    "/v1/pronunciations/{id}": {
+      "$ref": "./paths/pronunciation.json"
+    },
+    "/v1/pronunciations/{id}/clone": {
+      "$ref": "./paths/pronunciation-clone.json"
+    },
+    "/v1/pronunciations/{id}/pairs": {
+      "$ref": "./paths/pronunciation-pairs.json"
+    },
+    "/v1/pronunciations/{id}/pairs/{pairId}": {
+      "$ref": "./paths/pronunciation-pair.json"
+    },
+    "/v1/glossaries/{id}": {
+      "$ref": "./paths/glossary.json"
+    },
+    "/v1/glossaries/{id}/clone": {
+      "$ref": "./paths/glossary-clone.json"
+    },
+    "/v1/insights/{id}": {
+      "$ref": "./paths/insight.json"
+    },
+    "/v1/insights/{id}/clone": {
+      "$ref": "./paths/insight-clone.json"
+    },
+    "/v1/insights/{id}/items": {
+      "$ref": "./paths/insight-items.json"
+    },
+    "/v1/insights/{id}/items/{itemId}": {
+      "$ref": "./paths/insight-item.json"
+    },
+    "/v1/subtitle-profiles/{id}": {
+      "$ref": "./paths/subtitle-profile.json"
+    },
+    "/v1/subtitle-profiles/{id}/clone": {
+      "$ref": "./paths/subtitle-profile-clone.json"
+    },
+    "/v1/templates": {
+      "$ref": "./paths/templates.json"
+    },
+    "/v1/templates/{id}": {
+      "$ref": "./paths/template.json"
+    },
+    "/v1/templates/{id}/clone": {
+      "$ref": "./paths/template-clone.json"
+    },
+    "/v1/voices/clones": {
+      "$ref": "./paths/voice-clones.json"
+    },
+    "/v1/voices/clones/{id}": {
+      "$ref": "./paths/voice-clone.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/speakers": {
+      "$ref": "./paths/recording-speakers.json"
+    },
+    "/v1/projects/{id}/archive": {
+      "$ref": "./paths/project-archive.json"
+    },
+    "/v1/projects/{id}/copy": {
+      "$ref": "./paths/project-copy.json"
+    },
+    "/v1/projects/{id}/pronunciations/pairs": {
+      "$ref": "./paths/project-pronunciation-pairs.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/exports": {
+      "$ref": "./paths/recording-exports.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/exports/subtitles": {
+      "$ref": "./paths/recording-subtitle-export.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/exports/{exportId}": {
+      "$ref": "./paths/recording-export.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/source-files": {
+      "$ref": "./paths/recording-source-files.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/segment-audio": {
+      "$ref": "./paths/recording-segment-audio.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/summary": {
+      "$ref": "./paths/recording-summary.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/custom-attributes": {
+      "$ref": "./paths/recording-custom-attributes.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/safe-communications": {
+      "$ref": "./paths/recording-safe-communications.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/insights": {
+      "$ref": "./paths/recording-insights.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/summarize": {
+      "$ref": "./paths/recording-summarize.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/transcribe": {
+      "$ref": "./paths/recording-transcribe.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/segment-audio-speed": {
+      "$ref": "./paths/recording-segment-audio-speed.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/segment-audio-split": {
+      "$ref": "./paths/recording-segment-audio-split.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/segment-audio-merge": {
+      "$ref": "./paths/recording-segment-audio-merge.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/background-audio": {
+      "$ref": "./paths/recording-background-audio.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}": {
+      "$ref": "./paths/recording.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/sync-dubbing": {
+      "$ref": "./paths/recording-sync-dubbing.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/dubbing-sync-status": {
+      "$ref": "./paths/recording-dubbing-sync-status.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/dubbing-segment-status": {
+      "$ref": "./paths/recording-dubbing-segment-status.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles/versions": {
+      "$ref": "./paths/recording-subtitle-versions.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles/versions/{versionId}": {
+      "$ref": "./paths/recording-subtitle-version.json"
+    },
+    "/v1/projects/{projectId}/recordings/upload-url": {
+      "$ref": "./paths/recording-upload-url.json"
+    },
+    "/v1/projects/{projectId}/recordings": {
+      "$ref": "./paths/recording-add.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/estimates": {
+      "$ref": "./paths/recording-estimates.json"
+    },
+    "/v1/tts/engines": {
+      "$ref": "./paths/tts-engines.json"
+    },
+    "/v1/tts/voices": {
+      "$ref": "./paths/tts-voices.json"
+    },
+    "/v1/tts/voices/filters": {
+      "$ref": "./paths/tts-voice-filters.json"
+    },
+    "/v1/tts/voices/{voiceId}": {
+      "$ref": "./paths/tts-voice.json"
+    },
+    "/v1/tts/speech": {
+      "$ref": "./paths/tts-speech.json"
+    },
+    "/v1/tts/voices/suggested": {
+      "$ref": "./paths/tts-voices-suggested.json"
+    },
+    "/v1/tts/voices/favorites": {
+      "$ref": "./paths/tts-voices-favorites.json"
+    },
+    "/v1/tts/voices/favorites/{voiceId}": {
+      "$ref": "./paths/tts-voices-favorite.json"
+    },
+    "/v1/preferences": {
+      "$ref": "./paths/preferences.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/cultural-review": {
+      "$ref": "./paths/recording-cultural-review.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles/shorten": {
+      "$ref": "./paths/recording-subtitles-shorten.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles/retranslate": {
+      "$ref": "./paths/recording-subtitles-retranslate.json"
+    },
+    "/v1/projects/{projectId}/recordings/{recordingId}/subtitles/upload": {
+      "$ref": "./paths/recording-subtitle-upload.json"
+    },
+    "/v1/pronunciations/import": {
+      "$ref": "./paths/pronunciation-import.json"
+    },
+    "/v1/pronunciations/import/confirm": {
+      "$ref": "./paths/pronunciation-import-confirm.json"
+    },
+    "/v1/fonts": {
+      "$ref": "./paths/fonts.json"
+    },
+    "/v1/fonts/families/{id}": {
+      "$ref": "./paths/font-family.json"
+    },
+    "/v1/fonts/{id}": {
+      "$ref": "./paths/font.json"
+    },
+    "/v1/fonts/{id}/file": {
+      "$ref": "./paths/font-file.json"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The same Phrase Platform API token as `Authorization: Bearer <token>`. Use either this or `X-API-Key`, not both. Errors are the same: `401` for a token that is missing, invalid or expired, `403` for an action that is not allowed."
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Your Phrase Platform API token in the `X-API-Key` header. A missing, invalid or expired token is answered with `401`. `403` means the token is valid but the action is not allowed for it."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "$ref": "./schemas/ErrorResponse.json"
+      },
+      "CreateProjectSubtitleProfile": {
+        "$ref": "./schemas/CreateProjectSubtitleProfile.json"
+      },
+      "CreateProjectPronunciation": {
+        "$ref": "./schemas/CreateProjectPronunciation.json"
+      },
+      "UpdateProjectRequest": {
+        "$ref": "./schemas/UpdateProjectRequest.json"
+      },
+      "SubtitleWord": {
+        "$ref": "./schemas/SubtitleWord.json"
+      },
+      "SubtitleSegment": {
+        "$ref": "./schemas/SubtitleSegment.json"
+      },
+      "UpdateSubtitleRequest": {
+        "$ref": "./schemas/UpdateSubtitleRequest.json"
+      },
+      "TranslateRecordingRequest": {
+        "$ref": "./schemas/TranslateRecordingRequest.json"
+      },
+      "AddDubbingRequest": {
+        "$ref": "./schemas/AddDubbingRequest.json"
+      },
+      "SubtitleSegmentResponseItem": {
+        "$ref": "./schemas/SubtitleSegmentResponseItem.json"
+      },
+      "SubtitleSegmentResponse": {
+        "$ref": "./schemas/SubtitleSegmentResponse.json"
+      },
+      "CueSettings": {
+        "$ref": "./schemas/CueSettings.json"
+      },
+      "SubtitleStyle": {
+        "$ref": "./schemas/SubtitleStyle.json"
+      },
+      "SegmentComment": {
+        "$ref": "./schemas/SegmentComment.json"
+      },
+      "SegmentReview": {
+        "$ref": "./schemas/SegmentReview.json"
+      },
+      "SegmentDubbingMetadata": {
+        "$ref": "./schemas/SegmentDubbingMetadata.json"
+      },
+      "SegmentMetadata": {
+        "$ref": "./schemas/SegmentMetadata.json"
+      },
+      "RecordingContext": {
+        "$ref": "./schemas/RecordingContext.json"
+      },
+      "Pagination": {
+        "$ref": "./schemas/Pagination.json"
+      },
+      "Project": {
+        "$ref": "./schemas/Project.json"
+      },
+      "Recording": {
+        "$ref": "./schemas/Recording.json"
+      },
+      "ProjectGlossary": {
+        "$ref": "./schemas/ProjectGlossary.json"
+      },
+      "ProjectPronunciation": {
+        "$ref": "./schemas/ProjectPronunciation.json"
+      },
+      "ProjectSafeCommunication": {
+        "$ref": "./schemas/ProjectSafeCommunication.json"
+      },
+      "ProjectInsight": {
+        "$ref": "./schemas/ProjectInsight.json"
+      },
+      "ProjectDetail": {
+        "$ref": "./schemas/ProjectDetail.json"
+      },
+      "Glossary": {
+        "$ref": "./schemas/Glossary.json"
+      },
+      "InsightItem": {
+        "$ref": "./schemas/InsightItem.json"
+      },
+      "Insight": {
+        "$ref": "./schemas/Insight.json"
+      },
+      "PronunciationPair": {
+        "$ref": "./schemas/PronunciationPair.json"
+      },
+      "Pronunciation": {
+        "$ref": "./schemas/Pronunciation.json"
+      },
+      "SafeCommunication": {
+        "$ref": "./schemas/SafeCommunication.json"
+      },
+      "SubtitleProfile": {
+        "$ref": "./schemas/SubtitleProfile.json"
+      },
+      "AcceptedResponse": {
+        "$ref": "./schemas/AcceptedResponse.json"
+      },
+      "TaskStatus": {
+        "$ref": "./schemas/TaskStatus.json"
+      },
+      "RecordingStatus": {
+        "$ref": "./schemas/RecordingStatus.json"
+      },
+      "PronunciationPairInput": {
+        "$ref": "./schemas/PronunciationPairInput.json"
+      },
+      "UpdatePronunciationPairRequest": {
+        "$ref": "./schemas/UpdatePronunciationPairRequest.json"
+      },
+      "CreatePronunciationRequest": {
+        "$ref": "./schemas/CreatePronunciationRequest.json"
+      },
+      "UpdatePronunciationRequest": {
+        "$ref": "./schemas/UpdatePronunciationRequest.json"
+      },
+      "CreateGlossaryRequest": {
+        "$ref": "./schemas/CreateGlossaryRequest.json"
+      },
+      "UpdateGlossaryRequest": {
+        "$ref": "./schemas/UpdateGlossaryRequest.json"
+      },
+      "CreateInsightRequest": {
+        "$ref": "./schemas/CreateInsightRequest.json"
+      },
+      "UpdateInsightRequest": {
+        "$ref": "./schemas/UpdateInsightRequest.json"
+      },
+      "CreateInsightItemRequest": {
+        "$ref": "./schemas/CreateInsightItemRequest.json"
+      },
+      "UpdateInsightItemRequest": {
+        "$ref": "./schemas/UpdateInsightItemRequest.json"
+      },
+      "CreateSubtitleProfileRequest": {
+        "$ref": "./schemas/CreateSubtitleProfileRequest.json"
+      },
+      "UpdateSubtitleProfileRequest": {
+        "$ref": "./schemas/UpdateSubtitleProfileRequest.json"
+      },
+      "TemplateSettings": {
+        "$ref": "./schemas/TemplateSettings.json"
+      },
+      "Template": {
+        "$ref": "./schemas/Template.json"
+      },
+      "CreateTemplateRequest": {
+        "$ref": "./schemas/CreateTemplateRequest.json"
+      },
+      "UpdateTemplateRequest": {
+        "$ref": "./schemas/UpdateTemplateRequest.json"
+      },
+      "VoiceClone": {
+        "$ref": "./schemas/VoiceClone.json"
+      },
+      "UpdateVoiceCloneRequest": {
+        "$ref": "./schemas/UpdateVoiceCloneRequest.json"
+      },
+      "RecordingSpeaker": {
+        "$ref": "./schemas/RecordingSpeaker.json"
+      },
+      "AssignSpeakerVoicesRequest": {
+        "$ref": "./schemas/AssignSpeakerVoicesRequest.json"
+      },
+      "ExternalTextExport": {
+        "$ref": "./schemas/ExternalTextExport.json"
+      },
+      "CreateExportRequest": {
+        "$ref": "./schemas/CreateExportRequest.json"
+      },
+      "Export": {
+        "$ref": "./schemas/Export.json"
+      },
+      "SourceFiles": {
+        "$ref": "./schemas/SourceFiles.json"
+      },
+      "SegmentAudio": {
+        "$ref": "./schemas/SegmentAudio.json"
+      },
+      "RecordingSummary": {
+        "$ref": "./schemas/RecordingSummary.json"
+      },
+      "CustomAttribute": {
+        "$ref": "./schemas/CustomAttribute.json"
+      },
+      "SafeCommunicationResult": {
+        "$ref": "./schemas/SafeCommunicationResult.json"
+      },
+      "InsightResult": {
+        "$ref": "./schemas/InsightResult.json"
+      },
+      "SummarizeRecordingRequest": {
+        "$ref": "./schemas/SummarizeRecordingRequest.json"
+      },
+      "TranscribeRecordingRequest": {
+        "$ref": "./schemas/TranscribeRecordingRequest.json"
+      },
+      "SegmentAudioSpeedRequest": {
+        "$ref": "./schemas/SegmentAudioSpeedRequest.json"
+      },
+      "SegmentAudioSpeedResponse": {
+        "$ref": "./schemas/SegmentAudioSpeedResponse.json"
+      },
+      "SegmentAudioSplitRequest": {
+        "$ref": "./schemas/SegmentAudioSplitRequest.json"
+      },
+      "SegmentAudioMergeRequest": {
+        "$ref": "./schemas/SegmentAudioMergeRequest.json"
+      },
+      "BackgroundAudioUpload": {
+        "$ref": "./schemas/BackgroundAudioUpload.json"
+      },
+      "BackgroundAudioResponse": {
+        "$ref": "./schemas/BackgroundAudioResponse.json"
+      },
+      "AddSpeakerRequest": {
+        "$ref": "./schemas/AddSpeakerRequest.json"
+      },
+      "RenameSpeakerRequest": {
+        "$ref": "./schemas/RenameSpeakerRequest.json"
+      },
+      "DeleteSpeakerRequest": {
+        "$ref": "./schemas/DeleteSpeakerRequest.json"
+      },
+      "SyncDubbingRequest": {
+        "$ref": "./schemas/SyncDubbingRequest.json"
+      },
+      "DubbingSyncStatus": {
+        "$ref": "./schemas/DubbingSyncStatus.json"
+      },
+      "DubbingSegmentStatuses": {
+        "$ref": "./schemas/DubbingSegmentStatuses.json"
+      },
+      "SubtitleVersion": {
+        "$ref": "./schemas/SubtitleVersion.json"
+      },
+      "UploadUrlRequest": {
+        "$ref": "./schemas/UploadUrlRequest.json"
+      },
+      "UploadUrl": {
+        "$ref": "./schemas/UploadUrl.json"
+      },
+      "AddRecordingRequest": {
+        "$ref": "./schemas/AddRecordingRequest.json"
+      },
+      "AddedRecording": {
+        "$ref": "./schemas/AddedRecording.json"
+      },
+      "CreditBalance": {
+        "$ref": "./schemas/CreditBalance.json"
+      },
+      "CostEstimateRequest": {
+        "$ref": "./schemas/CostEstimateRequest.json"
+      },
+      "LanguageCost": {
+        "$ref": "./schemas/LanguageCost.json"
+      },
+      "CostEstimate": {
+        "$ref": "./schemas/CostEstimate.json"
+      },
+      "TtsEngine": {
+        "$ref": "./schemas/TtsEngine.json"
+      },
+      "TtsEngineList": {
+        "$ref": "./schemas/TtsEngineList.json"
+      },
+      "TtsVoice": {
+        "$ref": "./schemas/TtsVoice.json"
+      },
+      "TtsVoicePagination": {
+        "$ref": "./schemas/TtsVoicePagination.json"
+      },
+      "TtsVoiceList": {
+        "$ref": "./schemas/TtsVoiceList.json"
+      },
+      "TtsVoiceFilters": {
+        "$ref": "./schemas/TtsVoiceFilters.json"
+      },
+      "SpeechPronunciation": {
+        "$ref": "./schemas/SpeechPronunciation.json"
+      },
+      "SpeechRequest": {
+        "$ref": "./schemas/SpeechRequest.json"
+      },
+      "TtsVoiceDataList": {
+        "$ref": "./schemas/TtsVoiceDataList.json"
+      },
+      "FavoriteVoiceRequest": {
+        "$ref": "./schemas/FavoriteVoiceRequest.json"
+      },
+      "Preference": {
+        "$ref": "./schemas/Preference.json"
+      },
+      "UpdatePreferenceRequest": {
+        "$ref": "./schemas/UpdatePreferenceRequest.json"
+      },
+      "UpdateRecordingContextRequest": {
+        "$ref": "./schemas/UpdateRecordingContextRequest.json"
+      }
+    }
+  }
+}

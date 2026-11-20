@@ -1,0 +1,119 @@
+{
+  "type": "object",
+  "description": "A Studio project and its summary state.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Project ID.",
+      "format": "uuid",
+      "example": "3f2b8c1e-5a7d-4e9b-8c6a-1d2e3f4a5b6c"
+    },
+    "name": {
+      "type": "string",
+      "description": "Project name.",
+      "example": "Meeting Recording"
+    },
+    "archived": {
+      "type": "boolean",
+      "description": "Whether the project is archived."
+    },
+    "status": {
+      "type": "string",
+      "description": "Current processing status of the project.",
+      "enum": [
+        "ARCHIVED",
+        "PENDING",
+        "IN_PROGRESS",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "example": "IN_PROGRESS"
+    },
+    "firstRecordingId": {
+      "type": "string",
+      "description": "ID of the first recording of the project."
+    },
+    "sourceLanguage": {
+      "type": "string",
+      "description": "Source language code."
+    },
+    "expectedLanguages": {
+      "type": "array",
+      "description": "Union of the additional languages declared on the project's recordings.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "subtitleProfileId": {
+      "type": "string",
+      "description": "ID of the subtitle profile used by the project.",
+      "format": "uuid"
+    },
+    "mediaType": {
+      "type": "string",
+      "description": "Media type of the project.",
+      "enum": [
+        "AUDIO",
+        "VIDEO",
+        "AUDIO_VIDEO"
+      ]
+    },
+    "duration": {
+      "type": "number",
+      "description": "Total duration of the recordings in seconds."
+    },
+    "fileCount": {
+      "type": "integer",
+      "description": "Number of recordings in the project."
+    },
+    "recordingTypes": {
+      "type": "array",
+      "description": "Processing steps that exist on the project.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "TRANSCRIPTION",
+          "TRANSLATION",
+          "DUBBING",
+          "SUMMARY"
+        ]
+      }
+    },
+    "isPublic": {
+      "type": "boolean",
+      "description": "Whether every member of the organization can open the project."
+    },
+    "reviewProgress": {
+      "type": "object",
+      "description": "Review progress per step (`TRANSCRIPTION`, `TRANSLATION`, `DUBBING`) and language, returned by the project list and the project detail. The project detail lists only the steps and languages of your share of a shared project; the project list counts every step and language of the project. Present when the project has reviewable segments.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Counts per language code.",
+        "additionalProperties": {
+          "type": "object",
+          "description": "Segments of one language.",
+          "properties": {
+            "totalSegments": {
+              "type": "integer",
+              "description": "Number of segments of the language."
+            },
+            "reviewedSegments": {
+              "type": "integer",
+              "description": "Number of segments whose review status is `REVIEWED`."
+            }
+          }
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

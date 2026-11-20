@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "targetLanguage": {
+      "type": "string",
+      "description": "Language of the track to translate again.",
+      "example": "es-es"
+    },
+    "segmentIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "description": "Ids of the segments to translate again, at most 50.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dubbing": {
+      "type": "boolean",
+      "default": false,
+      "description": "`true` to translate the dubbing track of the language instead of the subtitle track."
+    }
+  },
+  "required": [
+    "targetLanguage",
+    "segmentIds"
+  ]
+}

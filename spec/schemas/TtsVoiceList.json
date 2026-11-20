@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "description": "A page of voices.",
+  "properties": {
+    "data": {
+      "type": "array",
+      "description": "Voices.",
+      "items": {
+        "$ref": "../schemas/TtsVoice.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../schemas/TtsVoicePagination.json"
+    }
+  },
+  "required": [
+    "data",
+    "pagination"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "description": "Credits your organization has left. Credits are minutes of media.",
+  "properties": {
+    "remainingMinutes": {
+      "type": "integer",
+      "description": "Minutes left. `null` when the plan has no known balance.",
+      "nullable": true
+    },
+    "unlimited": {
+      "type": "boolean",
+      "description": "`true` when the plan has no limit."
+    },
+    "state": {
+      "type": "string",
+      "description": "How the balance stands: `OK`, `WARNING` (running low), `BLOCKED` (no credits left). A blocked organization cannot start transcription, translation, dubbing or text-to-speech; reading, editing the text of subtitles and exporting still work. `null` when unknown.",
+      "nullable": true,
+      "enum": [
+        "OK",
+        "WARNING",
+        "BLOCKED",
+        null
+      ]
+    }
+  },
+  "required": [
+    "remainingMinutes",
+    "unlimited",
+    "state"
+  ]
+}

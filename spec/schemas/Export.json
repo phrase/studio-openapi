@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "description": "An export of a recording: either ready, with its download link, or running, with the url to poll.",
+  "properties": {
+    "exportId": {
+      "type": "string",
+      "description": "Identifies a running export. Absent when the export was ready at once."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type that was requested. Present in the answer to the request."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "done",
+        "failed"
+      ],
+      "description": "`pending`: queued. `in_progress`: being rendered. `done`: ready, see `downloadUrl`. `failed`: stopped, see `errorMessage`."
+    },
+    "progress": {
+      "type": "integer",
+      "description": "Percent done, when known."
+    },
+    "downloadUrl": {
+      "type": "string",
+      "description": "Signed link to the file, valid for three hours. Only when `status` is `done`.",
+      "format": "uri"
+    },
+    "statusUrl": {
+      "type": "string",
+      "description": "Path to poll with `GET` and the same credentials until `status` is `done` or `failed`."
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "Why the export failed. Only when `status` is `failed`."
+    }
+  },
+  "required": [
+    "status"
+  ]
+}

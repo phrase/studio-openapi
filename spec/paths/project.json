@@ -1,0 +1,578 @@
+{
+  "get": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "Get Project Details",
+    "description": "Retrieve one project with its recordings, languages, settings and the shared items it uses. The owner and accounts the project is shared with can read it; a share may leave out steps or languages, which then are missing from the answer. `404` when the project does not exist, `403` when you have no access to it.",
+    "operationId": "getProjectDetails",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Project details retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ProjectDetail.json"
+            },
+            "examples": {
+              "basic_project": {
+                "summary": "Basic project without insights/safe communications",
+                "value": {
+                  "id": "24746a21-bf6a-46c8-872f-8df3c9df1b53",
+                  "name": "<string>",
+                  "archived": false,
+                  "firstRecordingId": "f62368a1-6fe7-4015-a010-3360ab987134",
+                  "sourceLanguage": "en",
+                  "subtitleProfileId": "12c499bb-1ec9-43f2-9e0a-c07486366898",
+                  "mediaType": "AUDIO",
+                  "duration": 11.7,
+                  "fileCount": 1,
+                  "status": "COMPLETED",
+                  "recordingTypes": [
+                    "TRANSCRIPTION"
+                  ],
+                  "createdAt": "2025-11-06T16:27:38.279Z",
+                  "updatedAt": "2025-11-06T16:32:19.742Z",
+                  "recordings": [
+                    {
+                      "id": "f62368a1-6fe7-4015-a010-3360ab987134",
+                      "projectId": "24746a21-bf6a-46c8-872f-8df3c9df1b53",
+                      "name": "audio.wav",
+                      "type": "application/octet-stream",
+                      "extension": "wav",
+                      "sourceLanguage": "en",
+                      "expectedLanguages": [],
+                      "translationLanguages": [],
+                      "dubbingLanguages": [],
+                      "summaryEnabled": false,
+                      "customAttributesEnabled": false,
+                      "sourceDuration": 11.65,
+                      "duration": 11.7,
+                      "createdAt": "2025-11-06T16:27:40.620Z",
+                      "updatedAt": "2025-11-06T16:27:40.620Z",
+                      "insightsEnabled": false,
+                      "safeCommunicationsEnabled": false
+                    }
+                  ],
+                  "pronunciations": [],
+                  "safeCommunications": [],
+                  "insights": []
+                }
+              },
+              "full_project": {
+                "summary": "Project with all features enabled",
+                "value": {
+                  "id": "f372af3c-c0c5-4913-9c65-fa24d66bbc24",
+                  "name": "test glossary fetch",
+                  "archived": false,
+                  "firstRecordingId": "5160671f-3233-43f8-bd84-086bfe7fa13d",
+                  "sourceLanguage": "en",
+                  "subtitleProfileId": "12c499bb-1ec9-43f2-9e0a-c07486366898",
+                  "mediaType": "AUDIO",
+                  "duration": 11.7,
+                  "fileCount": 1,
+                  "status": "COMPLETED",
+                  "recordingTypes": [
+                    "TRANSCRIPTION",
+                    "TRANSLATION",
+                    "DUBBING",
+                    "SUMMARY"
+                  ],
+                  "createdAt": "2025-11-06T16:48:28.959Z",
+                  "updatedAt": "2025-11-06T17:00:00.395Z",
+                  "recordings": [
+                    {
+                      "id": "5160671f-3233-43f8-bd84-086bfe7fa13d",
+                      "projectId": "f372af3c-c0c5-4913-9c65-fa24d66bbc24",
+                      "name": "test-audio.wav",
+                      "type": "audio/wav",
+                      "extension": "wav",
+                      "sourceLanguage": "en",
+                      "expectedLanguages": [],
+                      "translationLanguages": [
+                        "tr"
+                      ],
+                      "dubbingLanguages": [
+                        "tr"
+                      ],
+                      "summaryEnabled": false,
+                      "customAttributesEnabled": false,
+                      "sourceDuration": 11.65,
+                      "duration": 11.7,
+                      "createdAt": "2025-11-06T16:48:31.746Z",
+                      "updatedAt": "2025-11-06T16:48:31.746Z",
+                      "insightsEnabled": true,
+                      "safeCommunicationsEnabled": true
+                    }
+                  ],
+                  "pronunciations": [
+                    {
+                      "id": "f983b484-e1b6-439d-8aca-fd9c29181773",
+                      "name": "english  greeting",
+                      "languageCode": "tr",
+                      "items": [
+                        {
+                          "source": "hello",
+                          "target": "onion"
+                        }
+                      ]
+                    }
+                  ],
+                  "safeCommunications": [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440003",
+                      "name": "Respectful Language",
+                      "description": "Assesses the use of polite, considerate, and civil language while ensuring the absence of derogatory terms, personal attacks, or demeaning phrases towards any individual or group."
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440002",
+                      "name": "Potential Red Flags",
+                      "description": "Identifies content, phrases, or exchanges that could be considered unethical, illegal, or harmful, potentially exposing individuals or organizations to legal, reputational, or security risks."
+                    }
+                  ],
+                  "insights": [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655445001",
+                      "name": "Earnings Call",
+                      "description": "Curated prompts to analyze quarterly earnings calls, focusing on growth drivers, risk factors, and forward-looking guidance to inform strategic decisions.",
+                      "items": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445101",
+                          "name": "Growth and Revenue Drivers",
+                          "content": "Can you elaborate on the primary drivers behind this quarter's revenue growth or decline? Specifically, how do factors such as market demand, pricing changes, new customer acquisition, or product/service mix have impacted the earnings results?"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445102",
+                          "name": "Challenges and Risk Management",
+                          "content": "What were the main challenges faced this quarter, and how have they impacted the financial results? Additionally, how is the company addressing these challenges, and what risk management strategies are being implemented to mitigate potential future risks?"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445103",
+                          "name": "Future Outlook and Strategic Initiatives",
+                          "content": "Based on this quarter's performance and current market trends, what is the company's outlook for the upcoming quarters? Can you provide more details on any planned strategic initiatives or investments that are expected to drive future growth or improve operational efficiency?"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655445002",
+                      "name": "Company Presentation",
+                      "description": "Prompts designed to extract actionable insights from company presentations, covering implementation steps, emerging trends, and lessons learned for better execution.",
+                      "items": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445201",
+                          "name": "Insights on Implementation",
+                          "content": "Based on the strategies or solutions you presented, could you suggest practical steps for implementation in a [specific context relevant to your field or interest]? How do these steps account for common obstacles or industry-specific challenges?"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445202",
+                          "name": "Future Implications and Trends",
+                          "content": "From your perspective, how might the trends or innovations you discussed today evolve over the next few years? What do you foresee as the potential long-term impact on our industry, and how should professionals or organizations prepare to adapt?"
+                        },
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655445203",
+                          "name": "Lessons from Successes and Failures",
+                          "content": "Can you share a personal experience or a case study where the approach you advocated led to significant outcomes, either successful or otherwise? What were the key lessons learned, and how can these insights inform future strategy or decision-making?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request (invalid ID)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid project id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_api_key": {
+                "summary": "Invalid API key",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project exists but is not shared with you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Project not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Project not found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Project not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "Delete Project",
+    "description": "Delete a project with all its recordings, subtitles and files. It cannot be undone. Only the owner may delete a project; for anyone else the answer is `404`.",
+    "operationId": "deleteProject",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "204": {
+        "description": "The project was deleted. The response has no body."
+      },
+      "400": {
+        "description": "Bad Request (invalid ID)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid project id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_api_key": {
+                "summary": "Invalid API key",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Project not found or you don't have access to it",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "not_found": {
+                "summary": "Project not found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Project not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "server_error": {
+                "summary": "Unexpected error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "patch": {
+    "tags": [
+      "Projects"
+    ],
+    "summary": "Update Project",
+    "description": "Update the settings of a project: the models for translation and insights, the machine translation profile and translation memory, the text-to-speech engine, and the sharing visibility. Which of the machine translation profile and the translation memory apply depends on the translation model, as in Studio: `plai` (Phrase Language AI) takes both, chosen by you; `aita` (AI Translation Agent) takes a translation memory, and Studio chooses its machine translation profile; `gpt-5-mini` and `gpt-4o-mini` take neither. Changing the model keeps the settings that still apply and clears the ones that do not; sending a setting that does not apply is refused with `400`. For `aita` Studio looks up the machine translation profile in your Phrase TMS connection and answers `400` when there is none. The model types follow from the models and are not sent. The endpoint is partial: only fields present in the body are written, so a single field can be changed without resending the rest. Authorization is restricted to the project owner and other accounts in the same organization.\n\nThe same call renames the project with `name`. Updating the settings or renaming is for the owner of the project and managers of the organization; for anyone else the answer is `404`.",
+    "operationId": "updateProject",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Project ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/UpdateProjectRequest.json"
+          },
+          "examples": {
+            "assign_translation_resources": {
+              "summary": "Translate with Phrase Language AI, with a translation memory and an MT profile",
+              "value": {
+                "translationModelName": "plai",
+                "translationMemoryId": "tm-uid-123",
+                "mtProfileId": "mt-profile-uid-456"
+              }
+            },
+            "switch_tts_provider": {
+              "summary": "Change the TTS provider used for dubbing",
+              "value": {
+                "ttsProvider": "eleven_v3"
+              }
+            },
+            "change_translation_model": {
+              "summary": "Translate with the AI Translation Agent (Studio chooses the MT profile)",
+              "value": {
+                "translationModelName": "aita",
+                "translationMemoryId": "tm-uid-123"
+              }
+            },
+            "share_project": {
+              "summary": "Make the project visible to every member of the organization",
+              "value": {
+                "isPublic": true
+              }
+            },
+            "gpt_model": {
+              "summary": "Translate with a GPT model (no MT profile or translation memory)",
+              "value": {
+                "translationModelName": "gpt-5-mini"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Project updated successfully"
+      },
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad Request",
+                "value": {
+                  "statusCode": 400,
+                  "message": "Bad Request",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Unauthorized",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Unauthorized",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Project not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "project_not_found": {
+                "summary": "Project not found",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Project not found",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "internal_server_error": {
+                "summary": "Internal server error",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

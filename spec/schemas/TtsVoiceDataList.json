@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "description": "Voices.",
+  "properties": {
+    "data": {
+      "type": "array",
+      "description": "Voices.",
+      "items": {
+        "$ref": "../schemas/TtsVoice.json"
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

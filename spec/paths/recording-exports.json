@@ -1,0 +1,228 @@
+{
+  "post": {
+    "tags": [
+      "Exports"
+    ],
+    "summary": "Export a recording",
+    "description": "Ask for a file that Studio makes from a recording: a video with the subtitles burned in, a dubbed video or dubbed audio, the dubbed audio as stems or per speaker, or the original audio. A file that is ready at once (the original audio, a bilingual Word document) answers `200` with `downloadUrl`. Anything that has to be rendered answers `202` with `statusUrl`: poll it until `status` is `done` and take `downloadUrl`, or `failed` and read `errorMessage`. Asking again for the same file while it renders returns the same `exportId`. Subtitle files are not rendered by a job; read them with `GET .../exports/subtitles`. Needs read access to the steps and languages the file is made from.",
+    "operationId": "createExport",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreateExportRequest.json"
+          },
+          "examples": {
+            "dubbed_audio": {
+              "summary": "Dubbed audio in Spanish",
+              "value": {
+                "type": "dubbed_audio",
+                "dubbingLanguage": "es-es"
+              }
+            },
+            "burned_in": {
+              "summary": "Video with Spanish subtitles burned in",
+              "value": {
+                "type": "burned_in_video",
+                "language": "es-es"
+              }
+            },
+            "dubbed_videos": {
+              "summary": "Dubbed videos in two languages",
+              "value": {
+                "type": "dubbed_videos",
+                "languages": [
+                  "es-es",
+                  "fr-fr"
+                ],
+                "subtitleLanguage": "es-es"
+              }
+            },
+            "bilingual": {
+              "summary": "Bilingual Word document, English and Spanish",
+              "value": {
+                "type": "bilingual_docx",
+                "language": "es-es",
+                "includeTimecode": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "202": {
+        "description": "The export was queued",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Export.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "exportId": "es-es_audio",
+                  "type": "dubbed_audio",
+                  "status": "pending",
+                  "statusUrl": "/v1/projects/6f1d2c3e-8b4a-4c5d-9e7f-123456789abc/recordings/0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d/exports/es-es_audio"
+                }
+              }
+            }
+          }
+        }
+      },
+      "200": {
+        "description": "The file is ready at once",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Export.json"
+            },
+            "examples": {
+              "ready": {
+                "summary": "Source audio",
+                "value": {
+                  "type": "source_audio",
+                  "status": "done",
+                  "downloadUrl": "https://storage.googleapis.com/bucket/file.mp3?X-Goog-Signature=..."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project does not exist or is not shared with you, or your share of the project does not include this step or language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The recording does not exist in this project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

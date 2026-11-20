@@ -1,0 +1,193 @@
+{
+  "post": {
+    "tags": [
+      "Text to speech"
+    ],
+    "summary": "Generate speech",
+    "description": "Speak a text with an engine and a voice and get the audio back. The text is at most 500 characters. Pronunciation is corrected the way dubbing does it: inline `pronunciations` and the sets in `pronunciationIds` are applied, and each engine gets them in the form it takes (see `pronunciationMode` of `GET /v1/tts/engines`). Nothing is saved. At most 30 requests a minute per account, and at most 100,000 characters a day for your whole organization (the voice preview and text-to-speech tool of Studio count against the same budget; it resets at 00:00 UTC); more are refused with `429`. It uses no credits, but an organization that has used up its credits (`balance.state` is `BLOCKED`) is refused with `403`, like the text-to-speech tool of Studio.",
+    "operationId": "createSpeech",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/SpeechRequest.json"
+          },
+          "examples": {
+            "ipa": {
+              "summary": "IPA pronunciation",
+              "value": {
+                "text": "Phrase is hosted with SQL.",
+                "voiceId": "49b2c280-1604-4fa9-8f79-30c08f87edd5",
+                "engine": "eleven_v3",
+                "pronunciations": [
+                  {
+                    "source": "Phrase",
+                    "target": "freɪz",
+                    "notation": "ipa"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The audio.",
+        "content": {
+          "audio/mpeg": {
+            "schema": {
+              "type": "string",
+              "format": "binary"
+            },
+            "examples": {
+              "audio": {
+                "summary": "MP3 audio bytes",
+                "value": "<binary mp3 audio>"
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Your organization has no credits left (`No remaining minutes available`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "blocked": {
+                "summary": "No credits left",
+                "value": {
+                  "success": false,
+                  "statusCode": 403,
+                  "message": "No remaining minutes available",
+                  "timestamp": "2025-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too many requests: 30 a minute per account, or the daily limit of 100,000 characters of your organization is reached.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e429": {
+                "summary": "Too many requests: 30 a minute per account.",
+                "value": {
+                  "statusCode": 429,
+                  "message": "ThrottlerException: Too Many Requests",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              },
+              "daily_limit": {
+                "summary": "The daily character limit of the organization is reached.",
+                "value": {
+                  "statusCode": 429,
+                  "message": "The daily text-to-speech limit of 100000 characters is reached for your organization. It resets at 00:00 UTC.",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

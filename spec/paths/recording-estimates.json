@@ -1,0 +1,203 @@
+{
+  "post": {
+    "tags": [
+      "Credits"
+    ],
+    "summary": "Estimate the cost of an action",
+    "description": "Price a `translate`, `dubbing` or `transcribe` before you start it. Only `translate` costs credits. `transcribe` here is a retranscription of a recording that exists, which is free; the first transcription is charged when the recording is added and has no estimate. Nothing is started and nothing is charged. A language that is already translated costs `0`. The source language of the recording cannot be translated into: asking for it answers `400`. A new language costs credits even when you provide its subtitles yourself. Needs the same access as the action itself. The answer works for an organization without credits too: `allowed` is then `false` and `balance.state` is `BLOCKED`.",
+    "operationId": "createCostEstimate",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "description": "Project ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "recordingId",
+        "in": "path",
+        "required": true,
+        "description": "Recording ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CostEstimateRequest.json"
+          },
+          "examples": {
+            "translate": {
+              "summary": "Two new languages",
+              "value": {
+                "action": "translate",
+                "languages": [
+                  "de-de",
+                  "fr-fr"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "The estimate",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/CostEstimate.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "action": "translate",
+                  "unit": "minutes",
+                  "minutes": 2,
+                  "perLanguage": [
+                    {
+                      "language": "de-de",
+                      "minutes": 1,
+                      "reason": "new_language"
+                    },
+                    {
+                      "language": "fr-fr",
+                      "minutes": 1,
+                      "reason": "new_language"
+                    }
+                  ],
+                  "balance": {
+                    "remainingMinutes": 8058,
+                    "unlimited": false,
+                    "state": "WARNING"
+                  },
+                  "enoughCredits": true,
+                  "allowed": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden: the project is not shared with you, or your share does not include this step or language.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e403": {
+                "summary": "Forbidden: you may not change this item.",
+                "value": {
+                  "statusCode": 403,
+                  "message": "You are not authorized to modify this item",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "The recording does not exist in this project.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "get": {
+    "tags": [
+      "Templates"
+    ],
+    "summary": "Get templates",
+    "description": "Retrieve the project templates of your organization. A template is a saved set of project settings. The translation management ids inside come from the TMS. Members of the organization can read every item of the organization.",
+    "operationId": "getTemplates",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Templates retrieved",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Items.",
+                  "items": {
+                    "$ref": "../schemas/Template.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "data": [
+                    {
+                      "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                      "name": "Spanish dubbing",
+                      "description": "Translate and dub into Spanish",
+                      "settings": {
+                        "sourceLanguage": "en",
+                        "translation": {
+                          "languages": [
+                            "es-es"
+                          ]
+                        },
+                        "dubbing": {
+                          "languages": [
+                            "es-es"
+                          ]
+                        }
+                      },
+                      "createdAt": "2026-01-01T00:00:00.000Z",
+                      "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 1,
+                    "total": 1,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Templates"
+    ],
+    "summary": "Create a template",
+    "description": "Create a project template. Every dubbing language must also be a translation language or the source language; otherwise the call is rejected with `400`. What a template stores has to work when a project is made from it, so the settings are checked when you save them: `glossaryId`, `subtitleProfileId`, the ids in `translation.subtitleProfiles` and in `dubbing.pronunciations` must be items your organization can see, otherwise the call is rejected with `400` (`<field> refers to something that is not available to your organization: <id>`); the translation `preferences` follow the rules of the project settings (a translation model from the allowed choices, a machine translation profile only with a model that takes one, a translation memory only with a Phrase AI model). Returns the created template.",
+    "operationId": "createTemplate",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreateTemplateRequest.json"
+          },
+          "examples": {
+            "template": {
+              "summary": "Translate and dub into Spanish",
+              "value": {
+                "name": "Spanish dubbing",
+                "description": "Translate and dub into Spanish",
+                "settings": {
+                  "sourceLanguage": "en",
+                  "translation": {
+                    "languages": [
+                      "es-es"
+                    ]
+                  },
+                  "dubbing": {
+                    "languages": [
+                      "es-es"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Template created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Template.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Spanish dubbing",
+                  "description": "Translate and dub into Spanish",
+                  "settings": {
+                    "sourceLanguage": "en",
+                    "translation": {
+                      "languages": [
+                        "es-es"
+                      ]
+                    },
+                    "dubbing": {
+                      "languages": [
+                        "es-es"
+                      ]
+                    }
+                  },
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

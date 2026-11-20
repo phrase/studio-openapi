@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "description": "A list of terms that is kept untranslated or translated in a fixed way.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Glossary ID.",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Glossary name."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the glossary is for. Null when none was given.",
+      "nullable": true
+    },
+    "items": {
+      "type": "string",
+      "description": "Glossary terms, one per line."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the glossary can be applied to projects."
+    },
+    "default": {
+      "type": "boolean",
+      "description": "True for items that Studio provides to every account. They cannot be edited."
+    },
+    "shared": {
+      "type": "boolean",
+      "description": "True for items that belong to another account of your organization; false for items you own and for Studio's defaults."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation time.",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update time.",
+      "format": "date-time"
+    }
+  }
+}

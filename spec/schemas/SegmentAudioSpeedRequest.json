@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "description": "A new duration for the dubbed audio of one segment.",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "Dubbing language."
+    },
+    "segmentId": {
+      "type": "string",
+      "description": "Segment to change."
+    },
+    "ttsDuration": {
+      "type": "number",
+      "description": "New duration of the audio in seconds. Shorter is faster speech.",
+      "minimum": 0
+    },
+    "originalTtsDuration": {
+      "type": "number",
+      "description": "Duration of the audio before any speed change, in seconds. Read it from `metadata.dubbing.originalTtsDuration` of the dubbing subtitles.",
+      "minimum": 0
+    },
+    "reset": {
+      "type": "boolean",
+      "description": "Restore the original speed. Send `originalTtsDuration` as `ttsDuration` with it."
+    },
+    "segmentStart": {
+      "type": "number",
+      "description": "Start of the segment in seconds.",
+      "minimum": 0
+    },
+    "segmentEnd": {
+      "type": "number",
+      "description": "End of the segment in seconds.",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "language",
+    "segmentId",
+    "ttsDuration",
+    "originalTtsDuration"
+  ]
+}

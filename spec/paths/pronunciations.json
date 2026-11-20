@@ -1,0 +1,261 @@
+{
+  "get": {
+    "tags": [
+      "Pronunciations"
+    ],
+    "summary": "Get Pronunciations",
+    "description": "Retrieve the pronunciation sets of your organization, with their pairs. Members of the organization can read every item of the organization.",
+    "operationId": "getPronunciations",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Pronunciations retrieved successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "description": "Pronunciation sets you can use.",
+                  "items": {
+                    "$ref": "../schemas/Pronunciation.json"
+                  }
+                },
+                "pagination": {
+                  "$ref": "../schemas/Pagination.json"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            },
+            "examples": {
+              "example": {
+                "summary": "Sample response",
+                "value": {
+                  "data": [
+                    {
+                      "id": "f983b484-e1b6-439d-8aca-fd9c29181773",
+                      "name": "english  greeting",
+                      "description": "test",
+                      "active": true,
+                      "createdAt": "2025-10-13T10:53:12.400Z",
+                      "updatedAt": "2025-10-13T10:53:12.400Z",
+                      "items": [
+                        {
+                          "id": "03e75ff0-50f2-493c-a46b-b0f4101e5850",
+                          "source": "hello",
+                          "target": "onion",
+                          "notation": "plain",
+                          "language": "en"
+                        }
+                      ]
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "pageSize": 1,
+                    "total": 1,
+                    "totalPages": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "tags": [
+      "Pronunciations"
+    ],
+    "summary": "Create a pronunciation set",
+    "description": "Create a pronunciation set. With `pairs` the set and all its pairs are created in one call (up to 10000), which is the way to load a whole list before dubbing. Members of the organization can read every item of the organization. Returns the created set with the ids of its pairs.",
+    "operationId": "createPronunciation",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../schemas/CreatePronunciationRequest.json"
+          },
+          "examples": {
+            "bulk": {
+              "summary": "A set with its pairs in one call",
+              "value": {
+                "name": "Tech terms",
+                "description": "Words our brand says in a fixed way",
+                "pairs": [
+                  {
+                    "source": "SQL",
+                    "target": "sequel",
+                    "notation": "plain"
+                  },
+                  {
+                    "source": "nginx",
+                    "target": "engine x",
+                    "notation": "plain"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "A pronunciation set created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Pronunciation.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Tech terms",
+                  "description": "Words our brand says in a fixed way",
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "items": [
+                    {
+                      "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                      "source": "SQL",
+                      "target": "sequel",
+                      "notation": "plain",
+                      "language": "en"
+                    }
+                  ],
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

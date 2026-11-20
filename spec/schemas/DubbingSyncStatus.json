@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "description": "Whether a dubbing still matches its translation.",
+  "properties": {
+    "dubbingSubtitlesExist": {
+      "type": "boolean",
+      "description": "True when the language has dubbing subtitles."
+    },
+    "outOfSync": {
+      "type": "boolean",
+      "description": "True when the translation was edited after the dubbing subtitles were made."
+    }
+  },
+  "required": [
+    "dubbingSubtitlesExist",
+    "outOfSync"
+  ]
+}

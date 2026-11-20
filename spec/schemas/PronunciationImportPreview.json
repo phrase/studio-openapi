@@ -1,0 +1,83 @@
+{
+  "type": "object",
+  "description": "What the file contains. Nothing is saved yet.",
+  "properties": {
+    "pairs": {
+      "type": "array",
+      "description": "The pairs that were read.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "The term."
+          },
+          "target": {
+            "type": "string",
+            "description": "How it is said."
+          },
+          "notation": {
+            "type": "string",
+            "enum": [
+              "plain",
+              "ipa"
+            ],
+            "description": "`plain` is the text as it is said, `ipa` is a phonetic transcription."
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "notation"
+        ]
+      }
+    },
+    "invalidRows": {
+      "type": "array",
+      "description": "Rows that could not be read (at most 500 are listed).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "integer",
+            "description": "Row number in the file."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the row could not be read."
+          }
+        },
+        "required": [
+          "row",
+          "reason"
+        ]
+      }
+    },
+    "invalidRowCount": {
+      "type": "integer",
+      "description": "Number of rows that could not be read."
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Notes about the file, for example that a sheet was ignored."
+    },
+    "languageCode": {
+      "type": "string",
+      "description": "Language of the file, when the file says it."
+    },
+    "suggestedName": {
+      "type": "string",
+      "description": "A name that is free in your organization, taken from the file name."
+    }
+  },
+  "required": [
+    "pairs",
+    "invalidRows",
+    "invalidRowCount",
+    "warnings",
+    "suggestedName"
+  ]
+}

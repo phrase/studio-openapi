@@ -1,0 +1,151 @@
+{
+  "get": {
+    "tags": [
+      "Text to speech"
+    ],
+    "summary": "Get a voice",
+    "description": "Retrieve one voice of an engine. Use the id from `GET /v1/tts/voices`, `GET /v1/tts/voices/suggested` or `GET /v1/tts/voices/favorites`, and the same `engine`. An id the engine does not know answers `404`.",
+    "operationId": "getTtsVoice",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "voiceId",
+        "in": "path",
+        "required": true,
+        "description": "Voice id.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "engine",
+        "in": "query",
+        "required": false,
+        "description": "Engine id from `GET /v1/tts/engines`. Defaults to `eleven_v3`. An engine that is not available to your organization is refused with `400`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "eleven_v2",
+            "eleven_v3",
+            "eleven_v4",
+            "eleven_v4_turbo",
+            "azure_tts",
+            "voiseed",
+            "gemini_2_5_flash_tts"
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Voice",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/TtsVoice.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "af-ZA-AdriNeural",
+                  "name": "Adri",
+                  "characteristics": {
+                    "gender": "female"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: a field is missing, empty or has the wrong type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e400": {
+                "summary": "Bad request: a field is missing, empty or has the wrong type.",
+                "value": {
+                  "statusCode": 400,
+                  "message": "name must be a string",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

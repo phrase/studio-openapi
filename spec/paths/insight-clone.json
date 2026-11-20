@@ -1,0 +1,166 @@
+{
+  "post": {
+    "tags": [
+      "Insights"
+    ],
+    "summary": "Clone an insight",
+    "description": "Copy an insight, with its items, into your own insights under the name \"<name> (copy)\", or \"<name> (copy 2)\", \"<name> (copy 3)\" and so on when that name is taken. Any member of the organization may clone. Returns the copy.",
+    "operationId": "cloneInsight",
+    "security": [
+      {
+        "apiKeyAuth": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Insight ID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Copy created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/Insight.json"
+            },
+            "examples": {
+              "example": {
+                "summary": "Example",
+                "value": {
+                  "id": "6f1d2c3e-8b4a-4c5d-9e7f-123456789abc",
+                  "name": "Marketing review (copy)",
+                  "description": "Questions for every video",
+                  "active": true,
+                  "default": false,
+                  "shared": false,
+                  "items": [
+                    {
+                      "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                      "name": "Tone",
+                      "content": "Describe the tone of the video.",
+                      "createdAt": "2026-01-01T00:00:00.000Z",
+                      "updatedAt": "2026-01-01T00:00:00.000Z"
+                    }
+                  ],
+                  "createdAt": "2026-01-01T00:00:00.000Z",
+                  "updatedAt": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad request: an id in the path is not a valid UUID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "invalid_id": {
+                "summary": "Invalid id",
+                "value": {
+                  "statusCode": 400,
+                  "message": "not-a-uuid does not match the required regex",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized (invalid API key).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e401": {
+                "summary": "Unauthorized (invalid API key).",
+                "value": {
+                  "statusCode": 401,
+                  "message": "Authorization failed",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found, or not visible to you.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e404": {
+                "summary": "Not found, or not visible to you.",
+                "value": {
+                  "statusCode": 404,
+                  "message": "Not found",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict: an item with this name already exists in your organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e409": {
+                "summary": "Conflict: an item with this name already exists in your organization.",
+                "value": {
+                  "statusCode": 409,
+                  "message": "An item with the name \"x\" already exists",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../schemas/ErrorResponse.json"
+            },
+            "examples": {
+              "e500": {
+                "summary": "Internal server error.",
+                "value": {
+                  "statusCode": 500,
+                  "message": "Internal server error",
+                  "timestamp": "2026-01-01T00:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
