@@ -4,7 +4,7 @@
       "Dubbing audio"
     ],
     "summary": "Change the speed of a segment",
-    "description": "Set a new duration for the dubbed audio of one segment, which speeds it up or slows it down. To go back, send `reset: true` with `originalTtsDuration` as `ttsDuration`. Needs write access to the dubbing step of the language. The language must already have generated dubbing audio; otherwise the call is refused with `400` (`Not available for this project`). Returns the segment with a link to its new audio.",
+    "description": "Set a new duration for the dubbed audio of one segment, which speeds it up or slows it down. The audio is never slowed below 0.8 times its natural speed, so a much longer duration leaves the end of the segment silent. To go back, send `reset: true` with `originalTtsDuration` as `ttsDuration`. Needs write access to the dubbing step of the language. The language must already have generated dubbing audio; otherwise the call is refused with `400` (`Not available for this project`). Returns the segment with a link to its new audio.",
     "operationId": "updateSegmentAudioSpeed",
     "security": [
       {

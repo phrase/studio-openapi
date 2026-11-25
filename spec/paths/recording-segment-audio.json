@@ -4,7 +4,7 @@
       "Exports"
     ],
     "summary": "Get the dubbed audio of segments",
-    "description": "Signed links to the dubbed audio of the segments that start in a time range, for one language. The range is at most 300 seconds. Needs read access to the dubbing step of the language.",
+    "description": "Signed links to the dubbed audio of the segments that start in a time range, for one language. Needs read access to the dubbing step of the language.",
     "operationId": "getSegmentAudio",
     "security": [
       {
@@ -59,7 +59,7 @@
         "name": "endTime",
         "in": "query",
         "required": false,
-        "description": "End of the range in seconds, after `startTime`, at most 300 seconds later. Defaults to 60.",
+        "description": "End of the range in seconds, after `startTime`. Defaults to 60.",
         "schema": {
           "type": "number",
           "minimum": 0,
