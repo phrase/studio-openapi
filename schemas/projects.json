@@ -12071,7 +12071,7 @@
           "Exports"
         ],
         "summary": "Get the dubbed audio of segments",
-        "description": "Signed links to the dubbed audio of the segments that start in a time range, for one language. The range is at most 300 seconds. Needs read access to the dubbing step of the language.",
+        "description": "Signed links to the dubbed audio of the segments that start in a time range, for one language. Needs read access to the dubbing step of the language.",
         "operationId": "getSegmentAudio",
         "security": [
           {
@@ -12126,7 +12126,7 @@
             "name": "endTime",
             "in": "query",
             "required": false,
-            "description": "End of the range in seconds, after `startTime`, at most 300 seconds later. Defaults to 60.",
+            "description": "End of the range in seconds, after `startTime`. Defaults to 60.",
             "schema": {
               "type": "number",
               "minimum": 0,
@@ -13379,7 +13379,7 @@
           "Dubbing audio"
         ],
         "summary": "Change the speed of a segment",
-        "description": "Set a new duration for the dubbed audio of one segment, which speeds it up or slows it down. To go back, send `reset: true` with `originalTtsDuration` as `ttsDuration`. Needs write access to the dubbing step of the language. The language must already have generated dubbing audio; otherwise the call is refused with `400` (`Not available for this project`). Returns the segment with a link to its new audio.",
+        "description": "Set a new duration for the dubbed audio of one segment, which speeds it up or slows it down. The audio is never slowed below 0.8 times its natural speed, so a much longer duration leaves the end of the segment silent. To go back, send `reset: true` with `originalTtsDuration` as `ttsDuration`. Needs write access to the dubbing step of the language. The language must already have generated dubbing audio; otherwise the call is refused with `400` (`Not available for this project`). Returns the segment with a link to its new audio.",
         "operationId": "updateSegmentAudioSpeed",
         "security": [
           {
